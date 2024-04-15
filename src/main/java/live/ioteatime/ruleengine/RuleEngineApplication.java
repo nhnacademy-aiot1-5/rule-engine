@@ -9,5 +9,4 @@ public class RuleEngineApplication {
     public static void main(String[] args) {
         SpringApplication.run(RuleEngineApplication.class, args);
     }
-
 }
