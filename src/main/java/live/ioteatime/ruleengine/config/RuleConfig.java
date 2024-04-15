@@ -1,5 +1,8 @@
 package live.ioteatime.ruleengine.config;
 
-public class RuleConfig {
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
+public class RuleConfig {
+    // TODO 룰 구현
 }
