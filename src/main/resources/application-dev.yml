@@ -7,4 +7,5 @@ influx:
 mqtt:
     uri: tcp://133.186.153.19:1883
     id: test
-    topic: data/s/nhnacademy/b/gyeongnam/p/+/d/gems-3500/e/+/t/+/ph/+/de/#
+    topic:
+        - data/s/nhnacademy/b/gyeongnam/p/+/d/gems-3500/e/+/t/+/ph/+/de/#
