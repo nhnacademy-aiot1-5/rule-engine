@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.util.ReflectionTestUtils.*;
+import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 @Slf4j
 class RuleChainTest {
@@ -32,8 +31,6 @@ class RuleChainTest {
 
     @InjectMocks
     private RuleChainImpl ruleChain;
-
-
 
     @BeforeEach
     void setUp() {
