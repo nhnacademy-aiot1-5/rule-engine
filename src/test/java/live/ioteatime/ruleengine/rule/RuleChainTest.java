@@ -6,10 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -18,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 
 @Slf4j
 class RuleChainTest {
@@ -49,19 +47,12 @@ class RuleChainTest {
         data.setTopic("adssad");
 
         Answer answer = i -> {
-            //gkfsodyd
             MqttData argument1 = i.getArgument(0, MqttData.class);
             RuleChain argument = i.getArgument(1, RuleChain.class);
             argument.doProcess(argument1);
-            //0번째
             return null;
         };
-        doAnswer(i -> {
-            MqttData argument1 = i.getArgument(0, MqttData.class);
-            RuleChain argument = i.getArgument(1, RuleChain.class);
-            argument.doProcess(argument1);
-            return null;
-        }).when(rule1).doProcess(any(), any());
+
         doAnswer(answer).when(rule1).doProcess(any(), any());
         doAnswer(answer).when(rule2).doProcess(any(), any());
         doAnswer(answer).when(rule3).doProcess(any(), any());
@@ -73,7 +64,7 @@ class RuleChainTest {
         verify(rule2).doProcess(any(MqttData.class), any(RuleChain.class));
         verify(rule3).doProcess(any(MqttData.class), any(RuleChain.class));
 
-        List<Rule> rules = (List<Rule>) ReflectionTestUtils.getField(ruleChain, "rules");
+        List<Rule> rules = (List<Rule>) getField(ruleChain, "rules");
         Assertions.assertTrue(rules.size() == 3);
     }
 }
