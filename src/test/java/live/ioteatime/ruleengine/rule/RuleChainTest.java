@@ -30,7 +30,6 @@ class RuleChainTest {
     @Mock
     private Rule rule3;
 
-    @InjectMocks
     private RuleChainImpl ruleChain;
 
     @BeforeEach
