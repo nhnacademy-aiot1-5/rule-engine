@@ -1,10 +1,14 @@
 influx:
     url: http://localhost:8086
-    org: nhnacademy
-    bucket: nhnacademy
-    token: C8j90xqSSzP2sW9JdmrRdrSGm7FvIi6Wmcj__2w-5kr06H34RbNb3OiGMuaWYH-j7wID21eMLqvueOTrdNr7QA==
+    org: ioteatime
+    bucket: ioteatime
+    token: uv17hZnMWOsJ8VqsnJabIVNyA9S38aAgZ1-P-6vGQoBjgsVcrpkKwqOIukYmT8Y9pnVpOSN9chBFYT9JJs_01g==
 
 mqtt:
     uri: tcp://133.186.153.19:1883
     id: test
     topic: data/s/nhnacademy/b/gyeongnam/p/+/d/gems-3500/e/+/t/+/ph/+/de/#
+
+logging:
+    level:
+        live.ioteatime.ruleengine.callback.MqttCallbackImpl: debug
