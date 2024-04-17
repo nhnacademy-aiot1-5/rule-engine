@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,8 +40,8 @@ class RuleChainTest {
     }
 
     @Test
-    void doProcess() {
-        MqttData data = new MqttData();
+    void doProcess() throws Exception {
+        MqttData data = getMqttData();
         data.setTopic("adssad");
 
         Answer answer = i -> {
@@ -63,5 +64,11 @@ class RuleChainTest {
 
         List<Rule> rules = (List<Rule>) getField(ruleChain, "rules");
         Assertions.assertTrue(rules.size() == 3);
+    }
+
+    private MqttData getMqttData() throws Exception {
+        Constructor<?> constructor = Class.forName("live.ioteatime.ruleengine.domain.MqttData").getDeclaredConstructor();
+        constructor.setAccessible(true);
+        return (MqttData) constructor.newInstance();
     }
 }
