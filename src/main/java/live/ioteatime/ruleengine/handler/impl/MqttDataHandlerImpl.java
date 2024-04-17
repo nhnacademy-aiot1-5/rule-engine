@@ -6,6 +6,9 @@ import live.ioteatime.ruleengine.domain.MqttData;
 import live.ioteatime.ruleengine.handler.MqttDataHandler;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * MQTT 데이터 핸들러입니다.
@@ -13,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
  * 큐에서 데이터를 꺼내 룰체인을 사용하여 데이터를 처리합니다.
  */
 @Slf4j
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MqttDataHandlerImpl implements MqttDataHandler {
 
     private static final AtomicInteger counter = new AtomicInteger(0);
