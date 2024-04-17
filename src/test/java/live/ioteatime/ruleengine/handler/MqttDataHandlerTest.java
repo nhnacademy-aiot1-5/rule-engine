@@ -1,4 +1,4 @@
-package live.ioteatime.ruleengine.handler.impl;
+package live.ioteatime.ruleengine.handler;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -7,14 +7,14 @@ import java.lang.reflect.Constructor;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import live.ioteatime.ruleengine.domain.MqttData;
-import live.ioteatime.ruleengine.handler.MqttDataHandler;
+import live.ioteatime.ruleengine.handler.impl.MqttDataHandlerImpl;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-class MqttDataHandlerImplTest {
+class MqttDataHandlerTest {
 
     BlockingQueue<MqttData> queue;
     RuleChain ruleChain;
