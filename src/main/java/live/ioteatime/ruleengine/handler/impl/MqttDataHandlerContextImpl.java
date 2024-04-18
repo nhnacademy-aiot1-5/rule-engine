@@ -30,12 +30,12 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
 
     private void startHandlers() {
         handlers.forEach(MqttDataHandler::start);
-        log.info("Handlers have been started.");
+        log.info("{} handlers have been started.", handlers.size());
     }
 
     private void createHandlers() {
         IntStream.range(0, totalThread)
                  .forEach(i -> handlers.add(factory.getObject()));
-        log.info("Handlers have been created.");
+        log.info("{} handlers have been created.", handlers.size());
     }
 }
