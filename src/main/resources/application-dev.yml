@@ -2,10 +2,10 @@ influx:
     url: http://localhost:8086
     org: ioteatime
     bucket: ioteatime
-    token: uv17hZnMWOsJ8VqsnJabIVNyA9S38aAgZ1-P-6vGQoBjgsVcrpkKwqOIukYmT8Y9pnVpOSN9chBFYT9JJs_01g==
+    token: qMAlqYdeo8KGX-wgL2M_gsBnzOtuHOspsop_rKUGdOecR4DUMM_EKdrQ248f9xTg5doSSepz4Z_fOejehCtMUA==
 
 mqtt:
     uri: tcp://133.186.153.19:1883
     id: test
-    topic:
+    topics:
         - data/s/nhnacademy/b/gyeongnam/p/+/d/gems-3500/e/+/t/+/ph/+/de/#
