@@ -19,9 +19,9 @@ public class MqttConfig {
         mqttClient.setCallback(mqttCallback);
 
         mqttClient.connect();
-        log.info("mqttClient connect success: " + mqttClientProperties.getUri());
+        log.info("MqttClient connect success: {}", mqttClientProperties.getUri());
         mqttClient.subscribe(mqttClientProperties.getTopic());
-        log.info("mqttClient subscribe success: " + mqttClientProperties.getTopic());
+        log.info("MqttClient subscribe success: {}", mqttClientProperties.getTopic());
 
         return mqttClient;
     }
