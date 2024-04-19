@@ -5,7 +5,7 @@ influx:
     token: ${INFLUXDB_TOKEN}
 
 
-Spring:
+my:
     rabbitmq:
         host: ${RABBITMQ_IP}
         port: ${RABBITMQ_PORT}
