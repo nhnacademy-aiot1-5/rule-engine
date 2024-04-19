@@ -5,7 +5,7 @@ influx:
     token: FZxV6cxYXqdjGoLgpUYbqgGw_1Bc-kQgZBeUv1IQpyAVG9Mhcpqgi_QvfyntVcPzOR7R87q3quQxkBG5jZRe2A==
 
 
-Spring:
+my:
     rabbitmq:
         host: 133.186.241.86
         port: 5672
