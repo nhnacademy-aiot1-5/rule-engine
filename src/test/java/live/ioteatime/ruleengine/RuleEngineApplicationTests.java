@@ -9,5 +9,4 @@ class RuleEngineApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

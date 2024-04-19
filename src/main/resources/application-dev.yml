@@ -1,0 +1,14 @@
+influx:
+    url: http://localhost:8086
+    org: test
+    bucket: test
+    token: FZxV6cxYXqdjGoLgpUYbqgGw_1Bc-kQgZBeUv1IQpyAVG9Mhcpqgi_QvfyntVcPzOR7R87q3quQxkBG5jZRe2A==
+
+
+Spring:
+    rabbitmq:
+        host: 133.186.241.86
+        port: 5672
+        username: admin
+        password: admin
+
