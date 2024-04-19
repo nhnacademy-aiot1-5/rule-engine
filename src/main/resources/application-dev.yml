@@ -1,11 +1,14 @@
 influx:
     url: http://localhost:8086
-    org: ioteatime
-    bucket: ioteatime
-    token: qMAlqYdeo8KGX-wgL2M_gsBnzOtuHOspsop_rKUGdOecR4DUMM_EKdrQ248f9xTg5doSSepz4Z_fOejehCtMUA==
+    org: test
+    bucket: test
+    token: FZxV6cxYXqdjGoLgpUYbqgGw_1Bc-kQgZBeUv1IQpyAVG9Mhcpqgi_QvfyntVcPzOR7R87q3quQxkBG5jZRe2A==
 
-mqtt:
-    uri: tcp://133.186.153.19:1883
-    id: test
-    topics:
-        - data/s/nhnacademy/b/gyeongnam/p/+/d/gems-3500/e/+/t/+/ph/+/de/#
+
+Spring:
+    rabbitmq:
+        host: 133.186.241.86
+        port: 5672
+        username: admin
+        password: admin
+
