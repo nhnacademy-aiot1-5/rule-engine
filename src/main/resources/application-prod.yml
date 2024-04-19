@@ -1,0 +1,14 @@
+influx:
+    url: ${INFLUXDB_IP}
+    org: ${INFLUXDB_ORG}
+    bucket: ${INFLUXDB_BUCKET}
+    token: ${INFLUXDB_TOKEN}
+
+
+Spring:
+    rabbitmq:
+        host: ${RABBITMQ_IP}
+        port: ${RABBITMQ_PORT}
+        username: ${RABBITMQ_USERNAME}
+        password: ${RABBITMQ_PW}
+
