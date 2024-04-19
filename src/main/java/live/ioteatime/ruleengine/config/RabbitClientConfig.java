@@ -9,13 +9,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Getter
 public class RabbitClientConfig {
-    @Value("${Spring.rabbitmq.host}")
+    @Value("${my.rabbitmq.host}")
     private String host;
-    @Value("${Spring.rabbitmq.port}")
+    @Value("${my.rabbitmq.port}")
     private String port;
-    @Value("${Spring.rabbitmq.username}")
+    @Value("${my.rabbitmq.username}")
     private String username;
-    @Value("${Spring.rabbitmq.password}")
+    @Value("${my.rabbitmq.password}")
     private String password;
 
     @Bean
