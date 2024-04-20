@@ -23,7 +23,6 @@ public class RabbitmqConfig {
     private final BlockingQueue<MqttData> blockingQueue;
     private final ObjectMapper mapper;
     private final ConnectionFactory connectionFactory;
-    private final RabbitClientConfig rabbitClientConfig;
 
     /**
      * Rabbitmq 에서 데이터들을 불러와
@@ -31,10 +30,7 @@ public class RabbitmqConfig {
      */
     @Bean
     public void getMessage() throws IOException, TimeoutException {
-        connectionFactory.setHost(rabbitClientConfig.getHost());
-        connectionFactory.setPort(Integer.parseInt(rabbitClientConfig.getPort()));
-        connectionFactory.setUsername(rabbitClientConfig.getUsername());
-        connectionFactory.setPassword(rabbitClientConfig.getPassword());
+
 
         Connection connection = connectionFactory.newConnection();
         Channel channel = connection.createChannel();
