@@ -16,7 +16,7 @@ public class RabbitClientConfig {
         connectionFactory.setHost(rabbitmqProperties.getHost());
         connectionFactory.setUsername(rabbitmqProperties.getUsername());
         connectionFactory.setPassword(rabbitmqProperties.getPassword());
-        connectionFactory.setPort((rabbitmqProperties.getPort()));
+        connectionFactory.setPort(rabbitmqProperties.getPort());
 
         return connectionFactory;
     }
