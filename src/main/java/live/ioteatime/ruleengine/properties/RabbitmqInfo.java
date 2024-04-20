@@ -1,11 +1,13 @@
 package live.ioteatime.ruleengine.properties;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-@Data
+@Setter
+@Getter
 public class RabbitmqInfo {
     @Value("${rabbitmq.host}")
     private String host;
