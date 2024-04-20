@@ -1,7 +1,7 @@
 package live.ioteatime.ruleengine.config;
 
 import com.rabbitmq.client.ConnectionFactory;
-import live.ioteatime.ruleengine.properties.RabbitmqProperties;
+import live.ioteatime.ruleengine.properties.RabbitmqInfo;
 import lombok.Getter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +11,12 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitClientConfig {
 
     @Bean
-    public ConnectionFactory connectionFactory(RabbitmqProperties rabbitmqProperties) {
+    public ConnectionFactory connectionFactory(RabbitmqInfo rabbitmqInfo) {
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost(rabbitmqProperties.getHost());
-        connectionFactory.setUsername(rabbitmqProperties.getUsername());
-        connectionFactory.setPassword(rabbitmqProperties.getPassword());
-        connectionFactory.setPort(Integer.parseInt(rabbitmqProperties.getPort()));
+        connectionFactory.setHost(rabbitmqInfo.getHost());
+        connectionFactory.setUsername(rabbitmqInfo.getUsername());
+        connectionFactory.setPassword(rabbitmqInfo.getPassword());
+        connectionFactory.setPort(Integer.parseInt(rabbitmqInfo.getPort()));
 
         return connectionFactory;
     }
