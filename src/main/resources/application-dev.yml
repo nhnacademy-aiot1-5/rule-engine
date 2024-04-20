@@ -1,3 +1,6 @@
+spring:
+    config:
+        name: dev
 influx:
     url: http://localhost:8086
     org: test

@@ -1,3 +1,6 @@
+spring:
+    config:
+        name: prod
 influx:
     url: ${{ secrets.INFLUXDB_IP }}
     org: ${{ secrets.INFLUXDB_ORG }}
