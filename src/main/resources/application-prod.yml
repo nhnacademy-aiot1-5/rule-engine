@@ -1,14 +1,14 @@
 influx:
-    url: ${{INFLUXDB_IP}}
-    org: ${{INFLUXDB_ORG}}
-    bucket: ${{INFLUXDB_BUCKET}}
-    token: ${{INFLUXDB_TOKEN}}
+    url: ${{ secrets.INFLUXDB_IP }}
+    org: ${{ secrets.INFLUXDB_ORG }}
+    bucket: ${{ secrets.INFLUXDB_BUCKET }}
+    token: ${{ secrets.INFLUXDB_TOKEN }}
 
 
 my:
     rabbitmq:
-        host: ${{RABBITMQ_IP}}
-        port: ${{RABBITMQ_PORT}}
-        username: ${{RABBITMQ_USERNAME}}
-        password: ${{RABBITMQ_PW}}
+        host: ${{ secrets.RABBITMQ_IP }}
+        port: ${{ secrets.RABBITMQ_PORT }}
+        username: ${{ secrets.RABBITMQ_USERNAME }}
+        password: ${{ secrets.RABBITMQ_PW }}
 
