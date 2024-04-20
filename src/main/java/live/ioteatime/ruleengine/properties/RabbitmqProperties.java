@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class RabbitmqProperties {
     private String host;
-   private String port;
+   private int port;
     private String username;
     private String password;
 }
