@@ -5,10 +5,9 @@ influx:
     token: ${{ secrets.INFLUXDB_TOKEN }}
 
 
-my:
-    rabbitmq:
-        host: ${{ secrets.RABBITMQ_IP }}
-        port: ${{ secrets.RABBITMQ_PORT }}
-        username: ${{ secrets.RABBITMQ_USERNAME }}
-        password: ${{ secrets.RABBITMQ_PW }}
+rabbitmq:
+    host: ${{ secrets.RABBITMQ_IP }}
+    port: ${{ secrets.RABBITMQ_PORT }}
+    username: ${{ secrets.RABBITMQ_USERNAME }}
+    password: ${{ secrets.RABBITMQ_PW }}
 
