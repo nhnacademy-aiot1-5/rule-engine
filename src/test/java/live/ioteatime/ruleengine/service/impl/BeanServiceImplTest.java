@@ -28,9 +28,10 @@ class BeanServiceImplTest {
         beanSet.setRabbitmqExchange("restTopic");
         beanSet.setRabbitmqRoutingKey("data/#");
 
-       File act= beanService.createConfig(beanSet, tempDir.getAbsolutePath() + File.separator);
+       String act= beanService.createConfig(beanSet, tempDir.getAbsolutePath() + File.separator);
+        File file = new File(act);
 
-        assertNotNull(act);
-        assertTrue(act.isFile());
+        assertNotNull(file);
+        assertTrue(file.exists());
     }
 }

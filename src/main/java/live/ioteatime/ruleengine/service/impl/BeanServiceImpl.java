@@ -14,7 +14,7 @@ import java.io.IOException;
 @Slf4j
 public class BeanServiceImpl implements BeanService {
     @Override
-    public File createConfig(BeanSet beanSet,String path) {
+    public String createConfig(BeanSet beanSet,String path) {
         String fileName = "application-"+beanSet.getMqttId()+".properties";
         File file = new File(path+fileName);
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -32,6 +32,6 @@ public class BeanServiceImpl implements BeanService {
         } catch (IOException e) {
             log.error("Create FIle false {}", e.getMessage());
         }
-        return file;
+        return file.getPath();
     }
 }
