@@ -23,7 +23,7 @@ public class RabbitClientConfig {
         connectionFactory.setHost(host);
         connectionFactory.setUsername(username);
         connectionFactory.setPassword(password);
-        connectionFactory.setPort(Integer.parseInt(port));
+        connectionFactory.setPort(Integer.parseInt(port.trim()));
 
         return connectionFactory;
     }
