@@ -21,9 +21,9 @@ public class RabbitClientConfig {
     public ConnectionFactory connectionFactory() {
         ConnectionFactory connectionFactory = new ConnectionFactory();
         connectionFactory.setHost(host);
-        connectionFactory.setUsername(username.trim());
-        connectionFactory.setPassword(password.trim());
-        connectionFactory.setPort(Integer.parseInt(port.trim()));
+        connectionFactory.setUsername(username);
+        connectionFactory.setPassword(password);
+        connectionFactory.setPort(Integer.parseInt(port));
 
         return connectionFactory;
     }
