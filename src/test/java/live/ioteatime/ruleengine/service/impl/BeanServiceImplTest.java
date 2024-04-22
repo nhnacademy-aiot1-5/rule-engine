@@ -9,14 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class BeanServiceImplTest {
 
     @Autowired
     private BeanService beanService;
     @Test
-    void createConfig(@TempDir File tempDir) throws Exception {
+    void createConfig(@TempDir File tempDir){
         BeanSet beanSet = new BeanSet();
         beanSet.setMqttId("testId");
         beanSet.setMqttHost("tcp://localhost:1883");
