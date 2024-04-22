@@ -25,6 +25,17 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
+    - name:
+      run: |
+        echo "INFLUXDB_IP= ${{ secrets.INFLUXDB_IP }}" >> $GITHUB_ENV
+        echo "INFLUXDB_ORG= ${{ secrets.INFLUXDB_ORG }}" >> $GITHUB_ENV
+        echo "INFLUXDB_BUCKET= ${{ secrets.INFLUXDB_BUCKET }}" >> $GITHUB_ENV
+        echo "INFLUXDB_TOKEN= ${{ secrets.INFLUXDB_TOKEN }}" >> $GITHUB_ENV
+        echo "RABBITMQ_IP= ${{ secrets.RABBITMQ_IP }}" >> $GITHUB_ENV
+        echo "RABBITMQ_PORT= ${{ secrets.RABBITMQ_PORT }}" >> $GITHUB_ENV
+        echo "RABBITMQ_USERNAME= ${{ secrets.RABBITMQ_USERNAME }}" >> $GITHUB_ENV
+        echo "RABBITMQ_PW= ${{ secrets.RABBITMQ_PW }}" >> $GITHUB_ENV
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
