@@ -31,7 +31,6 @@ public class RabbitmqConfig {
     @Bean
     public void getMessage() throws IOException, TimeoutException {
 
-
         Connection connection = connectionFactory.newConnection();
         Channel channel = connection.createChannel();
         log.info("RabbitMQ connection established");
