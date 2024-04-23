@@ -13,6 +13,7 @@ import java.io.IOException;
 @Service
 @Slf4j
 public class BeanServiceImpl implements BeanService {
+
     @Override
     public String createConfig(BeanSet beanSet,String path) {
         String fileName = "application-"+beanSet.getMqttId()+".properties";
@@ -33,5 +34,24 @@ public class BeanServiceImpl implements BeanService {
             log.error("Create FIle false {}", e.getMessage());
         }
         return file.getPath();
+    }
+
+
+    @Override
+    public String createFolder(String name, String path) {
+        String folderPath = path+name;
+        File file = new File(folderPath);
+        boolean folderCreated = file.mkdirs();
+        if (!folderCreated) {
+            log.info("exists folder {}", folderPath);
+        }
+        log.info("crate folder {}", folderPath);
+        return folderPath+"/";
+    }
+
+    @Override
+    public String splitFileName(String filePath) {
+        String[] split = filePath.split("/");
+        return split[split.length-1];
     }
 }
