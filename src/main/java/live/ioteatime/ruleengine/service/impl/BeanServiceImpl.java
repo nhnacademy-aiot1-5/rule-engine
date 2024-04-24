@@ -25,7 +25,7 @@ public class BeanServiceImpl implements BeanService {
         String fileName = "application-prod.properties";
         File file = new File(path+fileName);
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("spring.config.name=" + beanSet.getMqttId() + "\n");
+            writer.write("spring.config.name=prod" + "\n");
             writer.write("mqtt.server.uri=" + beanSet.getMqttHost() + "\n");
             writer.write("mqtt.client.id=" + beanSet.getMqttId() + "\n");
             writer.write("mqtt.subscribe.topic=" + beanSet.getMqttTopic() + "\n");
