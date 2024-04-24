@@ -23,29 +23,29 @@ public class JschServiceImpl implements JschService {
     @Override
     public void scpFile(String folderPath,String fileName) {
         String newDirectory = jschProperties.getSavePath()+"/"+fileName;
-        try{
-            JSch jSch = new JSch();
-            jSch.addIdentity(jschProperties.getPrivateKey());
-            Session session = createSession(jSch);
+            try{
+                JSch jSch = new JSch();
+                jSch.addIdentity(jschProperties.getPrivateKey());
+                Session session = createSession(jSch);
 
-            ChannelSftp channel = createChannel(session);
+                ChannelSftp channel = createChannel(session);
 
-            putInstance(folderPath, channel, newDirectory);
-            deleteFolder(folderPath);
+                putInstance(folderPath, channel, newDirectory);
+                deleteFolder(folderPath);
 
-            channel.disconnect();
-            session.disconnect();
+                channel.disconnect();
+                session.disconnect();
 
-        } catch (Exception e) {
-            log.error("scpFile  {} ", e.getMessage());
-        }
+            } catch (Exception e) {
+                e.getStackTrace();
+            }
     }
 
     private Session createSession(JSch jSch) throws JSchException {
         Session session = jSch.getSession(jschProperties.getUser(), jschProperties.getHost(), 22);
         session.setConfig("StrictHostKeyChecking","no");
         session.connect();
-        log.info("session connect {} ",session.getUserInfo());
+        log.info("session connect {} ",session.getUserName());
         return session;
 
     }

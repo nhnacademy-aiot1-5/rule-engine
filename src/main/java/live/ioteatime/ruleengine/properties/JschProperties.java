@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 public class JschProperties {
 
-    private String keyPath;
+    private String privateKey;
     private String user;
     private String host;
     private String savePath;
