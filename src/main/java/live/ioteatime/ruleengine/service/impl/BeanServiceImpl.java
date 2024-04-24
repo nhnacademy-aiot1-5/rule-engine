@@ -16,7 +16,7 @@ public class BeanServiceImpl implements BeanService {
 
     @Override
     public String createConfig(BeanSet beanSet,String path) {
-        String fileName = "application-"+beanSet.getMqttId()+".properties";
+        String fileName = "application-prod.properties";
         File file = new File(path+fileName);
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("spring.config.name=" + beanSet.getMqttId() + "\n");
