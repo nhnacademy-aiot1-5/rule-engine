@@ -29,7 +29,8 @@ public class JschConfig {
         Session session = jSch.getSession(jschProperties.getUser(), jschProperties.getHost(), 22);
         session.setConfig("StrictHostKeyChecking","no");
         session.connect();
-        log.info("session connect {} ",session.getUserName());
+        log.info("session connect user name {} ",session.getUserName());
+        log.info("session connect  Host {} ",session.getHost());
         return session;
     }
     @Bean
