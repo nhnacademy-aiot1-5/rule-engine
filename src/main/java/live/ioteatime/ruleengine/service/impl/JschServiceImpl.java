@@ -1,8 +1,7 @@
 package live.ioteatime.ruleengine.service.impl;
 
+import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import live.ioteatime.ruleengine.properties.JschProperties;
@@ -19,7 +18,9 @@ import java.util.Objects;
 @Slf4j
 public class JschServiceImpl implements JschService {
     private final JschProperties jschProperties;
-
+    private final ChannelSftp channel;
+    private final Session session;
+    private final ChannelExec channelExec;
     /**
      *
      * @param folderPath 저장할 인스턴스의 디레토리 주소
@@ -30,50 +31,19 @@ public class JschServiceImpl implements JschService {
     public void scpFile(String folderPath,String fileName) {
         String newDirectory = jschProperties.getSavePath()+"/"+fileName;
             try{
-                JSch jSch = new JSch();
-                jSch.addIdentity(jschProperties.getPrivateKey());
-                Session session = createSession(jSch);
-
-                ChannelSftp channel = createChannel(session);
-
                 putInstance(folderPath, channel, newDirectory);
                 deleteFolder(folderPath);
 
+                channelExec.setCommand("./startup.sh "+fileName);
+                channelExec.connect();
+
                 channel.disconnect();
+                channelExec.disconnect();
                 session.disconnect();
 
             } catch (Exception e) {
                 e.getStackTrace();
             }
-    }
-
-    /**
-     *
-     * @param jSch ssh 프로토콜 라이브러리
-     * @return session -> ssh 연결을 나타내는 객체
-     * @throws JSchException
-     *  ssh 연결을 위한 session 객체를 만드는 메서드
-     */
-    private Session createSession(JSch jSch) throws JSchException {
-        Session session = jSch.getSession(jschProperties.getUser(), jschProperties.getHost(), 22);
-        session.setConfig("StrictHostKeyChecking","no");
-        session.connect();
-        log.info("session connect {} ",session.getUserName());
-        return session;
-    }
-
-    /**
-     *
-     * @param session
-     * @return channel
-     * @throws JSchException
-     *  ssh 프로토콜로 파일을 전송, 관리해 주는 채널인 ChannelSftp 를 만드는 메서드
-     */
-    private ChannelSftp createChannel(Session session) throws JSchException {
-        ChannelSftp  channel = (ChannelSftp) session.openChannel("sftp");
-        channel.connect();
-        log.info("Channel connected.");
-        return channel;
     }
 
     /**
