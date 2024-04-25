@@ -8,22 +8,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-//@SpringBootTest
+@SpringBootTest
 class RuleEngineApplicationTests {
 
-//    @MockBean
-//    JSch jSch;
-//
-//    @MockBean
-//    Session Session;
-//
-//    @MockBean
-//    ChannelSftp channelSftp;
-//
-//    @MockBean
-//    ChannelExec channel;
+    @MockBean
+    JSch jSch;
 
-//    @Test
-//    void contextLoads() {
-//    }
+    @MockBean
+    Session Session;
+
+    @MockBean
+    ChannelSftp channelSftp;
+
+    @MockBean
+    ChannelExec channel;
+
+    @Test
+    void contextLoads() {
+    }
 }
