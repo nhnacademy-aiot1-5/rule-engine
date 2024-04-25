@@ -11,11 +11,10 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-@SpringBootTest
+
 class BeanServiceImplTest {
 
-    @Autowired
-    private BeanService beanService;
+    private BeanService beanService =new BeanServiceImpl();
     @Test
     void createConfig(@TempDir File tempDir){
         BeanSet beanSet = new BeanSet();
