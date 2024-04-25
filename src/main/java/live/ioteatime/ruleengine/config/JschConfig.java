@@ -1,6 +1,5 @@
 package live.ioteatime.ruleengine.config;
 
-import com.jcraft.jsch.*;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
