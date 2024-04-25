@@ -31,9 +31,9 @@ public class JschServiceImpl implements JschService {
     public void scpFile(String folderPath,String fileName) {
         String newDirectory = jschProperties.getSavePath()+"/"+fileName;
             try{
-
                 putInstance(folderPath, channel, newDirectory);
                 deleteFolder(folderPath);
+
                 channelExec.setCommand("./startup.sh "+fileName);
                 channelExec.connect();
 
