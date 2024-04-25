@@ -24,6 +24,8 @@ public class JschConfig {
         jSch.addIdentity(jschProperties.getPrivateKey());
         return jSch;
     }
+
+    //TODO Session Manager
     @Bean
     public Session session(JSch jSch) throws JSchException {
         Session session = jSch.getSession(jschProperties.getUser(), jschProperties.getHost(), 22);
@@ -33,6 +35,9 @@ public class JschConfig {
         log.info("session connect  Host {} ",session.getHost());
         return session;
     }
+
+    //TODO Channel Adaptor
+    // boolean scp(session,filepath,destination) , void ssh(session)
     @Bean
     public ChannelSftp channelSftp(Session session) throws JSchException {
         ChannelSftp  channel = (ChannelSftp) session.openChannel("sftp");
@@ -40,6 +45,7 @@ public class JschConfig {
         log.info("Channel connected.");
         return channel;
     }
+
     @Bean
     public ChannelExec channel(Session session) throws JSchException {
         Channel channel = session.openChannel("exec");
