@@ -41,35 +41,4 @@ public class BeanServiceImpl implements BeanService {
         }
         return file.getPath();
     }
-
-    /**
-     *
-     * @param name - 생성할 디렉토리 이름
-     * @param path - 생성할 디렉토리 경로
-     * @return 생성한 디렉토리 경로
-     *  브로커 설정 파일을 담을 디렉토리를 만드는 메서드
-     */
-    @Override
-    public String createFolder(String name, String path) {
-        String folderPath = path+name;
-        File file = new File(folderPath);
-        boolean folderCreated = file.mkdirs();
-        if (!folderCreated) {
-            log.info("exists folder {}", folderPath);
-        }
-        log.info("crate folder {}", folderPath);
-        return folderPath+"/";
-    }
-
-    /**
-     *
-     * @param filePath - 생성한 파일 경로
-     * @return 파일의 이름
-     *  필요없는 부분을 자르고 이름만 만드는 메서드
-     */
-    @Override
-    public String splitFileName(String filePath) {
-        String[] split = filePath.split("/");
-        return split[split.length-1];
-    }
 }

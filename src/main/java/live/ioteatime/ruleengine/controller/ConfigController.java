@@ -23,12 +23,10 @@ public class ConfigController {
 
     @PostMapping("/addBroker")
     public ResponseEntity<String> addBroker(@RequestBody BeanSet beanSet) {
-        String folderPath = beanService.createFolder(beanSet.getMqttId(), path);
 
-       String filePath= beanService.createConfig(beanSet,folderPath);
+       String filePath= beanService.createConfig(beanSet,path);
        log.info("addBroker file:{}",filePath);
-        String fileName = beanService.splitFileName(folderPath);
-        jschService.scpFile(folderPath,fileName);
+        jschService.scpFile(filePath,beanSet.getMqttId());
         return ResponseEntity.ok("Create Properties ");
     }
 }
