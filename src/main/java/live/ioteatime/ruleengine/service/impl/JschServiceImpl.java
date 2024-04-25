@@ -2,101 +2,86 @@ package live.ioteatime.ruleengine.service.impl;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.properties.JschProperties;
 import live.ioteatime.ruleengine.service.JschService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.util.Objects;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class JschServiceImpl implements JschService {
     private final JschProperties jschProperties;
-    private final ChannelSftp channel;
-    private final Session session;
-    private final ChannelExec channelExec;
+    private final JSchManager jSchManager;
+
+    public JschServiceImpl(JschProperties jschProperties, JSchManager jSchManager) {
+        this.jschProperties = jschProperties;
+        this.jSchManager = jSchManager;
+        jSchManager.setJSch();
+    }
+
     /**
-     *
-     * @param folderPath 저장할 인스턴스의 디레토리 주소
+     * @param filePath 저장할 인스턴스의 디레토리 주소
      * @param fileName 저장할 인스턴스의 디렉토리의 이름
-     *  저장할 인스턴스에 scp 보내는 메서드
+     *                 저장할 인스턴스에 scp 보내는 메서드
+     *
      */
     @Override
-    public void scpFile(String folderPath,String fileName) {
-        String newDirectory = jschProperties.getSavePath()+"/"+fileName;
-            try{
-                putInstance(folderPath, channel, newDirectory);
-                deleteFolder(folderPath);
+    public void scpFile(String filePath, String fileName) {
+        String destination = jschProperties.getSavePath() + "/" + fileName;
+        ChannelSftp channel = jSchManager.createChannelSftp();
+        ChannelExec channelExec = jSchManager.createChannelExec();
+        try {
 
-                channelExec.setCommand("./startup.sh "+fileName);
-                channelExec.connect();
+            putInstance(filePath, channel, destination);
 
-                channel.disconnect();
-                channelExec.disconnect();
-                session.disconnect();
+            deleteFolder(filePath);
 
-            } catch (Exception e) {
-                e.getStackTrace();
-            }
+            channelExec.setCommand("./startup.sh " + fileName);
+            channelExec.connect();
+
+        } catch (Exception e) {
+            log.error("scpFile Error {}", e.getMessage());
+        }
     }
 
     /**
-     *
-     * @param folderPath - 디렉토리 경로
-     * @param channel
+     * @param filePath     - 파일 경로
+     * @param channel - 채널
      * @param newDirectory - 저장할 인스턴스의 경로
-     *  디렉토리 경로에있는 디렉토리, 파일 모두 전송하는 메서드
+     *                     디렉토리 경로에있는 디렉토리, 파일 모두 전송하는 메서드
      */
-    private static void putInstance(String folderPath, ChannelSftp channel, String newDirectory) {
-        File folder = new File(folderPath);
+    private static void putInstance(String filePath, ChannelSftp channel, String newDirectory) {
         try {
             channel.mkdir(newDirectory);
-            uploadInstance(folder.listFiles(),newDirectory,channel);
+            uploadInstance(filePath, newDirectory, channel);
         } catch (SftpException e) {
-            log.info("이미 있는 설정 파일입니다. 덮어 씌우기");
-            uploadInstance(folder.listFiles(),newDirectory,channel);
+            log.info("이미 존재하는 설정입니다. 덮어 씌우기");
+            uploadInstance(filePath, newDirectory, channel);
         }
     }
 
-    private static void uploadInstance(File[] files,String folderPath,ChannelSftp channel ){
-        for (File file : Objects.requireNonNull(files)) {
-            if (file.isFile()) {
-                try {
-                    channel.put(file.getAbsolutePath(), folderPath);
-                    log.info("upload {}", file.getAbsolutePath());
-                } catch (SftpException e) {
-                    e.getStackTrace();
-                }
-            }
+    private static void uploadInstance(String filePath, String newDirectory, ChannelSftp channel) {
+        try {
+            channel.put(filePath, newDirectory, ChannelSftp.OVERWRITE);
+            log.info("upload {}", filePath);
+        } catch (SftpException e) {
+            log.error("uploadInstance {}", e.getMessage());
         }
     }
 
     /**
-     *
-     * @param folderPath - 삭제할 디렉토리 경로
-     * 작업 완료후 전송된 디렉토리, 파일을 삭제 하는 메서드
+     * @param filePath - 삭제할 파일 경로
+     *                   작업 완료후 전송된 디렉토리, 파일을 삭제 하는 메서드
      */
-    private static void deleteFolder(String folderPath) {
-        File folder = new File(folderPath);
-        if (folder.isDirectory()) {
-            File[] files = folder.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    deleteFolder(file.getAbsolutePath());
-                }
-            }
-        }
-        if (folder.delete()) {
-        log.info("delete folder {}", folder.getAbsolutePath());
-        }
-        else {
-            log.warn("Failed to delete folder {}", folder.getAbsolutePath());
-        }
+    private static void deleteFolder(String filePath) throws IOException {
+        Files.delete(Path.of(filePath));
+        log.info("deleteFile {}", filePath);
     }
+
 }
