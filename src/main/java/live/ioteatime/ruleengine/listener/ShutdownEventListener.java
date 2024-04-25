@@ -1,8 +1,6 @@
 package live.ioteatime.ruleengine.listener;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.Session;
+import live.ioteatime.ruleengine.manager.JSchManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -18,12 +16,8 @@ public class ShutdownEventListener implements ApplicationListener<ContextClosedE
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
         try {
-            ChannelSftp channelSftp = event.getApplicationContext().getBean(ChannelSftp.class);
-            Session session = event.getApplicationContext().getBean(Session.class);
-            ChannelExec channelExec = event.getApplicationContext().getBean(ChannelExec.class);
-            channelSftp.disconnect();
-            session.disconnect();
-            channelExec.disconnect();
+            JSchManager jSchManager = event.getApplicationContext().getBean(JSchManager.class);
+            jSchManager.disconnect();
         } catch (BeansException e) {
             log.error("ShutdownEventListener {}", e.getMessage());
         }
