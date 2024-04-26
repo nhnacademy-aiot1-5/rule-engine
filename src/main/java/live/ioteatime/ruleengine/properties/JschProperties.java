@@ -13,7 +13,6 @@ public class JschProperties {
     private String user;
     private String host;
     private String savePath;
-    private String filePath;
     private String folderPath;
 
 }
