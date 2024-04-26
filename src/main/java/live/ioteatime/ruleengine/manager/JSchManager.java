@@ -71,8 +71,12 @@ public class JSchManager {
      * 모든 채널 연결 해제 메소드
      */
     public void disconnect() {
-        channelSftp.disconnect();
-        channelExec.disconnect();
+        if (channelSftp != null) {
+            channelSftp.disconnect();
+        }
+        if (channelExec != null) {
+            channelExec.disconnect();
+        }
         log.info("Channel disconnected.");
     }
 
