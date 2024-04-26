@@ -2,28 +2,23 @@ package live.ioteatime.ruleengine.config;
 
 import com.rabbitmq.client.ConnectionFactory;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
+@RequiredArgsConstructor
 public class RabbitClientConfig {
-    @Value("${rabbitmq.host}")
-    private String host;
-    @Value("${rabbitmq.port}")
-    private String port;
-    @Value("${rabbitmq.username}")
-    private String username;
-    @Value("${rabbitmq.password}")
-    private String password;
+    private final RabbitProperties rabbitProperties;
     @Bean
     public ConnectionFactory connectionFactory() {
         ConnectionFactory connectionFactory = new ConnectionFactory();
-        connectionFactory.setHost(host);
-        connectionFactory.setUsername(username);
-        connectionFactory.setPassword(password);
-        connectionFactory.setPort(Integer.parseInt(port));
+        connectionFactory.setHost(rabbitProperties.getHost());
+        connectionFactory.setUsername(rabbitProperties.getUsername());
+        connectionFactory.setPassword(rabbitProperties.getPassword());
+        connectionFactory.setPort(rabbitProperties.getPort());
 
         return connectionFactory;
     }

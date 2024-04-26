@@ -2,7 +2,9 @@ package live.ioteatime.ruleengine.service.impl;
 
 import live.ioteatime.ruleengine.domain.BeanSet;
 import live.ioteatime.ruleengine.service.BeanService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -12,7 +14,9 @@ import java.io.IOException;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class BeanServiceImpl implements BeanService {
+    private final RabbitProperties rabbitProperties;
     /**
      *
      * @param beanSet - 브로커 설정을 위한 변수들
@@ -29,12 +33,12 @@ public class BeanServiceImpl implements BeanService {
             writer.write("mqtt.server.uri=" + beanSet.getMqttHost() + "\n");
             writer.write("mqtt.client.id=" + beanSet.getMqttId() + "\n");
             writer.write("mqtt.subscribe.topic=" + beanSet.getMqttTopic() + "\n");
-            writer.write("spring.rabbitmq.host=" + beanSet.getRabbitmqHost() + "\n");
-            writer.write("spring.rabbitmq.port=" + beanSet.getRabbitmqPort() + "\n");
-            writer.write("spring.rabbitmq.username=" + beanSet.getRabbitmqUsername() + "\n");
-            writer.write("spring.rabbitmq.password=" + beanSet.getRabbitmqPassword() + "\n");
-            writer.write("spring.rabbitmq.template.exchange=" + beanSet.getRabbitmqExchange() + "\n");
-            writer.write("spring.rabbitmq.template.routing-key=" + beanSet.getRabbitmqRoutingKey() + "\n");
+            writer.write("spring.rabbitmq.host=" + rabbitProperties.getHost() + "\n");
+            writer.write("spring.rabbitmq.port=" + rabbitProperties.getPort() + "\n");
+            writer.write("spring.rabbitmq.username=" + rabbitProperties.getUsername() + "\n");
+            writer.write("spring.rabbitmq.password=" + rabbitProperties.getPassword() + "\n");
+            writer.write("spring.rabbitmq.template.exchange=" + rabbitProperties.getTemplate().getExchange() + "\n");
+            writer.write("spring.rabbitmq.template.routing-key=" + rabbitProperties.getTemplate().getRoutingKey() + "\n");
 
         } catch (IOException e) {
             log.error("Create FIle false {}", e.getMessage());
