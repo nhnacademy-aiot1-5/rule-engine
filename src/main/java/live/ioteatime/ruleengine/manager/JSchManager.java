@@ -20,6 +20,10 @@ import javax.annotation.PostConstruct;
 public class JSchManager {
     private final JschProperties jschProperties;
 
+    /**
+     *  처음 빈 생성 직후 자동으로 호출
+     *  정상적으로 세션이 연결 되는지 확인
+     */
     @PostConstruct
     public void sessionCheck() throws CreateJSchSessionException {
         Session session = createSession();
@@ -33,7 +37,8 @@ public class JSchManager {
     }
 
     /**
-     * JSch 초기화 메서드
+     * JSch 초기화 후 세션 생성
+     * @return Session
      */
     public Session createSession() throws CreateJSchSessionException {
         try {
