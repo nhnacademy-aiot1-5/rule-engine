@@ -24,10 +24,6 @@ public class JschServiceImpl implements JschService {
     private final JschProperties jschProperties;
     private final JSchManager jSchManager;
 
-    /**
-     * @param filePath 보낼 파일의 경로
-     * @param fileName 저장할 인스턴스의 디렉토리의 이름
-     */
     @Override
     public void scpFile(String filePath, String fileName) throws CreateJSchSessionException {
         String destinationDir = jschProperties.getSavePath() + "/" + fileName;
@@ -36,8 +32,8 @@ public class JschServiceImpl implements JschService {
         ChannelExec channelExec = jSchManager.createChannelExec(session);
 
         try {
-            putInstance(filePath, channelSftp, destinationDir);
-            deleteFolder(filePath);
+            mkdirAndPut(filePath, channelSftp, destinationDir);
+            deleteFile(filePath);
             giveCommand(fileName, channelExec);
             jschDisconnect(session, channelSftp, channelExec);
         } catch (Exception e) {
@@ -50,17 +46,17 @@ public class JschServiceImpl implements JschService {
      * @param channel        연결한 인스턴스의 채널
      * @param destinationDir 인스턴스에 생성할 디렉토리 경로
      */
-    private static void putInstance(String filePath, ChannelSftp channel, String destinationDir) {
+    private static void mkdirAndPut(String filePath, ChannelSftp channel, String destinationDir) {
         try {
             channel.mkdir(destinationDir);
-            uploadInstance(filePath, destinationDir, channel);
+            putFile(filePath, destinationDir, channel);
         } catch (SftpException e) {
             log.info("이미 존재하는 설정입니다. 덮어 씌우기");
-            uploadInstance(filePath, destinationDir, channel);
+            putFile(filePath, destinationDir, channel);
         }
     }
 
-    private static void uploadInstance(String filePath, String destinationDir, ChannelSftp channel) {
+    private static void putFile(String filePath, String destinationDir, ChannelSftp channel) {
         try {
             channel.put(filePath, destinationDir, ChannelSftp.OVERWRITE);
             log.info("upload {}", filePath);
@@ -73,7 +69,7 @@ public class JschServiceImpl implements JschService {
      * @param filePath - 삭제할 파일 경로
      *                 작업 완료후 전송된 디렉토리, 파일을 삭제 하는 메서드
      */
-    private static void deleteFolder(String filePath) throws IOException {
+    private static void deleteFile(String filePath) throws IOException {
         Files.delete(Path.of(filePath));
         log.info("deleteFile {}", filePath);
     }
