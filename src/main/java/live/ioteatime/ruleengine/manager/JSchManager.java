@@ -29,6 +29,7 @@ public class JSchManager {
         Session session = createSession();
         if (session == null || !session.isConnected()) {
             log.error("session check failed");
+
             return;
         }
         log.info("Session connected. User: {}, Host: {}", session.getUserName(), session.getHost());
@@ -47,6 +48,7 @@ public class JSchManager {
             Session session = jSch.getSession(jschProperties.getUser(), jschProperties.getHost(), 22);
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect();
+
             return session;
         } catch (JSchException e) {
             throw new CreateJSchSessionException("create JSch session failed",e);
@@ -62,9 +64,11 @@ public class JSchManager {
             ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
             channelSftp.connect();
             log.info("ChannelSftp connected.");
+
             return channelSftp;
         } catch (JSchException e) {
             log.error("create ChannelSftp Failed {}", e.getMessage());
+
             return null;
         }
     }
@@ -78,9 +82,11 @@ public class JSchManager {
             ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
             channelExec.setPty(true);
             log.info("ChannelExec connected.");
+
             return channelExec;
         } catch (JSchException e) {
             log.error("createChannelExec Failed {}", e.getMessage());
+
             return null;
         }
     }

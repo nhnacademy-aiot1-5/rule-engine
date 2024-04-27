@@ -23,8 +23,8 @@ public class ConfigController {
 
     @PostMapping("/addBroker")
     public ResponseEntity<String> addBroker(@RequestBody MqttInfo mqttInfo) throws CreateJSchSessionException {
-       String filePath= createProperties.createConfig(mqttInfo,path);
-       log.info("addBroker file:{}",filePath);
+        String filePath = createProperties.createConfig(mqttInfo, path);
+        log.info("addBroker file:{}", filePath);
 
         jschService.scpFile(filePath, mqttInfo.getMqttId());
 

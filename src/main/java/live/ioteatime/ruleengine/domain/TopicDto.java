@@ -12,5 +12,4 @@ public class TopicDto {
     private String type;
     private String phase;
     private String description;
-
 }
