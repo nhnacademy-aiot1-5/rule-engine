@@ -8,7 +8,6 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class MqttData {
-
     @Setter
     private String topic;
     private Long time;

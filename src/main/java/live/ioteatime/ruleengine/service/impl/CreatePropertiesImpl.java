@@ -28,6 +28,7 @@ public class CreatePropertiesImpl implements CreateProperties {
     public String createConfig(MqttInfo mqttInfo, String path) {
         String fileName = "application-prod.properties";
         File file = new File(path + fileName);
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("spring.config.name=prod" + "\n");
             writer.write("mqtt.server.uri=" + mqttInfo.getMqttHost() + "\n");
@@ -42,6 +43,7 @@ public class CreatePropertiesImpl implements CreateProperties {
         } catch (IOException e) {
             log.error("Create FIle false {}", e.getMessage());
         }
+
         return file.getPath();
     }
 
