@@ -2,6 +2,7 @@ package live.ioteatime.ruleengine.service.impl;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.Session;
 import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.properties.JschProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,20 +18,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class JschServiceImplTest {
 
     @Mock
-    public JschProperties properties;
+    JschProperties properties;
     @Mock
-    public JSchManager jSchManager;
+    JSchManager jSchManager;
     @Mock
-    public ChannelSftp channelSftp;
+    Session session;
     @Mock
-    public ChannelExec channelExec;
+    ChannelSftp channelSftp;
+    @Mock
+    ChannelExec channelExec;
     @InjectMocks
-    public JschServiceImpl jschService;
-
+    JschServiceImpl jschService;
     MockedStatic<Files> files;
 
     @BeforeEach
@@ -43,19 +46,20 @@ class JschServiceImplTest {
 
         String destination = "destination";
         String filePath = "filePath";
-        String fileName= "test";
+        String fileName = "test";
         String command = "./startup.sh " + fileName;
         String destinationPaht = destination + "/" + fileName;
 
         when(properties.getSavePath()).thenReturn(destination);
-        when(jSchManager.createChannelSftp()).thenReturn(channelSftp);
-        when(jSchManager.createChannelExec()).thenReturn(channelExec);
+        when(jSchManager.createSession()).thenReturn(session);
+        when(jSchManager.createChannelSftp(session)).thenReturn(channelSftp);
+        when(jSchManager.createChannelExec(session)).thenReturn(channelExec);
 
-        jschService.scpFile(filePath,fileName);
+        jschService.scpFile(filePath, fileName);
 
         verify(channelSftp).mkdir(eq(destinationPaht));
         verify(channelSftp).put(eq(filePath), eq(destinationPaht), eq(ChannelSftp.OVERWRITE));
-        files.verify(()-> Files.delete(eq(Path.of(filePath))));
+        files.verify(() -> Files.delete(eq(Path.of(filePath))));
         verify(channelExec).setCommand((command));
         verify(channelExec).connect();
 
