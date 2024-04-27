@@ -29,7 +29,7 @@ public class RabbitmqConfig {
      * blockingQueue 에 넣는 메소드 입니다.
      */
     @Bean
-    public void getMessage() throws IOException, TimeoutException {
+    public Connection getMessage() throws IOException, TimeoutException {
 
         Connection connection = connectionFactory.newConnection();
         Channel channel = connection.createChannel();
@@ -51,5 +51,6 @@ public class RabbitmqConfig {
             // true = 자동으로 ack 전(작업 완료 신호인 ack가 rabbitmq에 도착해야 큐에서 데이터 삭제)
             channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
             });
+        return connection;
         }
 }
