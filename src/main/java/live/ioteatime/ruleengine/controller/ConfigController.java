@@ -1,6 +1,7 @@
 package live.ioteatime.ruleengine.controller;
 
 import live.ioteatime.ruleengine.domain.BeanSet;
+import live.ioteatime.ruleengine.exception.CreateJSchSessionException;
 import live.ioteatime.ruleengine.service.BeanService;
 import live.ioteatime.ruleengine.service.JschService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,12 @@ public class ConfigController {
     private String path;
 
     @PostMapping("/addBroker")
-    public ResponseEntity<String> addBroker(@RequestBody BeanSet beanSet) {
-
+    public ResponseEntity<String> addBroker(@RequestBody BeanSet beanSet) throws CreateJSchSessionException {
        String filePath= beanService.createConfig(beanSet,path);
        log.info("addBroker file:{}",filePath);
+
         jschService.scpFile(filePath,beanSet.getMqttId());
+
         return ResponseEntity.ok("Create Properties ");
     }
 }
