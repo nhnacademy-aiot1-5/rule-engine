@@ -24,9 +24,10 @@ public class ConfigController {
     @PostMapping("/addBroker")
     public ResponseEntity<String> addBroker(@RequestBody MqttInfo mqttInfo) throws CreateJSchSessionException {
         String filePath = createProperties.createConfig(mqttInfo, path);
+        String command = "./startup.sh ";
         log.info("addBroker file:{}", filePath);
 
-        jschService.scpFile(filePath, mqttInfo.getMqttId());
+        jschService.scpFile(filePath, mqttInfo.getMqttId(), command);
 
         return ResponseEntity.ok("Create Properties ");
     }

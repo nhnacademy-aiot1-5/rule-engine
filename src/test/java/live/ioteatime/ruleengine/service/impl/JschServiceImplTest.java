@@ -47,6 +47,7 @@ class JschServiceImplTest {
         String destination = "destination";
         String filePath = "filePath";
         String fileName = "test";
+        String shName = "./startup.sh ";
         String command = "./startup.sh " + fileName;
         String destinationPaht = destination + "/" + fileName;
 
@@ -55,13 +56,13 @@ class JschServiceImplTest {
         when(jSchManager.createChannelSftp(session)).thenReturn(channelSftp);
         when(jSchManager.createChannelExec(session)).thenReturn(channelExec);
 
-        jschService.scpFile(filePath, fileName);
+        jschService.scpFile(filePath, fileName,shName);
 
         verify(channelSftp).mkdir(eq(destinationPaht));
         verify(channelSftp).put(eq(filePath), eq(destinationPaht), eq(ChannelSftp.OVERWRITE));
         files.verify(() -> Files.delete(eq(Path.of(filePath))));
         verify(channelExec).setCommand((command));
         verify(channelExec).connect();
-
     }
+
 }
