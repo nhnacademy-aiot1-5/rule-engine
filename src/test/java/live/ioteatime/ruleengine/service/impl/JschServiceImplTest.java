@@ -10,13 +10,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class JschServiceImplTest {
-
     @Mock
     JschProperties properties;
     @Mock
@@ -29,35 +33,34 @@ class JschServiceImplTest {
     ChannelExec channelExec;
     @InjectMocks
     JschServiceImpl jschService;
-//    MockedStatic<Files> files;
 
     @BeforeEach
     void setUp() {
-//        files = Mockito.mockStatic(Files.class);
     }
 
     @Test
     void scpFile() throws Exception {
+        try (MockedStatic<Files> files = Mockito.mockStatic(Files.class)){
+            String destination = "destination";
+            String filePath = "filePath";
+            String fileName = "test";
+            String shName = "./startup.sh ";
+            String command = "./startup.sh " + fileName;
+            String destinationPaht = destination + "/" + fileName;
 
-        String destination = "destination";
-        String filePath = "filePath";
-        String fileName = "test";
-        String shName = "./startup.sh ";
-        String command = "./startup.sh " + fileName;
-        String destinationPaht = destination + "/" + fileName;
+            when(properties.getSavePath()).thenReturn(destination);
+            when(jSchManager.createSession()).thenReturn(session);
+            when(jSchManager.createChannelSftp(session)).thenReturn(channelSftp);
+            when(jSchManager.createChannelExec(session)).thenReturn(channelExec);
 
-        when(properties.getSavePath()).thenReturn(destination);
-        when(jSchManager.createSession()).thenReturn(session);
-        when(jSchManager.createChannelSftp(session)).thenReturn(channelSftp);
-        when(jSchManager.createChannelExec(session)).thenReturn(channelExec);
+            jschService.scpFile(filePath, fileName,shName);
 
-        jschService.scpFile(filePath, fileName,shName);
-
-        verify(channelSftp).mkdir(eq(destinationPaht));
-        verify(channelSftp).put(eq(filePath), eq(destinationPaht), eq(ChannelSftp.OVERWRITE));
-//        files.verify(() -> Files.delete(eq(Path.of(filePath))));
-//        verify(channelExec).setCommand((command));
-//        verify(channelExec).connect();
+            verify(channelSftp).mkdir(eq(destinationPaht));
+            verify(channelSftp).put(eq(filePath), eq(destinationPaht), eq(ChannelSftp.OVERWRITE));
+            files.verify(() -> Files.delete(eq(Path.of(filePath))));
+            verify(channelExec).setCommand((command));
+            verify(channelExec).connect();
+        }
     }
 
 }
