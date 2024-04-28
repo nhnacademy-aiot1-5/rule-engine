@@ -25,7 +25,7 @@ public class JschServiceImpl implements JschService {
     private final JSchManager jSchManager;
 
     @Override
-    public void scpFile(String filePath, String fileName) throws CreateJSchSessionException {
+    public void scpFile(String filePath, String fileName, String command) throws CreateJSchSessionException {
         String destinationDir = jschProperties.getSavePath() + "/" + fileName;
         Session session = jSchManager.createSession();
         ChannelSftp channelSftp = jSchManager.createChannelSftp(session);
@@ -34,7 +34,7 @@ public class JschServiceImpl implements JschService {
         try {
             mkdirAndPut(filePath, channelSftp, destinationDir);
             deleteFile(filePath);
-            giveCommand(fileName, channelExec);
+            giveCommand(command, fileName, channelExec);
             jschDisconnect(session, channelSftp, channelExec);
         } catch (Exception e) {
             log.error("scpFile Error {}", e.getMessage());
@@ -75,11 +75,11 @@ public class JschServiceImpl implements JschService {
     }
 
     /**
-     * @param scriptPath  실행 시킬 스크립트 경로
+     * @param fileName    실행 시킬 스크립트 경로
      * @param channelExec commandline 채널
      */
-    private static void giveCommand(String scriptPath, ChannelExec channelExec) throws JSchException {
-        channelExec.setCommand("./startup.sh " + scriptPath);
+    private static void giveCommand(String command, String fileName, ChannelExec channelExec) throws JSchException {
+        channelExec.setCommand(command + fileName);
         channelExec.connect();
     }
 
