@@ -22,4 +22,5 @@ public class InfluxDBConfig {
 
         return influxDBClient;
     }
+
 }

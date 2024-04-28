@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class RabbitClientConfig {
     private final RabbitProperties rabbitProperties;
+
     @Bean
     public ConnectionFactory connectionFactory() {
         ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -22,4 +23,5 @@ public class RabbitClientConfig {
 
         return connectionFactory;
     }
+
 }

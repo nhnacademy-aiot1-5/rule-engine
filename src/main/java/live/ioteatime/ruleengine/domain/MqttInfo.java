@@ -1,10 +1,11 @@
 package live.ioteatime.ruleengine.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Data
-public class BeanSet {
-
+@NoArgsConstructor
+@Getter
+public class MqttInfo {
     private String mqttHost;
     private String mqttId;
     private String mqttTopic;

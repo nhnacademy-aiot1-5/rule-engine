@@ -1,9 +1,9 @@
 package live.ioteatime.ruleengine;
 
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
+import com.influxdb.client.InfluxDBClient;
+import com.rabbitmq.client.Connection;
+import live.ioteatime.ruleengine.manager.JSchManager;
+import live.ioteatime.ruleengine.rule.RuleChain;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -12,16 +12,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 class RuleEngineApplicationTests {
 
     @MockBean
-    JSch jSch;
-
+    RuleChain ruleChain;
     @MockBean
-    Session Session;
-
+    InfluxDBClient influxDBClient;
     @MockBean
-    ChannelSftp channelSftp;
-
+    Connection connection;
     @MockBean
-    ChannelExec channel;
+    JSchManager jSchManager;
 
     @Test
     void contextLoads() {
