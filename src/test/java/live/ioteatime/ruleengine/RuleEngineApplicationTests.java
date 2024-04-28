@@ -10,7 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 class RuleEngineApplicationTests {
-
     @MockBean
     RuleChain ruleChain;
     @MockBean
@@ -23,4 +22,5 @@ class RuleEngineApplicationTests {
     @Test
     void contextLoads() {
     }
+
 }

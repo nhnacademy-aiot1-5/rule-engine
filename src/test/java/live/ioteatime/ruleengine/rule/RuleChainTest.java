@@ -21,7 +21,6 @@ import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 @Slf4j
 class RuleChainTest {
-
     @Mock
     private Rule rule1;
     @Mock
@@ -67,6 +66,8 @@ class RuleChainTest {
     private MqttData getMqttData() throws Exception {
         Constructor<?> constructor = Class.forName("live.ioteatime.ruleengine.domain.MqttData").getDeclaredConstructor();
         constructor.setAccessible(true);
+
         return (MqttData) constructor.newInstance();
     }
+
 }
