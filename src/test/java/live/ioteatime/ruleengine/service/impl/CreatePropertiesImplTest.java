@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -40,9 +41,10 @@ class CreatePropertiesImplTest {
     @Test
     void createConfig(@TempDir File tempDir){
         MqttInfo mqttInfo = new MqttInfo();
+        List<String> topics = List.of("data/#","data/#","data/#");
         ReflectionTestUtils.setField(mqttInfo, "mqttHost", "localhost");
         ReflectionTestUtils.setField(mqttInfo, "mqttId", "test");
-        ReflectionTestUtils.setField(mqttInfo, "mqttTopic", "test/data");
+        ReflectionTestUtils.setField(mqttInfo, "mqttTopic", topics);
 
         String resultFilePath = createProperties.createConfig(mqttInfo, tempDir.getAbsolutePath());
         String expectedFilePath = tempDir.getAbsolutePath() + "application-prod.properties";

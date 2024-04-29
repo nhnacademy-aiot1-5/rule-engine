@@ -11,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -33,7 +34,7 @@ public class CreatePropertiesImpl implements CreateProperties {
             writer.write("spring.config.name=prod" + "\n");
             writer.write("mqtt.server.uri=" + mqttInfo.getMqttHost() + "\n");
             writer.write("mqtt.client.id=" + mqttInfo.getMqttId() + "\n");
-            writer.write("mqtt.subscribe.topic=" + mqttInfo.getMqttTopic() + "\n");
+            writer.write("mqtt.subscribe.topic=" + splitTopic(mqttInfo.getMqttTopic()) + "\n");
             writer.write("spring.rabbitmq.host=" + rabbitProperties.getHost() + "\n");
             writer.write("spring.rabbitmq.port=" + rabbitProperties.getPort() + "\n");
             writer.write("spring.rabbitmq.username=" + rabbitProperties.getUsername() + "\n");
@@ -45,6 +46,20 @@ public class CreatePropertiesImpl implements CreateProperties {
         }
 
         return file.getPath();
+    }
+
+    private String splitTopic(List<String> topics) {
+        String topic = topics.toString();
+        String[] parts = topic.substring(1,topic.length()-1).split(",");
+        StringBuilder result = new StringBuilder();
+
+        for (String part : parts) {
+            result.append(part.trim()).append(",");
+        }
+
+        result.deleteCharAt(result.length() - 1);
+
+        return result.toString();
     }
 
 }
