@@ -4,6 +4,7 @@ import com.influxdb.client.InfluxDBClient;
 import com.rabbitmq.client.Connection;
 import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.rule.RuleChain;
+import live.ioteatime.ruleengine.scheduler.ReportScheduler;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,6 +19,8 @@ class RuleEngineApplicationTests {
     Connection connection;
     @MockBean
     JSchManager jSchManager;
+    @MockBean
+    ReportScheduler reportScheduler;
 
     @Test
     void contextLoads() {
