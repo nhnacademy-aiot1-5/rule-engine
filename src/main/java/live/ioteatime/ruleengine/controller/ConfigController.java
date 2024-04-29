@@ -21,7 +21,7 @@ public class ConfigController {
     @Value("${create.folder.path}")
     private String path;
 
-    @PostMapping("/addBroker")
+    @PostMapping("/brokers")
     public ResponseEntity<String> addBroker(@RequestBody MqttInfo mqttInfo) throws CreateJSchSessionException {
         String filePath = createProperties.createConfig(mqttInfo, path);
         String command = "./startup.sh ";
