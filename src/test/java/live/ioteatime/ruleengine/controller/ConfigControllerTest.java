@@ -14,6 +14,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -36,9 +38,11 @@ class ConfigControllerTest {
     @Test
     void addBroker() throws Exception {
         MqttInfo mqttInfo = new MqttInfo();
+        List<String> topics = List.of("data/#","data/#","data/#");
+
         ReflectionTestUtils.setField(mqttInfo, "mqttHost", "localhost");
         ReflectionTestUtils.setField(mqttInfo, "mqttId", "test");
-        ReflectionTestUtils.setField(mqttInfo, "mqttTopic", "test/data");
+        ReflectionTestUtils.setField(mqttInfo, "mqttTopic", topics);
         String filePath = "/src/asdadsa.properties";
         String command = "./startup.sh ";
 
