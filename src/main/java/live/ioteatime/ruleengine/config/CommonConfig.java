@@ -1,13 +1,12 @@
 package live.ioteatime.ruleengine.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import live.ioteatime.ruleengine.domain.MqttData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Configuration
 public class CommonConfig {
@@ -23,4 +22,5 @@ public class CommonConfig {
 
         return new ObjectMapper();
     }
+
 }
