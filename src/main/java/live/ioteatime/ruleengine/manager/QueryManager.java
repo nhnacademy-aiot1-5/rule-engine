@@ -1,6 +1,8 @@
 package live.ioteatime.ruleengine.manager;
 
+import live.ioteatime.ruleengine.domain.InfluxQuery;
 import live.ioteatime.ruleengine.domain.QueryRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +12,9 @@ import java.util.Map;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class QueryManager {
+    private final InfluxQuery influxQuery;
     StringBuilder query = new StringBuilder();
 
     public String setUp(QueryRequest queryRequest) {
@@ -20,6 +24,7 @@ public class QueryManager {
         setRange(queryRequest.getRange());
         settingFilter(queryRequest);
         setWindow(queryRequest.getWindow(),queryRequest.getFn(),queryRequest.getYield());
+        influxQuery.getQueries().add(query.toString());
 
         log.info("save influx query : {}",query);
 

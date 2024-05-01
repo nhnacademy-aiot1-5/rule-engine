@@ -1,6 +1,5 @@
 package live.ioteatime.ruleengine.controller;
 
-import live.ioteatime.ruleengine.domain.InfluxQuery;
 import live.ioteatime.ruleengine.domain.QueryRequest;
 import live.ioteatime.ruleengine.manager.QueryManager;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class InfluxQueryController {
     private final QueryManager queryManager;
-    private final InfluxQuery influxQuery;
 
     @PostMapping("/query")
     public ResponseEntity<String> setQuery(@RequestBody QueryRequest query) {
-        influxQuery.setQuery(queryManager.setUp(query));
+        queryManager.setUp(query);
 
         return ResponseEntity.ok("Create Query");
     }
