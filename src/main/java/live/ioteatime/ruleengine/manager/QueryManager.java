@@ -15,6 +15,7 @@ public class QueryManager {
 
     public String setUp(QueryRequest queryRequest) {
         cleanBuilder();
+        setLocalTime();
         setBucket(queryRequest.getBucket());
         setRange(queryRequest.getRange());
         settingFilter(queryRequest);
@@ -27,6 +28,10 @@ public class QueryManager {
 
     private void cleanBuilder() {
         query.setLength(0);
+    }
+
+    private void setLocalTime() {
+        query.append("import \"timezone\"").append("option location = timezone.fixed(offset: 9h) ");
     }
 
     private void settingFilter(QueryRequest queryRequest) {
