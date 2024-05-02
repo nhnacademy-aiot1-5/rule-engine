@@ -19,6 +19,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -38,7 +39,7 @@ class ConfigControllerTest {
     @Test
     void addBroker() throws Exception {
         MqttInfo mqttInfo = new MqttInfo();
-        List<String> topics = List.of("data/#","data/#","data/#");
+        List<String> topics = List.of("data/#", "data/#", "data/#");
 
         ReflectionTestUtils.setField(mqttInfo, "mqttHost", "localhost");
         ReflectionTestUtils.setField(mqttInfo, "mqttId", "test");
@@ -49,13 +50,25 @@ class ConfigControllerTest {
         doNothing().when(jschService).scpFile(anyString(), anyString());
 
         mockMvc.perform(post("/brokers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(mqttInfo)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(mqttInfo)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Create Properties ")));
 
         verify(jschService).scpFile(eq(filePath), eq(mqttInfo.getMqttId()));
         verify(createProperties).createConfig(any(MqttInfo.class));
+    }
+
+    @Test
+    void deleteBroker() throws Exception {
+        doNothing().when(jschService).deleteBridge(anyString());
+
+        mockMvc.perform(get("/delete/{bridgeName}", "test")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Delete Bridge ")));
+
+        verify(jschService).deleteBridge(anyString());
     }
 
 }
