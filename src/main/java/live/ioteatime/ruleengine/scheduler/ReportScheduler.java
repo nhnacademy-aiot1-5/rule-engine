@@ -5,6 +5,7 @@ import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import live.ioteatime.ruleengine.domain.DailyPower;
 import live.ioteatime.ruleengine.domain.InfluxQuery;
+import live.ioteatime.ruleengine.domain.LocalMidnightDto;
 import live.ioteatime.ruleengine.repository.DailyElectricityConsumptionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,18 +35,26 @@ public class ReportScheduler {
     public void saveTodayPower() {
         if (cronFlag) {
             try {
-                List<LocalDateTime> midNights = createMidnight();
-                Map<LocalDateTime, Object> hourlyPowerDataMap = getQuery(influxQuery.getQuery(), queryApi);
-                double totalPower = getTotalPower(hourlyPowerDataMap, midNights);
-                dailyElectricityConsumptionRepository.save(createDailyEntity(midNights.get(0), totalPower));
 
-                log.info("Saved today power data {} ", totalPower);
+                for (int i = 0; i < influxQuery.getQueries().size(); i++) {
+                    LocalMidnightDto localMidnightDto = createMidnight();
+                    Map<LocalDateTime, Object> hourlyPowerDataMap = getQuery(influxQuery.getQueries().get(i), queryApi);
+                    double totalPower = getTotalPower(hourlyPowerDataMap, localMidnightDto);
+                    insertMysql(localMidnightDto, totalPower);
+                    log.info("query info {}", influxQuery.getQueries().get(i));
+                }
+
             } catch (IllegalArgumentException e) {
                 log.debug("query is null {}", e.getMessage());
             } catch (NullPointerException e) {
                 log.error("please check your query {}", e.getMessage());
             }
         }
+    }
+
+    private void insertMysql(LocalMidnightDto localMidnightDto, double totalPower) {
+        DailyPower save = dailyElectricityConsumptionRepository.save(createDailyEntity(localMidnightDto.getYesterday(), totalPower));
+        log.info("insert success date {} | data {}", save.getDate(), save.getValue());
     }
 
     /**
@@ -58,14 +67,15 @@ public class ReportScheduler {
     private Map<LocalDateTime, Object> getQuery(String dailyQuery, QueryApi queryApi) throws IllegalArgumentException {
         Map<LocalDateTime, Object> hourlyPowerDataMap = new HashMap<>();
         List<FluxTable> tables = queryApi.query(dailyQuery);
-        ZoneId local = ZoneId.systemDefault();
 
         for (FluxTable table : tables) {
             List<FluxRecord> records = table.getRecords();
+
             for (FluxRecord fluxRecord : records) {
-                LocalDateTime localtime = LocalDateTime.ofInstant(Objects.requireNonNull(fluxRecord.getTime()), local);
+                LocalDateTime localtime = LocalDateTime.ofInstant(Objects.requireNonNull(fluxRecord.getTime()), ZoneId.systemDefault());
                 hourlyPowerDataMap.put(localtime, fluxRecord.getValue());
             }
+
         }
 
         return hourlyPowerDataMap;
@@ -79,9 +89,9 @@ public class ReportScheduler {
      * @param midNights          전날과 그날의 00:00
      * @return double
      */
-    private double getTotalPower(Map<LocalDateTime, Object> hourlyPowerDataMap, List<LocalDateTime> midNights) throws NullPointerException {
-        double today = (double) hourlyPowerDataMap.get(midNights.get(1));
-        double yesterday = (double) hourlyPowerDataMap.get(midNights.get(0));
+    private double getTotalPower(Map<LocalDateTime, Object> hourlyPowerDataMap, LocalMidnightDto midNights) throws NullPointerException {
+        double today = (double) hourlyPowerDataMap.get(midNights.getToday());
+        double yesterday = (double) hourlyPowerDataMap.get(midNights.getYesterday());
 
         return today - yesterday;
     }
@@ -96,7 +106,7 @@ public class ReportScheduler {
      *
      * @return List<LocalDateTime>
      */
-    private List<LocalDateTime> createMidnight() {
+    private LocalMidnightDto createMidnight() {
         LocalDateTime date = LocalDateTime.now();
         LocalDateTime todayMidNight = date.with(LocalTime.MIN);
         LocalDateTime yesterday = date.minusDays(1);
@@ -105,7 +115,7 @@ public class ReportScheduler {
         log.info("Today Midnight {} ", todayMidNight);
         log.info("Yesterday Midnight {} ", yesterdayMidnight);
 
-        return List.of(yesterdayMidnight, todayMidNight);
+        return new LocalMidnightDto(yesterdayMidnight, todayMidNight);
     }
 
 }

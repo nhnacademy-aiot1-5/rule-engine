@@ -33,8 +33,7 @@ class InfluxQueryControllerTest {
     void setQuery() throws Exception {
         QueryRequest queryRequest = new QueryRequest();
 
-        when(queryManager.setUp(any(QueryRequest.class))).thenReturn("SELECT * FROM measurement");
-        doNothing().when(influxQuery).setQuery(anyString());
+        doNothing().when(queryManager).setUp(any());
 
         mockMvc.perform(post("/query")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -42,7 +41,7 @@ class InfluxQueryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Create Query")));
 
-        verify(influxQuery).setQuery("SELECT * FROM measurement");
+        verify(queryManager).setUp(any());
     }
 
 }
