@@ -4,5 +4,5 @@ import live.ioteatime.ruleengine.domain.MqttInfo;
 
 public interface CreateProperties {
 
-    String createConfig(MqttInfo mqttInfo, String path);
+    String createConfig(MqttInfo mqttInfo);
 }
