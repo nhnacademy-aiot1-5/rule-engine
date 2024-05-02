@@ -4,8 +4,11 @@ import live.ioteatime.ruleengine.domain.InfluxQuery;
 import live.ioteatime.ruleengine.domain.QueryRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,19 +19,25 @@ import java.util.Map;
 public class QueryManager {
     private final InfluxQuery influxQuery;
     StringBuilder query = new StringBuilder();
+    @Value("${my.query.path}")
+    String queryPath;
 
-    public String setUp(QueryRequest queryRequest) {
+    @PostConstruct
+    private void initQuery() {
+        readQueryFile();
+    }
+
+    public void setUp(QueryRequest queryRequest) {
         cleanBuilder();
         setLocalTime();
         setBucket(queryRequest.getBucket());
         setRange(queryRequest.getRange());
         settingFilter(queryRequest);
-        setWindow(queryRequest.getWindow(),queryRequest.getFn(),queryRequest.getYield());
-        influxQuery.getQueries().add(query.toString());
+        setWindow(queryRequest.getWindow(), queryRequest.getFn(), queryRequest.getYield());
+        writeQueryFile();
+        readQueryFile();
 
-        log.info("save influx query : {}",query);
-
-        return query.toString();
+        log.info("save influx query : {}", query);
     }
 
     private void cleanBuilder() {
@@ -40,17 +49,19 @@ public class QueryManager {
     }
 
     private void settingFilter(QueryRequest queryRequest) {
-        Map<String,String> filters = queryRequest.getFilters();
+        Map<String, String> filters = queryRequest.getFilters();
         List<String> keys = new ArrayList<>();
         List<String> values = new ArrayList<>();
 
-        for (Map.Entry<String,String> entry : filters.entrySet()) {
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
             keys.add(entry.getKey());
             values.add(entry.getValue());
         }
+
         for (int i = 0; i < keys.size(); i++) {
             setFilter(keys.get(i), values.get(i));
         }
+
     }
 
     private void setBucket(String bucket) {
@@ -65,9 +76,40 @@ public class QueryManager {
         query.append("|> filter(fn: (r) => r[\"").append(filterName).append("\"] == \"").append(filter).append("\") ");
     }
 
-    private void setWindow(String window, String fn,String output) {
+    private void setWindow(String window, String fn, String output) {
         query.append("|> aggregateWindow(every: ").append(window).append(", fn: ").append(fn).append(", createEmpty: false) ")
                 .append("|> yield(name: \"").append(output).append("\")");
+    }
+
+    private void writeQueryFile() {
+        File file = new File(queryPath);
+
+        try {
+            if (!file.exists() && file.createNewFile()) {
+                log.info("create query file : {}", file.getAbsolutePath());
+            }
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true))) {
+                bufferedWriter.write(query.toString() + "\n");
+            }
+        } catch (IOException e) {
+            log.error("write query file : {}", file.getAbsolutePath(), e);
+        }
+    }
+
+    private void readQueryFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
+            String str;
+
+            while ((str = reader.readLine()) != null) {
+                influxQuery.getQueries().add(str);
+            }
+
+            log.info("query read {}", influxQuery.getQueries().size());
+        } catch (FileNotFoundException e) {
+            log.error("file not found {}", e.getMessage());
+        } catch (IOException e) {
+            log.error("read query file : {}", e.getMessage(), e);
+        }
     }
 
 }
