@@ -1,6 +1,7 @@
 package live.ioteatime.ruleengine.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import live.ioteatime.ruleengine.domain.InfluxQuery;
 import live.ioteatime.ruleengine.domain.MqttData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,12 @@ public class CommonConfig {
     public ObjectMapper objectMapper() {
 
         return new ObjectMapper();
+    }
+
+    @Bean
+    public InfluxQuery influxQuery() {
+
+        return new InfluxQuery();
     }
 
 }
