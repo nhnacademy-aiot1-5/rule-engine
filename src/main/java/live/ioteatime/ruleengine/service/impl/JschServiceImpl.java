@@ -1,5 +1,6 @@
 package live.ioteatime.ruleengine.service.impl;
 
+import com.jcraft.jsch.*;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -25,7 +27,8 @@ public class JschServiceImpl implements JschService {
     private final JSchManager jSchManager;
 
     @Override
-    public void scpFile(String filePath, String fileName, String command) throws CreateJSchSessionException {
+    public void scpFile(String filePath, String fileName) throws CreateJSchSessionException {
+        String startShell = "./startup.sh ";
         String destinationDir = jschProperties.getSavePath() + "/" + fileName;
         Session session = jSchManager.createSession();
         ChannelSftp channelSftp = jSchManager.createChannelSftp(session);
@@ -34,10 +37,52 @@ public class JschServiceImpl implements JschService {
         try {
             mkdirAndPut(filePath, channelSftp, destinationDir);
             deleteFile(filePath);
-            giveCommand(command, fileName, channelExec);
+            giveCommand(startShell, fileName, channelExec);
+            scriptMessage(channelExec);
             jschDisconnect(session, channelSftp, channelExec);
         } catch (Exception e) {
             log.error("scpFile Error {}", e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteBridge(String bridgeName) throws CreateJSchSessionException {
+        String stopShell = "./stop.sh ";
+        Session session = jSchManager.createSession();
+        ChannelExec channelExec = jSchManager.createChannelExec(session);
+
+        try {
+            giveCommand(stopShell, bridgeName, channelExec);
+            scriptMessage(channelExec);
+
+            channelExec.disconnect();
+            session.disconnect();
+            log.info("done");
+        } catch (JSchException | IOException e) {
+            log.error("deleteBridge Error {}", e.getMessage());
+        }
+    }
+
+    private static void scriptMessage(ChannelExec channelExec) throws IOException {
+        InputStream in = channelExec.getInputStream();
+        byte[] buffer = new byte[1024];
+        int i;
+
+        while ((i = in.read(buffer)) != -1) {
+            if (channelExec.isClosed()) {
+                log.info("{}", new String(buffer, 0, i));
+                log.info("exit-status {}", channelExec.getExitStatus());
+                break;
+            }
+            safeSleep();
+        }
+    }
+
+    private static void safeSleep() {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -80,6 +125,7 @@ public class JschServiceImpl implements JschService {
      */
     private static void giveCommand(String command, String fileName, ChannelExec channelExec) throws JSchException {
         channelExec.setCommand(command + fileName);
+        log.info("giveCommand {}", command + fileName);
         channelExec.connect();
     }
 
