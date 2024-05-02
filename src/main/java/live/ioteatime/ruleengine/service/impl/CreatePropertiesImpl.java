@@ -4,6 +4,7 @@ import live.ioteatime.ruleengine.domain.MqttInfo;
 import live.ioteatime.ruleengine.service.CreateProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +19,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CreatePropertiesImpl implements CreateProperties {
     private final RabbitProperties rabbitProperties;
+    @Value("${create.folder.path}")
+    private String path;
 
     /**
      * @param mqttInfo - 브로커 설정을 위한 변수들
-     * @param path     - 저장할 경로
      * @return - 생성한 파일 경로
      * 브로커 추가를 위한 설정 파일을 만드는 메서드
      */
     @Override
-    public String createConfig(MqttInfo mqttInfo, String path) {
+    public String createConfig(MqttInfo mqttInfo) {
         String fileName = "application-prod.properties";
         File file = new File(path + fileName);
 

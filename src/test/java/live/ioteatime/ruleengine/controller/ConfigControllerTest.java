@@ -44,10 +44,9 @@ class ConfigControllerTest {
         ReflectionTestUtils.setField(mqttInfo, "mqttId", "test");
         ReflectionTestUtils.setField(mqttInfo, "mqttTopic", topics);
         String filePath = "/src/asdadsa.properties";
-        String command = "./startup.sh ";
 
-        when(createProperties.createConfig(any(MqttInfo.class), anyString())).thenReturn(filePath);
-        doNothing().when(jschService).scpFile(anyString(), anyString(), anyString());
+        when(createProperties.createConfig(any(MqttInfo.class))).thenReturn(filePath);
+        doNothing().when(jschService).scpFile(anyString(), anyString());
 
         mockMvc.perform(post("/brokers")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -55,8 +54,8 @@ class ConfigControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Create Properties ")));
 
-        verify(jschService).scpFile(eq(filePath), eq(mqttInfo.getMqttId()), eq(command));
-        verify(createProperties).createConfig(any(MqttInfo.class), anyString());
+        verify(jschService).scpFile(eq(filePath), eq(mqttInfo.getMqttId()));
+        verify(createProperties).createConfig(any(MqttInfo.class));
     }
 
 }
