@@ -34,15 +34,14 @@ public class ReportScheduler {
     public void saveTodayPower() {
         if (cronFlag) {
             try {
-
                 for (int i = 0; i < influxQuery.getQueries().size(); i++) {
                     LocalMidnightDto localMidnightDto = createMidnight();
                     Map<LocalDateTime, Object> hourlyPowerDataMap = getQuery(influxQuery.getQueries().get(i), queryApi);
                     double totalPower = getTotalPower(hourlyPowerDataMap, localMidnightDto);
                     insertMysql(localMidnightDto, totalPower);
+
                     log.info("query info {}", influxQuery.getQueries().get(i));
                 }
-
             } catch (IllegalArgumentException e) {
                 log.debug("query is null {}", e.getMessage());
             } catch (NullPointerException e) {
@@ -58,15 +57,17 @@ public class ReportScheduler {
 
         if (cronFlag) {
             OutlierDto outlier = outlierService.getOutlier(key);
+             Optional<MinMaxDto> minMaxDto = outlierService.matchTime(outlier, localDateTimeDto);
 
-            if (outlier != null) {
-                Optional<MinMaxDto> minMaxDto = outlierService.matchTime(outlier, localDateTimeDto);
-                outlierRepo.setMin(minMaxDto.get().getMin());
-                outlierRepo.setMax(minMaxDto.get().getMax());
+             if (minMaxDto.isEmpty()) {
+                 log.info("outlier not found {}", key);
+             }
+             if (minMaxDto.isPresent()) {
+                 outlierRepo.setMin(minMaxDto.get().getMin());
+                 outlierRepo.setMax(minMaxDto.get().getMax());
 
-                log.info("outlier update to min {} max {}", outlierRepo.getMin(),outlierRepo.getMax());
-            }
-
+                 log.info("outlier update to min {} max {}", outlierRepo.getMin(),outlierRepo.getMax());
+             }
         }
     }
 
