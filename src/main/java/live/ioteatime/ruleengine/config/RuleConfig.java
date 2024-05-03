@@ -5,14 +5,21 @@ import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.OutlierRepo;
 import live.ioteatime.ruleengine.domain.TopicDto;
 import live.ioteatime.ruleengine.rule.Rule;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
+@Slf4j
 public class RuleConfig {
+    private final OutlierRepo outlierRepo;
+
     @Bean
     public Rule nullCheck() {
         return ((mqttData, ruleChain) -> {
@@ -29,6 +36,16 @@ public class RuleConfig {
                 }
 
                 return;
+            }
+            ruleChain.doProcess(mqttData);
+        });
+    }
+
+    @Bean
+    public Rule outlierCheck() {
+        return ((mqttData, ruleChain) -> {
+            if (mqttData.getValue() > outlierRepo.getMax() || mqttData.getValue() < outlierRepo.getMin()) {
+                log.info("{} is Outlier!!",mqttData.getValue());
             }
             ruleChain.doProcess(mqttData);
         });

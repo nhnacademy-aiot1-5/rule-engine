@@ -1,12 +1,12 @@
 package live.ioteatime.ruleengine.scheduler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
-import live.ioteatime.ruleengine.domain.DailyPower;
-import live.ioteatime.ruleengine.domain.InfluxQuery;
-import live.ioteatime.ruleengine.domain.LocalMidnightDto;
+import live.ioteatime.ruleengine.domain.*;
 import live.ioteatime.ruleengine.repository.DailyElectricityConsumptionRepository;
+import live.ioteatime.ruleengine.service.OutlierService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +16,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -28,6 +25,8 @@ public class ReportScheduler {
     private final DailyElectricityConsumptionRepository dailyElectricityConsumptionRepository;
     private final QueryApi queryApi;
     private final InfluxQuery influxQuery;
+    private final OutlierService outlierService;
+    private final OutlierRepo outlierRepo;
     @Value("${schedule.flag}")
     private boolean cronFlag;
 
@@ -35,20 +34,40 @@ public class ReportScheduler {
     public void saveTodayPower() {
         if (cronFlag) {
             try {
-
                 for (int i = 0; i < influxQuery.getQueries().size(); i++) {
                     LocalMidnightDto localMidnightDto = createMidnight();
                     Map<LocalDateTime, Object> hourlyPowerDataMap = getQuery(influxQuery.getQueries().get(i), queryApi);
                     double totalPower = getTotalPower(hourlyPowerDataMap, localMidnightDto);
                     insertMysql(localMidnightDto, totalPower);
+
                     log.info("query info {}", influxQuery.getQueries().get(i));
                 }
-
             } catch (IllegalArgumentException e) {
                 log.debug("query is null {}", e.getMessage());
             } catch (NullPointerException e) {
                 log.error("please check your query {}", e.getMessage());
             }
+        }
+    }
+
+    @Scheduled(cron = "${schedule.cron2}")
+    public void updateOutlier() throws JsonProcessingException {
+        String key = "hourly_outlier";
+        LocalDateTimeDto localDateTimeDto = outlierService.localDateTime();
+
+        if (cronFlag) {
+            OutlierDto outlier = outlierService.getOutlier(key);
+             Optional<MinMaxDto> minMaxDto = outlierService.matchTime(outlier, localDateTimeDto);
+
+             if (minMaxDto.isEmpty()) {
+                 log.info("outlier not found {}", key);
+             }
+             if (minMaxDto.isPresent()) {
+                 outlierRepo.setMin(minMaxDto.get().getMin());
+                 outlierRepo.setMax(minMaxDto.get().getMax());
+
+                 log.info("outlier update to min {} max {}", outlierRepo.getMin(),outlierRepo.getMax());
+             }
         }
     }
 
