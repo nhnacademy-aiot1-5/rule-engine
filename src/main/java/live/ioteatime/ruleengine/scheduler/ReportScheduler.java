@@ -5,6 +5,7 @@ import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
 import live.ioteatime.ruleengine.domain.*;
+import live.ioteatime.ruleengine.entity.DailyPowerEntity;
 import live.ioteatime.ruleengine.repository.DailyElectricityConsumptionRepository;
 import live.ioteatime.ruleengine.service.OutlierService;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +73,7 @@ public class ReportScheduler {
     }
 
     private void insertMysql(LocalMidnightDto localMidnightDto, double totalPower) {
-        DailyPower save = dailyElectricityConsumptionRepository.save(createDailyEntity(localMidnightDto.getYesterday(), totalPower));
+        DailyPowerEntity save = dailyElectricityConsumptionRepository.save(createDailyEntity(localMidnightDto.getYesterday(), totalPower));
         log.info("insert success date {} | data {}", save.getDate(), save.getValue());
     }
 
@@ -115,9 +116,9 @@ public class ReportScheduler {
         return today - yesterday;
     }
 
-    private DailyPower createDailyEntity(LocalDateTime midNights, Double totalPower) {
+    private DailyPowerEntity createDailyEntity(LocalDateTime midNights, Double totalPower) {
 
-        return DailyPower.builder().date(midNights).value(totalPower).build();
+        return DailyPowerEntity.builder().date(midNights).value(totalPower).build();
     }
 
     /**

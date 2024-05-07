@@ -1,4 +1,4 @@
-package live.ioteatime.ruleengine.domain;
+package live.ioteatime.ruleengine.entity;
 
 import lombok.*;
 
@@ -12,12 +12,11 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DailyPower {
+public class DailyPowerEntity {
     @Id
     @Column(name = "date")
     private LocalDateTime date;
 
     @Column(name = "value")
     private Double value;
-
 }
