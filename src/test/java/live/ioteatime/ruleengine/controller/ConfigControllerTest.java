@@ -65,14 +65,14 @@ class ConfigControllerTest {
 
     @Test
     void deleteBroker() throws Exception {
-        doNothing().when(jschService).deleteBridge(anyString());
+        doNothing().when(jschService).deleteBridge(anyString(),anyString());
 
         mockMvc.perform(get("/delete/{bridgeName}", "test")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Delete Bridge ")));
 
-        verify(jschService).deleteBridge(anyString());
+        verify(jschService).deleteBridge(anyString(),anyString());
     }
 
     @Test

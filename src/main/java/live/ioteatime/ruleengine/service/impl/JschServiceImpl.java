@@ -37,7 +37,7 @@ public class JschServiceImpl implements JschService {
         try {
             mkdirAndPut(filePath, channelSftp, destinationDir);
             deleteFile(filePath);
-            giveCommand(startShell, fileName, channelExec);
+            giveCommand(startShell, type, fileName, channelExec);
             scriptMessage(channelExec);
             jschDisconnect(session, channelSftp, channelExec);
         } catch (Exception e) {
@@ -46,15 +46,14 @@ public class JschServiceImpl implements JschService {
     }
 
     @Override
-    public void deleteBridge(String bridgeName) throws CreateJSchSessionException {
+    public void deleteBridge(String type,String bridgeName) throws CreateJSchSessionException {
         String stopShell = "./stop.sh ";
         Session session = jSchManager.createSession();
         ChannelExec channelExec = jSchManager.createChannelExec(session);
 
         try {
-            giveCommand(stopShell, bridgeName, channelExec);
+            giveCommand(stopShell, type,bridgeName, channelExec);
             scriptMessage(channelExec);
-
             channelExec.disconnect();
             session.disconnect();
             log.info("done");
@@ -123,8 +122,8 @@ public class JschServiceImpl implements JschService {
      * @param fileName    실행 시킬 스크립트 경로
      * @param channelExec commandline 채널
      */
-    private static void giveCommand(String command, String fileName, ChannelExec channelExec) throws JSchException {
-        channelExec.setCommand(command + fileName);
+    private static void giveCommand(String command,String type,String fileName, ChannelExec channelExec) throws JSchException {
+        channelExec.setCommand(command + type + " " + fileName);
         log.info("giveCommand {}", command + fileName);
         channelExec.connect();
     }

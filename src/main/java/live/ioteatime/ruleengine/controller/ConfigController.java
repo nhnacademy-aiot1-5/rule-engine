@@ -27,9 +27,9 @@ public class ConfigController {
         return ResponseEntity.ok("create mqtt Bridge properties ");
     }
 
-    @GetMapping("/delete/{bridgeName}")
-    public ResponseEntity<String> deleteBridge(@PathVariable String bridgeName) throws CreateJSchSessionException {
-        jschService.deleteBridge(bridgeName);
+    @GetMapping("/delete/{type}/{bridgeName}")
+    public ResponseEntity<String> deleteBridge(@PathVariable(name = "type")String type,@PathVariable String bridgeName) throws CreateJSchSessionException {
+        jschService.deleteBridge(type,bridgeName);
 
         return ResponseEntity.ok("Delete Bridge ");
     }
