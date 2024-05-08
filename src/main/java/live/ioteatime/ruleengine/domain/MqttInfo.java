@@ -1,11 +1,12 @@
 package live.ioteatime.ruleengine.domain;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class MqttInfo {
     private String mqttHost;
