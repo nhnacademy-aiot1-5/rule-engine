@@ -72,11 +72,6 @@ public class ReportScheduler {
         }
     }
 
-    private void insertMysql(LocalMidnightDto localMidnightDto, double totalPower) {
-        DailyPowerEntity save = dailyElectricityConsumptionRepository.save(createDailyEntity(localMidnightDto.getYesterday(), totalPower));
-        log.info("insert success date {} | data {}", save.getDate(), save.getValue());
-    }
-
     /**
      * influxdb 에 하루치 전력 총 합을 가져와 로컬 시간으로 바꾸는 메소드
      *
@@ -114,6 +109,11 @@ public class ReportScheduler {
         double yesterday = (double) hourlyPowerDataMap.get(midNights.getYesterday());
 
         return today - yesterday;
+    }
+
+    private void insertMysql(LocalMidnightDto localMidnightDto, double totalPower) {
+        DailyPowerEntity save = dailyElectricityConsumptionRepository.save(createDailyEntity(localMidnightDto.getYesterday(), totalPower));
+        log.info("insert success date {} | data {}", save.getDate(), save.getValue());
     }
 
     private DailyPowerEntity createDailyEntity(LocalDateTime midNights, Double totalPower) {
