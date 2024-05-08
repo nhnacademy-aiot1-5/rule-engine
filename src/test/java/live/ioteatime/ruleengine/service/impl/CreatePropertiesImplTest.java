@@ -1,5 +1,6 @@
 package live.ioteatime.ruleengine.service.impl;
 
+import live.ioteatime.ruleengine.domain.ModbusInfo;
 import live.ioteatime.ruleengine.domain.MqttInfo;
 import live.ioteatime.ruleengine.service.CreateProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,20 +35,38 @@ class CreatePropertiesImplTest {
         when(templateMock.getExchange()).thenReturn("testExchange");
         when(templateMock.getRoutingKey()).thenReturn("testRoutingKey");
 
-        createProperties =new CreatePropertiesImpl(rabbitPropertiesMock);
+        createProperties = new CreatePropertiesImpl(rabbitPropertiesMock);
     }
 
     @Test
-    void createConfig(){
-        MqttInfo mqttInfo = new MqttInfo();
-        List<String> topics = List.of("data/#","data/#","data/#");
+    void createMqttConfigTest() throws Exception {
+        Constructor<MqttInfo> constructor = MqttInfo.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        MqttInfo mqttInfo = constructor.newInstance();
+        List<String> topics = List.of("data/#", "data/#", "data/#");
         ReflectionTestUtils.setField(mqttInfo, "mqttHost", "localhost");
         ReflectionTestUtils.setField(mqttInfo, "mqttId", "test");
         ReflectionTestUtils.setField(mqttInfo, "mqttTopic", topics);
 
         String resultFilePath = createProperties.createConfig(mqttInfo);
-
         File resultFile = new File(resultFilePath);
+
+        assertTrue(resultFile.exists());
+    }
+
+    @Test
+    void createModbusConfigTest() throws Exception {
+        Constructor<ModbusInfo> constructor = ModbusInfo.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        ModbusInfo modbusInfo = constructor.newInstance();
+        ReflectionTestUtils.setField(modbusInfo, "name", "localhost");
+        ReflectionTestUtils.setField(modbusInfo, "host", "localhost");
+        ReflectionTestUtils.setField(modbusInfo, "port", 88);
+        ReflectionTestUtils.setField(modbusInfo, "channel", "800/2,12/21");
+
+        String config = createProperties.createConfig(modbusInfo);
+        File resultFile = new File(config);
+
         assertTrue(resultFile.exists());
     }
 

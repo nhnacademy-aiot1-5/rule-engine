@@ -1,6 +1,7 @@
 package live.ioteatime.ruleengine.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import live.ioteatime.ruleengine.domain.ModbusInfo;
 import live.ioteatime.ruleengine.domain.MqttInfo;
 import live.ioteatime.ruleengine.service.CreateProperties;
 import live.ioteatime.ruleengine.service.JschService;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
@@ -38,7 +40,9 @@ class ConfigControllerTest {
 
     @Test
     void addBroker() throws Exception {
-        MqttInfo mqttInfo = new MqttInfo();
+        Constructor<MqttInfo> constructor = MqttInfo.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        MqttInfo mqttInfo = constructor.newInstance();
         List<String> topics = List.of("data/#", "data/#", "data/#");
 
         ReflectionTestUtils.setField(mqttInfo, "mqttHost", "localhost");
@@ -47,15 +51,15 @@ class ConfigControllerTest {
         String filePath = "/src/asdadsa.properties";
 
         when(createProperties.createConfig(any(MqttInfo.class))).thenReturn(filePath);
-        doNothing().when(jschService).scpFile(anyString(), anyString());
+        doNothing().when(jschService).scpFile(anyString(), anyString(),anyString());
 
         mockMvc.perform(post("/brokers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(mqttInfo)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Create Properties ")));
+                .andExpect(content().string(containsString("create mqtt Bridge properties ")));
 
-        verify(jschService).scpFile(eq(filePath), eq(mqttInfo.getMqttId()));
+        verify(jschService).scpFile(eq(filePath), eq(mqttInfo.getMqttId()), anyString());
         verify(createProperties).createConfig(any(MqttInfo.class));
     }
 
@@ -69,6 +73,30 @@ class ConfigControllerTest {
                 .andExpect(content().string(containsString("Delete Bridge ")));
 
         verify(jschService).deleteBridge(anyString());
+    }
+
+    @Test
+    void addModbusTest() throws Exception {
+        Constructor<ModbusInfo> constructor = ModbusInfo.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        ModbusInfo modbusInfo = constructor.newInstance();
+        ReflectionTestUtils.setField(modbusInfo, "name", "localhost");
+        ReflectionTestUtils.setField(modbusInfo, "host", "localhost");
+        ReflectionTestUtils.setField(modbusInfo, "port", 88);
+        ReflectionTestUtils.setField(modbusInfo, "channel", "800/2,12/21");
+        String filePath = "/src/asdadsa.properties";
+
+        when(createProperties.createConfig(any(ModbusInfo.class))).thenReturn(filePath);
+        doNothing().when(jschService).scpFile(anyString(), anyString(),anyString());
+
+        mockMvc.perform(post("/modbus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(modbusInfo)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("create modbus Bridge properties ")));
+
+        verify(jschService).scpFile(eq(filePath),eq(modbusInfo.getName()),anyString());
+        verify(createProperties).createConfig(any(ModbusInfo.class));
     }
 
 }
