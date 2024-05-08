@@ -2,6 +2,7 @@ package live.ioteatime.ruleengine.manager;
 
 import live.ioteatime.ruleengine.domain.InfluxQuery;
 import live.ioteatime.ruleengine.domain.QueryRequest;
+import live.ioteatime.ruleengine.domain.QueryResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,7 @@ public class QueryManager {
         readQueryFile();
     }
 
-    public void setUp(QueryRequest queryRequest) {
+    public void addQuery(QueryRequest queryRequest) {
         cleanBuilder();
         setLocalTime();
         setBucket(queryRequest.getBucket());
@@ -38,6 +41,37 @@ public class QueryManager {
         readQueryFile();
 
         log.info("save influx query : {}", query);
+    }
+
+    public List<QueryResponse> getQueries() {
+        List<QueryResponse> queries = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
+            String line;
+            int index=0;
+
+            while ((line = reader.readLine()) != null) {
+                QueryResponse queryResponse = QueryResponse.builder().number(index).query(line).build();
+                queries.add(queryResponse);
+                index += 1;
+            }
+            log.info("queries {}", queries);
+        } catch (IOException e) {
+            log.error("query file is not found : {}", e.getMessage());
+        }
+
+        return queries;
+    }
+
+    public String deleteQuery(int index) {
+        List<String> queries = influxQuery.getQueries();
+
+        String remove = queries.remove(index);
+        modifyQueryFile();
+        readQueryFile();
+        log.info("delete query : {}", remove);
+
+        return remove;
     }
 
     private void cleanBuilder() {
@@ -61,7 +95,6 @@ public class QueryManager {
         for (int i = 0; i < keys.size(); i++) {
             setFilter(keys.get(i), values.get(i));
         }
-
     }
 
     private void setBucket(String bucket) {
@@ -96,14 +129,35 @@ public class QueryManager {
         }
     }
 
+    private void modifyQueryFile() {
+        try {
+            Files.delete(Path.of(queryPath));
+            File file = new File(queryPath);
+
+            if (!file.exists() && file.createNewFile()) {
+                log.info("delete and create query file : {}", file.getAbsolutePath());
+            }
+
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true))) {
+
+                for (String s : influxQuery.getQueries()) {
+                        bufferedWriter.write(s + "\n");
+                }
+            }
+        } catch (IOException e) {
+            log.error("read query file : {}", e.getMessage());
+        }
+    }
+
     private void readQueryFile() {
+        influxQuery.getQueries().clear();
+
         try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
             String str;
 
             while ((str = reader.readLine()) != null) {
                 influxQuery.getQueries().add(str);
             }
-
             log.info("query read {}", influxQuery.getQueries().size());
         } catch (FileNotFoundException e) {
             log.error("file not found {}", e.getMessage());
