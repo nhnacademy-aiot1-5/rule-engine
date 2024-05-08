@@ -1,5 +1,6 @@
 package live.ioteatime.ruleengine.controller;
 
+import live.ioteatime.ruleengine.domain.ModbusInfo;
 import live.ioteatime.ruleengine.domain.MqttInfo;
 import live.ioteatime.ruleengine.exception.CreateJSchSessionException;
 import live.ioteatime.ruleengine.service.CreateProperties;
@@ -21,9 +22,9 @@ public class ConfigController {
         String filePath = createProperties.createConfig(mqttInfo);
         log.info("addBroker file:{}", filePath);
 
-        jschService.scpFile(filePath, mqttInfo.getMqttId());
+        jschService.scpFile(filePath, mqttInfo.getMqttId(),"mqtt");
 
-        return ResponseEntity.ok("Create Properties ");
+        return ResponseEntity.ok("create mqtt Bridge properties ");
     }
 
     @GetMapping("/delete/{bridgeName}")
@@ -31,6 +32,16 @@ public class ConfigController {
         jschService.deleteBridge(bridgeName);
 
         return ResponseEntity.ok("Delete Bridge ");
+    }
+
+    @PostMapping("/modbus")
+    public ResponseEntity<String> addModbus(@RequestBody ModbusInfo modbusInfo) throws CreateJSchSessionException {
+        String filePath = createProperties.createConfig(modbusInfo);
+        log.info("addModbus file:{}", filePath);
+
+        jschService.scpFile(filePath,modbusInfo.getName(),"modbus");
+
+        return ResponseEntity.ok("create modbus Bridge properties ");
     }
 
 }
