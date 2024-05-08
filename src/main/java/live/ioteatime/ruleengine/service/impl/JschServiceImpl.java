@@ -27,9 +27,9 @@ public class JschServiceImpl implements JschService {
     private final JSchManager jSchManager;
 
     @Override
-    public void scpFile(String filePath, String fileName) throws CreateJSchSessionException {
+    public void scpFile(String filePath, String fileName,String type) throws CreateJSchSessionException {
         String startShell = "./startup.sh ";
-        String destinationDir = jschProperties.getSavePath() + "/" + fileName;
+        String destinationDir = jschProperties.getSavePath()+type + "/" + fileName;
         Session session = jSchManager.createSession();
         ChannelSftp channelSftp = jSchManager.createChannelSftp(session);
         ChannelExec channelExec = jSchManager.createChannelExec(session);
