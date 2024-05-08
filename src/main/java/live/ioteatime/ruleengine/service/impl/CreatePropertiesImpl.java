@@ -1,5 +1,6 @@
 package live.ioteatime.ruleengine.service.impl;
 
+import live.ioteatime.ruleengine.domain.ModbusInfo;
 import live.ioteatime.ruleengine.domain.MqttInfo;
 import live.ioteatime.ruleengine.service.CreateProperties;
 import lombok.RequiredArgsConstructor;
@@ -34,20 +35,44 @@ public class CreatePropertiesImpl implements CreateProperties {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("spring.config.name=prod" + "\n");
+            writer.write("bridge.mod=mqtt" + "\n");
             writer.write("mqtt.server.uri=" + mqttInfo.getMqttHost() + "\n");
             writer.write("mqtt.client.id=" + mqttInfo.getMqttId() + "\n");
             writer.write("mqtt.subscribe.topic=" + splitTopic(mqttInfo.getMqttTopic()) + "\n");
-            writer.write("spring.rabbitmq.host=" + rabbitProperties.getHost() + "\n");
-            writer.write("spring.rabbitmq.port=" + rabbitProperties.getPort() + "\n");
-            writer.write("spring.rabbitmq.username=" + rabbitProperties.getUsername() + "\n");
-            writer.write("spring.rabbitmq.password=" + rabbitProperties.getPassword() + "\n");
-            writer.write("spring.rabbitmq.template.exchange=" + rabbitProperties.getTemplate().getExchange() + "\n");
-            writer.write("spring.rabbitmq.template.routing-key=" + rabbitProperties.getTemplate().getRoutingKey() + "\n");
+            rabbitmqConfigSet(writer);
         } catch (IOException e) {
-            log.error("Create FIle false {}", e.getMessage());
+            log.error("Create mqtt FIle false {}", e.getMessage());
         }
 
         return file.getPath();
+    }
+
+    @Override
+    public String createConfig(ModbusInfo modbus) {
+        String fileName = "application-prod.properties";
+        File file = new File(path + fileName);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write("spring.config.name=prod" + "\n");
+            writer.write("bridge.mod=modbus" + "\n");
+            writer.write("modbus.host=" + modbus.getHost() + "\n");
+            writer.write("modbus.port=" + modbus.getPort() + "\n");
+            writer.write("modbus.channels=" + modbus.getChannel() + "\n");
+            rabbitmqConfigSet(writer);
+        } catch (IOException e) {
+            log.error("Create modbus FIle false {}", e.getMessage());
+        }
+
+        return file.getPath();
+    }
+
+    private void rabbitmqConfigSet(BufferedWriter writer) throws IOException {
+        writer.write("spring.rabbitmq.host=" + rabbitProperties.getHost() + "\n");
+        writer.write("spring.rabbitmq.port=" + rabbitProperties.getPort() + "\n");
+        writer.write("spring.rabbitmq.username=" + rabbitProperties.getUsername() + "\n");
+        writer.write("spring.rabbitmq.password=" + rabbitProperties.getPassword() + "\n");
+        writer.write("spring.rabbitmq.template.exchange=" + rabbitProperties.getTemplate().getExchange() + "\n");
+        writer.write("spring.rabbitmq.template.routing-key=" + rabbitProperties.getTemplate().getRoutingKey() + "\n");
     }
 
     private String splitTopic(List<String> topics) {
