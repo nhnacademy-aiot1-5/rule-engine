@@ -68,7 +68,7 @@ class InfluxQueryRepositoryControllerTest {
 
         when(queryServiceImpl.deleteQuery(anyInt())).thenReturn(remove);
 
-        mockMvc.perform(get("/delete/{index}", 0)
+        mockMvc.perform(get("/delete/query/{index}", 0)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string("delete " + remove));
