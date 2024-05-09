@@ -29,7 +29,7 @@ public class InfluxQueryController {
         return ResponseEntity.ok(queryManager.getQueries());
     }
 
-    @GetMapping("/delete/{index}")
+    @GetMapping("/delete/query/{index}")
     public ResponseEntity<String> deleteQuery(@PathVariable int index) {
         String deleteQuery = queryManager.deleteQuery(index);
 
