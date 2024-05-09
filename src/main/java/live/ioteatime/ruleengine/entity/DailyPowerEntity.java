@@ -6,17 +6,16 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Entity
-@Table(name = "daily_elec")
+@Table(name = "daily_electricity_consumption")
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class DailyPowerEntity {
     @Id
-    @Column(name = "date")
-    private LocalDateTime date;
-
-    @Column(name = "value")
-    private Double value;
+    @Column(name = "time")
+    private LocalDateTime time;
+    private int channelId;
+    private Double kwh;
+    private Double bill;
 }

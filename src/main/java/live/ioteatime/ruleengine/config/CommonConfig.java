@@ -2,7 +2,6 @@ package live.ioteatime.ruleengine.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import live.ioteatime.ruleengine.domain.InfluxQuery;
 import live.ioteatime.ruleengine.domain.MqttData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,12 +24,6 @@ public class CommonConfig {
         objectMapper.registerModule(new JavaTimeModule());
 
         return objectMapper;
-    }
-
-    @Bean
-    public InfluxQuery influxQuery() {
-
-        return new InfluxQuery();
     }
 
 }

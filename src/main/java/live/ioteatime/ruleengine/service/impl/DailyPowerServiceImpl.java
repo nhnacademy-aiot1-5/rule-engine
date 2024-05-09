@@ -1,9 +1,8 @@
 package live.ioteatime.ruleengine.service.impl;
 
-import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxRecord;
 import com.influxdb.query.FluxTable;
-import live.ioteatime.ruleengine.domain.InfluxQuery;
+import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
 import live.ioteatime.ruleengine.domain.LocalMidnightDto;
 import live.ioteatime.ruleengine.entity.DailyPowerEntity;
 import live.ioteatime.ruleengine.repository.DailyElectricityConsumptionRepository;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
@@ -25,22 +23,12 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DailyPowerServiceImpl implements DailyPowerService {
     private final DailyElectricityConsumptionRepository dailyElectricityConsumptionRepository;
-    private final QueryApi queryApi;
-    private final InfluxQuery influxQuery;
+    private final InfluxQueryRepository influxQueryRepository;
 
-    public int getQueryCount() {
-
-        return influxQuery.getQueries().size();
-    }
-
-    public String getInfluxQuery(int index) {
-
-        return influxQuery.getQueries().get(index);
-    }
-
+    @Override
     public Map<LocalDateTime, Object> convertInfluxDbResponseToLocalTime(String dailyQuery) throws IllegalArgumentException {
         Map<LocalDateTime, Object> hourlyPowerDataMap = new HashMap<>();
-        List<FluxTable> tables = queryApi.query(dailyQuery);
+        List<FluxTable> tables = influxQueryRepository.query(dailyQuery);
 
         if (tables.isEmpty()) {
             throw new IllegalArgumentException("please check your query");
@@ -58,33 +46,35 @@ public class DailyPowerServiceImpl implements DailyPowerService {
         return hourlyPowerDataMap;
     }
 
+    @Override
     public double calculateDailyPower(Map<LocalDateTime, Object> hourlyPowerDataMap, LocalMidnightDto midNights) throws NullPointerException {
-        double today = (double) hourlyPowerDataMap.get(midNights.getToday());
-        double yesterday = (double) hourlyPowerDataMap.get(midNights.getYesterday());
+        Double today = (Double) hourlyPowerDataMap.get(midNights.getToday());
+        Double yesterday = (Double) hourlyPowerDataMap.get(midNights.getYesterday());
 
         return today - yesterday;
     }
 
-    public void insertMysql(LocalDateTime yesterday, double totalPower) {
-        DailyPowerEntity save = dailyElectricityConsumptionRepository.save(createDailyEntity(yesterday, totalPower));
-        log.info("insert success date {} | data {}", save.getDate(), save.getValue());
+    @Override
+    public void insertMysql(LocalDateTime yesterday, Double totalPower,int channelId,Double bill) {
+        DailyPowerEntity save = dailyElectricityConsumptionRepository.save(createDailyEntity(yesterday,channelId,totalPower,bill));
+        log.info("insert success date {} | channel {} | value {} | bill {}", save.getTime(),save.getChannelId() ,save.getKwh(),save.getBill());
     }
 
-    private DailyPowerEntity createDailyEntity(LocalDateTime midNights, Double totalPower) {
+    @Override
+    public int getQueryCount() {
 
-        return DailyPowerEntity.builder().date(midNights).value(totalPower).build();
+        return influxQueryRepository.getQuerySize();
     }
 
-    public LocalMidnightDto createMidnight() {
-        LocalDateTime date = LocalDateTime.now();
-        LocalDateTime todayMidNight = date.with(LocalTime.MIN);
-        LocalDateTime yesterday = date.minusDays(1);
-        LocalDateTime yesterdayMidnight = yesterday.with(LocalTime.MIN);
+    @Override
+    public String getQuery(int index) {
 
-        log.info("Today Midnight {} ", todayMidNight);
-        log.info("Yesterday Midnight {} ", yesterdayMidnight);
+        return influxQueryRepository.getQuery(index);
+    }
 
-        return new LocalMidnightDto(yesterdayMidnight, todayMidNight);
+    private DailyPowerEntity createDailyEntity(LocalDateTime midNights,int channelId ,Double totalPower,Double bill) {
+
+        return DailyPowerEntity.builder().time(midNights).channelId(channelId).kwh(totalPower).bill(bill).build();
     }
 
 }

@@ -1,8 +1,11 @@
-package live.ioteatime.ruleengine.manager;
+package live.ioteatime.ruleengine.service.impl;
 
-import live.ioteatime.ruleengine.domain.InfluxQuery;
 import live.ioteatime.ruleengine.domain.QueryRequest;
 import live.ioteatime.ruleengine.domain.QueryResponse;
+import live.ioteatime.ruleengine.domain.Tags;
+import live.ioteatime.ruleengine.repository.ChannelsRepository;
+import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
+import live.ioteatime.ruleengine.service.QueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,13 +18,17 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class QueryManager {
-    private final InfluxQuery influxQuery;
+public class QueryServiceImpl implements QueryService {
+    private final InfluxQueryRepository influxQueryRepository;
+    private final ChannelsRepository channelsRepository;
     StringBuilder query = new StringBuilder();
+    Pattern pattern = Pattern.compile("\\[\"(\\w+)\"] == \"(\\w+)\"");
     @Value("${my.query.path}")
     String queryPath;
 
@@ -30,6 +37,7 @@ public class QueryManager {
         readQueryFile();
     }
 
+    @Override
     public void addQuery(QueryRequest queryRequest) {
         cleanBuilder();
         setLocalTime();
@@ -43,12 +51,13 @@ public class QueryManager {
         log.info("save influx query : {}", query);
     }
 
+    @Override
     public List<QueryResponse> getQueries() {
         List<QueryResponse> queries = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
             String line;
-            int index=0;
+            int index = 0;
 
             while ((line = reader.readLine()) != null) {
                 QueryResponse queryResponse = QueryResponse.builder().number(index).query(line).build();
@@ -63,8 +72,9 @@ public class QueryManager {
         return queries;
     }
 
+    @Override
     public String deleteQuery(int index) {
-        List<String> queries = influxQuery.getQueries();
+        List<String> queries = influxQueryRepository.getQueries();
 
         String remove = queries.remove(index);
         modifyQueryFile();
@@ -72,6 +82,44 @@ public class QueryManager {
         log.info("delete query : {}", remove);
 
         return remove;
+    }
+
+    @Override
+    public int getChannelId(int index) {
+        Tags tags = splitQuery(index);
+        return channelsRepository.findChannelIdByTags(tags.getType(), tags.getPhase(), tags.getDescription(), tags.getPlace());
+    }
+
+    private Tags splitQuery(int index) {
+        String s = influxQueryRepository.getQuery(index);
+        Matcher matcher = pattern.matcher(s);
+        Tags tags = new Tags();
+
+        while (matcher.find()) {
+            String field = matcher.group(1);
+            String value = matcher.group(2);
+
+            switch (field) {
+                case "place":
+                    tags.setPlace(value);
+                    break;
+                case "type":
+                    tags.setType(value);
+                    break;
+                case "phase":
+                    tags.setPhase(value);
+                    break;
+                case "description":
+                    tags.setDescription(value);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        log.info("split query {}", tags);
+
+        return tags;
     }
 
     private void cleanBuilder() {
@@ -91,7 +139,6 @@ public class QueryManager {
             keys.add(entry.getKey());
             values.add(entry.getValue());
         }
-
         for (int i = 0; i < keys.size(); i++) {
             setFilter(keys.get(i), values.get(i));
         }
@@ -137,11 +184,9 @@ public class QueryManager {
             if (!file.exists() && file.createNewFile()) {
                 log.info("delete and create query file : {}", file.getAbsolutePath());
             }
-
             try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true))) {
-
-                for (String s : influxQuery.getQueries()) {
-                        bufferedWriter.write(s + "\n");
+                for (String s : influxQueryRepository.getQueries()) {
+                    bufferedWriter.write(s + "\n");
                 }
             }
         } catch (IOException e) {
@@ -150,15 +195,15 @@ public class QueryManager {
     }
 
     private void readQueryFile() {
-        influxQuery.getQueries().clear();
+        influxQueryRepository.getQueries().clear();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
             String str;
 
             while ((str = reader.readLine()) != null) {
-                influxQuery.getQueries().add(str);
+                influxQueryRepository.getQueries().add(str);
             }
-            log.info("query read {}", influxQuery.getQueries().size());
+            log.info("query read {}", influxQueryRepository.getQueries().size());
         } catch (FileNotFoundException e) {
             log.error("file not found {}", e.getMessage());
         } catch (IOException e) {
