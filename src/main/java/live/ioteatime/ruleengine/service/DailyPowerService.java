@@ -18,7 +18,7 @@ public interface DailyPowerService {
      * @param index 몇번쨰 쿼리
      * @return influx 쿼리문
      */
-    String getInfluxQuery(int index);
+    String getQuery(int index);
 
     /**
      * influxdb 에 하루치 전력 총 합을 가져와 로컬 시간으로 바꾸는 메소드
@@ -38,12 +38,5 @@ public interface DailyPowerService {
      */
     double calculateDailyPower(Map<LocalDateTime, Object> hourlyPowerDataMap, LocalMidnightDto midNights);
 
-    void insertMysql(LocalDateTime yesterday, double totalPower);
-
-    /**
-     * 당일의 00:00 부터 다음날 00:00
-     *
-     * @return List<LocalDateTime>
-     */
-    LocalMidnightDto createMidnight();
+    void insertMysql(LocalDateTime yesterday, Double totalPower,int channelId,Double bill);
 }
