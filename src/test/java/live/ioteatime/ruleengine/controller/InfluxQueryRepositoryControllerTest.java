@@ -1,10 +1,10 @@
 package live.ioteatime.ruleengine.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import live.ioteatime.ruleengine.domain.InfluxQuery;
+import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
 import live.ioteatime.ruleengine.domain.QueryRequest;
 import live.ioteatime.ruleengine.domain.QueryResponse;
-import live.ioteatime.ruleengine.manager.QueryManager;
+import live.ioteatime.ruleengine.service.impl.QueryServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +24,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(InfluxQueryController.class)
-class InfluxQueryControllerTest {
+class InfluxQueryRepositoryControllerTest {
     @Autowired
     MockMvc mockMvc;
     @MockBean
-    QueryManager queryManager;
+    QueryServiceImpl queryServiceImpl;
     @MockBean
-    InfluxQuery influxQuery;
+    InfluxQueryRepository influxQueryRepository;
 
     @Test
     void addQueryTest() throws Exception {
         QueryRequest queryRequest = new QueryRequest();
 
-        doNothing().when(queryManager).addQuery(any());
+        doNothing().when(queryServiceImpl).addQuery(any());
 
         mockMvc.perform(post("/query")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -44,7 +44,7 @@ class InfluxQueryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Create Query")));
 
-        verify(queryManager).addQuery(any());
+        verify(queryServiceImpl).addQuery(any());
     }
 
     @Test
@@ -52,7 +52,7 @@ class InfluxQueryControllerTest {
         QueryResponse queryResponse = QueryResponse.builder().number(0).query("test").build();
         List<QueryResponse> queryResponseList = List.of(queryResponse);
 
-        when(queryManager.getQueries()).thenReturn(queryResponseList);
+        when(queryServiceImpl.getQueries()).thenReturn(queryResponseList);
 
         mockMvc.perform(get("/query")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -66,14 +66,14 @@ class InfluxQueryControllerTest {
     void deleteQueryTest() throws Exception {
         String remove = "test";
 
-        when(queryManager.deleteQuery(anyInt())).thenReturn(remove);
+        when(queryServiceImpl.deleteQuery(anyInt())).thenReturn(remove);
 
         mockMvc.perform(get("/delete/{index}", 0)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string("delete " + remove));
 
-        verify(queryManager).deleteQuery(anyInt());
+        verify(queryServiceImpl).deleteQuery(anyInt());
     }
 
 }
