@@ -92,5 +92,4 @@ public class InfluxQueryRepository {
         return queries.remove(index);
     }
 
-
 }
