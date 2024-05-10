@@ -160,6 +160,7 @@ public class QueryServiceImpl implements QueryService {
 
     protected BufferedReader createBufferedReader(String queryPath) {
         try {
+
             return new BufferedReader(new FileReader(queryPath));
         } catch (FileNotFoundException e) {
             throw new QueryFileIsNotFound(e.getMessage(), e);
