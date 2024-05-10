@@ -3,6 +3,7 @@ package live.ioteatime.ruleengine.service.impl;
 import live.ioteatime.ruleengine.domain.QueryRequest;
 import live.ioteatime.ruleengine.domain.QueryResponse;
 import live.ioteatime.ruleengine.domain.Tags;
+import live.ioteatime.ruleengine.exception.QueryFileIsNotFound;
 import live.ioteatime.ruleengine.repository.ChannelsRepository;
 import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
 import live.ioteatime.ruleengine.service.QueryService;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +54,7 @@ public class QueryServiceImpl implements QueryService {
     public List<QueryResponse> getQueries() {
         List<QueryResponse> queries = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(influxQueryRepository.getQueryPath()))) {
+        try (BufferedReader reader = createBufferedReader(influxQueryRepository.getQueryPath())) {
             String line;
             int index = 0;
 
@@ -111,7 +113,6 @@ public class QueryServiceImpl implements QueryService {
                 default:
                     break;
             }
-
         }
         log.info("split query {}", tags);
 
@@ -155,6 +156,15 @@ public class QueryServiceImpl implements QueryService {
     private void setWindow(String window, String fn, String output) {
         query.append("|> aggregateWindow(every: ").append(window).append(", fn: ").append(fn).append(", createEmpty: false) ")
                 .append("|> yield(name: \"").append(output).append("\")");
+    }
+
+    protected BufferedReader createBufferedReader(String queryPath) {
+        try {
+
+            return new BufferedReader(new FileReader(queryPath));
+        } catch (FileNotFoundException e) {
+            throw new QueryFileIsNotFound(e.getMessage(), e);
+        }
     }
 
 }
