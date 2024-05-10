@@ -33,7 +33,7 @@ class InfluxQueryRepositoryControllerTest {
     InfluxQueryRepository influxQueryRepository;
 
     @Test
-    void addQueryTest() throws Exception {
+    void updateQueryTest() throws Exception {
         QueryRequest queryRequest = new QueryRequest();
 
         doNothing().when(queryServiceImpl).addQuery(any());
