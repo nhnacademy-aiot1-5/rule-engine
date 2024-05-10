@@ -4,7 +4,6 @@ import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxTable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,16 +14,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
-@Getter
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class InfluxQueryRepository {
-    private List<String> queries = new ArrayList<>();
+    private final List<String> queries = new ArrayList<>();
     private final QueryApi queryApi;
+    @Getter
     @Value("${my.query.path}")
-    String queryPath;
+    private String queryPath;
 
     public List<FluxTable> query(String query) {
         return queryApi.query(query);

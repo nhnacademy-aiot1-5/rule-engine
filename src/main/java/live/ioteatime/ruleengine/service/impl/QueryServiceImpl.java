@@ -8,11 +8,12 @@ import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
 import live.ioteatime.ruleengine.service.QueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,10 @@ public class QueryServiceImpl implements QueryService {
     private final ChannelsRepository channelsRepository;
     StringBuilder query = new StringBuilder();
     Pattern pattern = Pattern.compile("\\[\"(\\w+)\"] == \"(\\w+)\"");
-    @Value("${my.query.path}")
-    String queryPath;
 
     @PostConstruct
     private void initQuery() {
-        influxQueryRepository.updateQuery(queryPath);
+        influxQueryRepository.updateQuery(influxQueryRepository.getQueryPath());
     }
 
     @Override
@@ -44,7 +43,7 @@ public class QueryServiceImpl implements QueryService {
         settingFilter(queryRequest);
         setWindow(queryRequest.getWindow(), queryRequest.getFn(), queryRequest.getYield());
         influxQueryRepository.writeQuery(query.toString());
-        influxQueryRepository.updateQuery(queryPath);
+        influxQueryRepository.updateQuery(influxQueryRepository.getQueryPath());
 
         log.info("save influx query : {}", query);
     }
@@ -53,7 +52,7 @@ public class QueryServiceImpl implements QueryService {
     public List<QueryResponse> getQueries() {
         List<QueryResponse> queries = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(influxQueryRepository.getQueryPath()))) {
             String line;
             int index = 0;
 
@@ -74,7 +73,7 @@ public class QueryServiceImpl implements QueryService {
     public String deleteQuery(int index) {
         String remove = influxQueryRepository.removeQuery(index);
         influxQueryRepository.modifyQuery();
-        influxQueryRepository.updateQuery(queryPath);
+        influxQueryRepository.updateQuery(influxQueryRepository.getQueryPath());
         log.info("delete query : {}", remove);
 
         return remove;
