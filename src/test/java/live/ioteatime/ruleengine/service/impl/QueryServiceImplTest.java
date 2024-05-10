@@ -66,7 +66,7 @@ class QueryServiceImplTest {
     }
 
     @Test
-    void getQueries() throws Exception {
+    void getQueries(){
 
         List<QueryResponse> queries = queryService.getQueries();
 
