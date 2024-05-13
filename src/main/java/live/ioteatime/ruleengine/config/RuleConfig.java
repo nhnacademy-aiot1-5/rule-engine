@@ -24,7 +24,7 @@ import java.util.Map;
 public class RuleConfig {
     private final OutlierRepository outlierRepository;
     private final MappingTableService mappingTableService;
-
+    private static final String PHASE = "kwh";
     private enum Protocol {
         MODBUS, MQTT
     }
@@ -56,8 +56,9 @@ public class RuleConfig {
     @Bean
     public Rule outlierCheck() {
         return ((mqttModbusDTO, ruleChain) -> {
-            if (Protocol.MQTT.toString().equals(mqttModbusDTO.getProtocol()) &&
-                    mqttModbusDTO.getValue() > outlierRepository.getMax() || mqttModbusDTO.getValue() < outlierRepository.getMin()) {
+            TopicDto topicDto = splitTopic(mqttModbusDTO);
+            if (Protocol.MQTT.toString().equals(mqttModbusDTO.getProtocol()) && PHASE.equals(topicDto.getPhase()) &&
+                    (mqttModbusDTO.getValue() > outlierRepository.getMax() || mqttModbusDTO.getValue() < outlierRepository.getMin())) {
 
                 log.info("{} is Outlier!!", mqttModbusDTO.getValue());
             }
