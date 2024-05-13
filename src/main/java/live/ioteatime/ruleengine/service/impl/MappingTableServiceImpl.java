@@ -1,0 +1,34 @@
+package live.ioteatime.ruleengine.service.impl;
+
+import live.ioteatime.ruleengine.domain.MappingData;
+import live.ioteatime.ruleengine.repository.ChannelsRepository;
+import live.ioteatime.ruleengine.repository.MappingTableRepository;
+import live.ioteatime.ruleengine.service.MappingTableService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class MappingTableServiceImpl implements MappingTableService {
+    private final ChannelsRepository channelsRepository;
+    private final MappingTableRepository mappingTableRepository;
+
+    @Override
+    public void getMappingTable() {
+        List<MappingData> mappingDataDto = channelsRepository.loadMappingTable();
+
+        mappingTableRepository.addValue(mappingDataDto);
+        log.info("----{}",mappingTableRepository.getTables());
+    }
+
+    @Override
+    public Map<String,String> getTags(int address) {
+        return mappingTableRepository.getTags(address);
+    }
+
+}

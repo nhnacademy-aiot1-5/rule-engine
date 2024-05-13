@@ -16,6 +16,6 @@ public class ChannelEntity {
     private int placeId;
     private String channelName;
     private int address;
-    private int quantity;
+    private int type;
     private int functionCode;
 }
