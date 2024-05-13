@@ -35,7 +35,7 @@ public class CreatePropertiesImpl implements CreateProperties {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("spring.config.name=prod" + "\n");
-            writer.write("bridge.mod=mqtt" + "\n");
+            writer.write("bridge.server.protocol=mqtt" + "\n");
             writer.write("mqtt.server.uri=" + mqttInfo.getMqttHost() + "\n");
             writer.write("mqtt.client.id=" + mqttInfo.getMqttId() + "\n");
             writer.write("mqtt.subscribe.topic=" + splitTopic(mqttInfo.getMqttTopic()) + "\n");
@@ -54,7 +54,7 @@ public class CreatePropertiesImpl implements CreateProperties {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("spring.config.name=prod" + "\n");
-            writer.write("bridge.mod=modbus" + "\n");
+            writer.write("bridge.server.protocol=modbus" + "\n");
             writer.write("modbus.host=" + modbus.getHost() + "\n");
             writer.write("modbus.port=" + modbus.getPort() + "\n");
             writer.write("modbus.channels=" + modbus.getChannel() + "\n");
