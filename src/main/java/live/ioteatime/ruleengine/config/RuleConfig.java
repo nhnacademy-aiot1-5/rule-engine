@@ -24,6 +24,7 @@ import java.util.Map;
 public class RuleConfig {
     private final OutlierRepo outlierRepo;
     private final MappingTableService mappingTableService;
+
     private enum Protocol {
         MODBUS, MQTT
     }
@@ -31,6 +32,11 @@ public class RuleConfig {
     @Bean
     public Rule nullCheck() {
         return ((mqttModbusDTO, ruleChain) -> {
+            if (Protocol.MODBUS.toString().equals(mqttModbusDTO.getProtocol())) {
+                ruleChain.doProcess(mqttModbusDTO);
+                return;
+            }
+
             TopicDto topicDto = splitTopic(mqttModbusDTO);
 
             if (mqttModbusDTO.getValue() == null) {
@@ -60,14 +66,12 @@ public class RuleConfig {
     @Bean
     public Rule inputInflux(InfluxDBClient influxDBClient) {
         return ((mqttModbusDTO, ruleChain) -> {
-
             if (String.valueOf(Protocol.MQTT).equals(mqttModbusDTO.getProtocol())) {
                 insertMqtt(influxDBClient, mqttModbusDTO, ruleChain);
                 return;
             }
 
             insertModbus(influxDBClient, mqttModbusDTO, ruleChain);
-
         });
     }
 
@@ -92,7 +96,6 @@ public class RuleConfig {
         String address = mqttModbusDTO.getId().split("/")[1];
         Map<String, String> tags = mappingTableService.getTags(Integer.parseInt(address));
         WriteApiBlocking writeApiBlocking = influxDBClient.getWriteApiBlocking();
-
         Point point = Point.measurement("test-measurement")
                 .time(mqttModbusDTO.getTime(), WritePrecision.MS)
                 .addTags(tags)

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 
@@ -18,16 +19,21 @@ public class MappingTableServiceImpl implements MappingTableService {
     private final ChannelsRepository channelsRepository;
     private final MappingTableRepository mappingTableRepository;
 
+    @PostConstruct
+    private void initQuery() {
+        this.getMappingTable();
+    }
+
     @Override
     public void getMappingTable() {
         List<MappingData> mappingDataDto = channelsRepository.loadMappingTable();
 
         mappingTableRepository.addValue(mappingDataDto);
-        log.info("----{}",mappingTableRepository.getTables());
+        log.info("----{}", mappingTableRepository.getTables());
     }
 
     @Override
-    public Map<String,String> getTags(int address) {
+    public Map<String, String> getTags(int address) {
         return mappingTableRepository.getTags(address);
     }
 

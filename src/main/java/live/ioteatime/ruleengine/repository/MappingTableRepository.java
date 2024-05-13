@@ -16,10 +16,12 @@ public class MappingTableRepository {
     private final Map<Integer, Map<String, String>> mappingTable = new HashMap<>();
 
     public Set<Map.Entry<Integer, Map<String, String>>> getTables() {
+
         return mappingTable.entrySet();
     }
 
     public Map<String, String> getTags(int address) {
+
         return mappingTable.get(address);
     }
 
@@ -33,7 +35,7 @@ public class MappingTableRepository {
             }
 
             Map<String, String> tag = new HashMap<>(Map.of("type", mappingData.getChannel_name(), "place", mappingData.getPlace_name(), mappingData.getType(), mappingData.getValue()));
-            mappingTable.put(mappingData.getAddress(),tag);
+            mappingTable.put(mappingData.getAddress(), tag);
         });
     }
 
