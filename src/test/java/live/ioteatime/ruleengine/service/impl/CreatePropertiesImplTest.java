@@ -61,7 +61,6 @@ class CreatePropertiesImplTest {
         ModbusInfo modbusInfo = constructor.newInstance();
         ReflectionTestUtils.setField(modbusInfo, "name", "localhost");
         ReflectionTestUtils.setField(modbusInfo, "host", "localhost");
-        ReflectionTestUtils.setField(modbusInfo, "port", 88);
         ReflectionTestUtils.setField(modbusInfo, "channel", "800/2,12/21");
 
         String config = createProperties.createConfig(modbusInfo);
