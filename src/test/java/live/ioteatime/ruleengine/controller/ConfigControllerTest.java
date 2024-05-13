@@ -53,7 +53,7 @@ class ConfigControllerTest {
         when(createProperties.createConfig(any(MqttInfo.class))).thenReturn(filePath);
         doNothing().when(jschService).scpFile(anyString(), anyString(),anyString());
 
-        mockMvc.perform(post("/brokers")
+        mockMvc.perform(post("/mqtt")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(mqttInfo)))
                 .andExpect(status().isOk())
