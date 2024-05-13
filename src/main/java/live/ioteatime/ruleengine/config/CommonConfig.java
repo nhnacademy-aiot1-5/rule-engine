@@ -2,7 +2,7 @@ package live.ioteatime.ruleengine.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class CommonConfig {
 
     @Bean
-    public BlockingQueue<MqttData> blockingQueue() {
+    public BlockingQueue<MqttModbusDTO> blockingQueue() {
 
         return new LinkedBlockingQueue<>();
     }

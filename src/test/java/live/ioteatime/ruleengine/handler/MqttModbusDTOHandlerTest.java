@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Constructor;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import live.ioteatime.ruleengine.handler.impl.MqttDataHandlerImpl;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import org.assertj.core.api.Assertions;
@@ -14,9 +14,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-class MqttDataHandlerTest {
+class MqttModbusDTOHandlerTest {
 
-    BlockingQueue<MqttData> queue;
+    BlockingQueue<MqttModbusDTO> queue;
     RuleChain ruleChain;
     MqttDataHandler mqttDataHandler;
     ObjectMapper objectMapper;
@@ -32,8 +32,8 @@ class MqttDataHandlerTest {
     @Test
     void run() throws Exception {
         // given
-        MqttData mqttData = getMqttData();
-        queue.put(mqttData);
+        MqttModbusDTO mqttModbusDTO = getMqttData();
+        queue.put(mqttModbusDTO);
 
         // when
         mqttDataHandler.start();
@@ -46,8 +46,8 @@ class MqttDataHandlerTest {
         Mockito.verify(ruleChain).doProcess(any());
     }
 
-    private MqttData getMqttData() throws Exception {
-        Constructor<MqttData> constructor = MqttData.class.getDeclaredConstructor();
+    private MqttModbusDTO getMqttData() throws Exception {
+        Constructor<MqttModbusDTO> constructor = MqttModbusDTO.class.getDeclaredConstructor();
         constructor.setAccessible(true);
 
         return constructor.newInstance();

@@ -5,7 +5,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
-import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @RequiredArgsConstructor
 public class RabbitmqConfig {
-    private final BlockingQueue<MqttData> blockingQueue;
+    private final BlockingQueue<MqttModbusDTO> blockingQueue;
     private final ObjectMapper mapper;
     private final ConnectionFactory connectionFactory;
 
@@ -37,7 +37,7 @@ public class RabbitmqConfig {
 
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody());
-            MqttData data = mapper.readValue(message, MqttData.class);
+            MqttModbusDTO data = mapper.readValue(message, MqttModbusDTO.class);
                 try {
                     blockingQueue.put(data);
                 } catch (InterruptedException e) {
