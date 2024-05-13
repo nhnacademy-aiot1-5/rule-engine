@@ -9,18 +9,21 @@ import live.ioteatime.ruleengine.domain.OutlierRepo;
 import live.ioteatime.ruleengine.domain.TopicDto;
 import live.ioteatime.ruleengine.rule.Rule;
 import live.ioteatime.ruleengine.rule.RuleChain;
+import live.ioteatime.ruleengine.service.MappingTableService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
+
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
 public class RuleConfig {
     private final OutlierRepo outlierRepo;
-
+    private final MappingTableService mappingTableService;
     private enum Protocol {
         MODBUS, MQTT
     }
@@ -60,10 +63,11 @@ public class RuleConfig {
 
             if (String.valueOf(Protocol.MQTT).equals(mqttModbusDTO.getProtocol())) {
                 insertMqtt(influxDBClient, mqttModbusDTO, ruleChain);
+                return;
             }
-            if (String.valueOf(Protocol.MODBUS).equals(mqttModbusDTO.getProtocol())) {
 
-            }
+            insertModbus(influxDBClient, mqttModbusDTO, ruleChain);
+
         });
     }
 
@@ -77,6 +81,21 @@ public class RuleConfig {
                 .addTag("type", topicDto.getType())
                 .addTag("phase", topicDto.getPhase())
                 .addTag("description", topicDto.getDescription())
+                .addField("value", mqttModbusDTO.getValue());
+
+        writeApiBlocking.writePoint(point);
+
+        ruleChain.doProcess(mqttModbusDTO);
+    }
+
+    private void insertModbus(InfluxDBClient influxDBClient, MqttModbusDTO mqttModbusDTO, RuleChain ruleChain) {
+        String address = mqttModbusDTO.getId().split("/")[1];
+        Map<String, String> tags = mappingTableService.getTags(Integer.parseInt(address));
+        WriteApiBlocking writeApiBlocking = influxDBClient.getWriteApiBlocking();
+
+        Point point = Point.measurement("test-measurement")
+                .time(mqttModbusDTO.getTime(), WritePrecision.MS)
+                .addTags(tags)
                 .addField("value", mqttModbusDTO.getValue());
 
         writeApiBlocking.writePoint(point);
