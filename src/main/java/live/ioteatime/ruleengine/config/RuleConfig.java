@@ -56,14 +56,12 @@ public class RuleConfig {
     @Bean
     public Rule outlierCheck() {
         return ((mqttModbusDTO, ruleChain) -> {
-            if (Protocol.MODBUS.toString().equals(mqttModbusDTO.getProtocol())) {
-                ruleChain.doProcess(mqttModbusDTO);
-                return;
-            }
+            if (Protocol.MQTT.toString().equals(mqttModbusDTO.getProtocol()) &&
+                    mqttModbusDTO.getValue() > outlierRepository.getMax() || mqttModbusDTO.getValue() < outlierRepository.getMin()) {
 
-            if (mqttModbusDTO.getValue() > outlierRepository.getMax() || mqttModbusDTO.getValue() < outlierRepository.getMin()) {
                 log.info("{} is Outlier!!", mqttModbusDTO.getValue());
             }
+
             ruleChain.doProcess(mqttModbusDTO);
         });
     }
