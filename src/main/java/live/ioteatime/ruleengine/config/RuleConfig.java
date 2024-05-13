@@ -5,7 +5,7 @@ import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import live.ioteatime.ruleengine.domain.MqttModbusDTO;
-import live.ioteatime.ruleengine.domain.OutlierRepo;
+import live.ioteatime.ruleengine.repository.OutlierRepository;
 import live.ioteatime.ruleengine.domain.TopicDto;
 import live.ioteatime.ruleengine.rule.Rule;
 import live.ioteatime.ruleengine.rule.RuleChain;
@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class RuleConfig {
-    private final OutlierRepo outlierRepo;
+    private final OutlierRepository outlierRepository;
     private final MappingTableService mappingTableService;
 
     private enum Protocol {
@@ -56,7 +56,11 @@ public class RuleConfig {
     @Bean
     public Rule outlierCheck() {
         return ((mqttModbusDTO, ruleChain) -> {
-            if (mqttModbusDTO.getValue() > outlierRepo.getMax() || mqttModbusDTO.getValue() < outlierRepo.getMin()) {
+            if (Protocol.MODBUS.toString().equals(mqttModbusDTO.getProtocol())) {
+                ruleChain.doProcess(mqttModbusDTO);
+            }
+
+            if (mqttModbusDTO.getValue() > outlierRepository.getMax() || mqttModbusDTO.getValue() < outlierRepository.getMin()) {
                 log.info("{} is Outlier!!", mqttModbusDTO.getValue());
             }
             ruleChain.doProcess(mqttModbusDTO);
