@@ -1,10 +1,10 @@
 package live.ioteatime.ruleengine.rule;
 
-import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 
 public interface RuleChain {
 
-    void doProcess(MqttData mqttData);
+    void doProcess(MqttModbusDTO mqttModbusDTO);
     void resetThreadLocal();
     void clearThreadLocal();
 }

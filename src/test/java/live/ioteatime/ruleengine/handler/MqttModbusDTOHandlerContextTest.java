@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.ObjectFactory;
 
-class MqttDataHandlerContextTest {
+class MqttModbusDTOHandlerContextTest {
 
     @Test
     void start() {
