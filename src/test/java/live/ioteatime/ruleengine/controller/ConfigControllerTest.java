@@ -67,7 +67,7 @@ class ConfigControllerTest {
     void deleteBroker() throws Exception {
         doNothing().when(jschService).deleteBridge(anyString(),anyString());
 
-        mockMvc.perform(get("/delete/{bridgeName}", "test")
+        mockMvc.perform(get("/delete/{type}/{bridgeName}", "test","test")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Delete Bridge ")));
@@ -82,7 +82,6 @@ class ConfigControllerTest {
         ModbusInfo modbusInfo = constructor.newInstance();
         ReflectionTestUtils.setField(modbusInfo, "name", "localhost");
         ReflectionTestUtils.setField(modbusInfo, "host", "localhost");
-        ReflectionTestUtils.setField(modbusInfo, "port", 88);
         ReflectionTestUtils.setField(modbusInfo, "channel", "800/2,12/21");
         String filePath = "/src/asdadsa.properties";
 
