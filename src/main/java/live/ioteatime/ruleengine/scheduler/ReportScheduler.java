@@ -2,6 +2,7 @@ package live.ioteatime.ruleengine.scheduler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import live.ioteatime.ruleengine.domain.*;
+import live.ioteatime.ruleengine.repository.OutlierRepository;
 import live.ioteatime.ruleengine.service.OutlierService;
 import live.ioteatime.ruleengine.service.impl.DailyPowerServiceImpl;
 import live.ioteatime.ruleengine.service.impl.QueryServiceImpl;
@@ -23,7 +24,7 @@ public class ReportScheduler {
     private final DailyPowerServiceImpl dailyPowerService;
     private final QueryServiceImpl queryServiceImpl;
     private final OutlierService outlierService;
-    private final OutlierRepo outlierRepo;
+    private final OutlierRepository outlierRepository;
     @Value("${schedule.flag}")
     private boolean cronFlag;
     LocalMidnightDto localMidnightDto = new LocalMidnightDto();
@@ -55,10 +56,10 @@ public class ReportScheduler {
                 log.info("outlier not found {}", key);
             }
             if (minMaxDto.isPresent()) {
-                outlierRepo.setMin(minMaxDto.get().getMin());
-                outlierRepo.setMax(minMaxDto.get().getMax());
+                outlierRepository.setMin(minMaxDto.get().getMin());
+                outlierRepository.setMax(minMaxDto.get().getMax());
 
-                log.info("outlier update to min {} max {}", outlierRepo.getMin(), outlierRepo.getMax());
+                log.info("outlier update to min {} max {}", outlierRepository.getMin(), outlierRepository.getMax());
             }
         }
     }
