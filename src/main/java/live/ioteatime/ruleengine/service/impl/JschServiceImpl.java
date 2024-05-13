@@ -1,6 +1,5 @@
 package live.ioteatime.ruleengine.service.impl;
 
-import com.jcraft.jsch.*;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
@@ -29,7 +28,7 @@ public class JschServiceImpl implements JschService {
     @Override
     public void scpFile(String filePath, String fileName,String type) throws CreateJSchSessionException {
         String startShell = "./startup.sh ";
-        String destinationDir = jschProperties.getSavePath()+type + "/" + fileName;
+        String destinationDir = jschProperties.getSavePath()+"/"+type + "/" + fileName;
         Session session = jSchManager.createSession();
         ChannelSftp channelSftp = jSchManager.createChannelSftp(session);
         ChannelExec channelExec = jSchManager.createChannelExec(session);
@@ -123,8 +122,9 @@ public class JschServiceImpl implements JschService {
      * @param channelExec commandline 채널
      */
     private static void giveCommand(String command,String type,String fileName, ChannelExec channelExec) throws JSchException {
-        channelExec.setCommand(command + type + " " + fileName);
-        log.info("giveCommand {}", command + fileName);
+        String commands = command + type + " " + fileName;
+        channelExec.setCommand(commands);
+        log.info("giveCommand {}", commands);
         channelExec.connect();
     }
 

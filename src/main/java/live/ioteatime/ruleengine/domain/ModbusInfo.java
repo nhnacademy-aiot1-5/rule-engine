@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 public class ModbusInfo {
     private String name;
     private String host;
-    private int port;
     private String channel;
 }
 
