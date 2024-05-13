@@ -58,6 +58,7 @@ public class RuleConfig {
         return ((mqttModbusDTO, ruleChain) -> {
             if (Protocol.MODBUS.toString().equals(mqttModbusDTO.getProtocol())) {
                 ruleChain.doProcess(mqttModbusDTO);
+                return;
             }
 
             if (mqttModbusDTO.getValue() > outlierRepository.getMax() || mqttModbusDTO.getValue() < outlierRepository.getMin()) {
