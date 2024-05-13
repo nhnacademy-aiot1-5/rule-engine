@@ -1,6 +1,6 @@
 package live.ioteatime.ruleengine.rule.impl;
 
-import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import live.ioteatime.ruleengine.rule.Rule;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +28,14 @@ public class RuleChainImpl implements RuleChain {
     }
 
     @Override
-    public void doProcess(MqttData mqttData) {
+    public void doProcess(MqttModbusDTO mqttModbusDTO) {
         Integer index = threadLocal.get();
         if (index >= rules.size()) {
 
             return;
         }
         threadLocal.set(index + 1);
-        rules.get(index).doProcess(mqttData,this);
+        rules.get(index).doProcess(mqttModbusDTO,this);
     }
 
 }

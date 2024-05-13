@@ -46,13 +46,14 @@ class JschServiceImplTest {
             String fileName = "test";
             String command = "./startup.sh " + fileName;
             String destinationPaht = destination + "/" + fileName;
+            String type = "mqtt";
 
             when(properties.getSavePath()).thenReturn(destination);
             when(jSchManager.createSession()).thenReturn(session);
             when(jSchManager.createChannelSftp(session)).thenReturn(channelSftp);
             when(jSchManager.createChannelExec(session)).thenReturn(channelExec);
 
-            jschService.scpFile(filePath, fileName);
+            jschService.scpFile(filePath, fileName,type);
 
             verify(channelSftp).mkdir(eq(destinationPaht));
             verify(channelSftp).put(eq(filePath), eq(destinationPaht), eq(ChannelSftp.OVERWRITE));

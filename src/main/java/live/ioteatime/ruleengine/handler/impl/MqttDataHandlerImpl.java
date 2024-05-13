@@ -2,7 +2,7 @@ package live.ioteatime.ruleengine.handler.impl;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import live.ioteatime.ruleengine.handler.MqttDataHandler;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     private static final AtomicInteger counter = new AtomicInteger(0);
 
     private final Thread thread;
-    private final BlockingQueue<MqttData> blockingQueue;
+    private final BlockingQueue<MqttModbusDTO> blockingQueue;
     private final RuleChain ruleChain;
 
     /**
@@ -32,16 +32,16 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
      * @param blockingQueue MQTT 데이터가 저장된 큐입니다.
      * @param ruleChain     데이터를 처리할 룰 체인입니다.
      */
-    public MqttDataHandlerImpl(BlockingQueue<MqttData> blockingQueue, RuleChain ruleChain) {
+    public MqttDataHandlerImpl(BlockingQueue<MqttModbusDTO> blockingQueue, RuleChain ruleChain) {
         thread = new Thread(this, "MqttDataHandlerThread-" + counter.incrementAndGet());
         this.blockingQueue = blockingQueue;
         this.ruleChain = ruleChain;
     }
 
     private void handleData() throws InterruptedException {
-        MqttData mqttData = blockingQueue.take();
+        MqttModbusDTO mqttModbusDTO = blockingQueue.take();
         ruleChain.resetThreadLocal();
-        ruleChain.doProcess(mqttData);
+        ruleChain.doProcess(mqttModbusDTO);
     }
 
     @Override

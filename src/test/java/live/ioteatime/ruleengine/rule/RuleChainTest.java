@@ -1,6 +1,6 @@
 package live.ioteatime.ruleengine.rule;
 
-import live.ioteatime.ruleengine.domain.MqttData;
+import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import live.ioteatime.ruleengine.rule.impl.RuleChainImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -38,11 +38,11 @@ class RuleChainTest {
 
     @Test
     void doProcess() throws Exception {
-        MqttData data = getMqttData();
-        data.setTopic("adssad");
+        MqttModbusDTO data = getMqttData();
+        data.setId("adssad");
 
         Answer answer = i -> {
-            MqttData argument1 = i.getArgument(0, MqttData.class);
+            MqttModbusDTO argument1 = i.getArgument(0, MqttModbusDTO.class);
             RuleChain argument = i.getArgument(1, RuleChain.class);
             argument.doProcess(argument1);
             return null;
@@ -55,19 +55,19 @@ class RuleChainTest {
         ruleChain.resetThreadLocal();
         ruleChain.doProcess(data);
 
-        verify(rule1).doProcess(any(MqttData.class), any(RuleChain.class));
-        verify(rule2).doProcess(any(MqttData.class), any(RuleChain.class));
-        verify(rule3).doProcess(any(MqttData.class), any(RuleChain.class));
+        verify(rule1).doProcess(any(MqttModbusDTO.class), any(RuleChain.class));
+        verify(rule2).doProcess(any(MqttModbusDTO.class), any(RuleChain.class));
+        verify(rule3).doProcess(any(MqttModbusDTO.class), any(RuleChain.class));
 
         List<Rule> rules = (List<Rule>) getField(ruleChain, "rules");
         Assertions.assertTrue(rules.size() == 3);
     }
 
-    private MqttData getMqttData() throws Exception {
-        Constructor<?> constructor = Class.forName("live.ioteatime.ruleengine.domain.MqttData").getDeclaredConstructor();
+    private MqttModbusDTO getMqttData() throws Exception {
+        Constructor<?> constructor = Class.forName("live.ioteatime.ruleengine.domain.MqttModbusDTO").getDeclaredConstructor();
         constructor.setAccessible(true);
 
-        return (MqttData) constructor.newInstance();
+        return (MqttModbusDTO) constructor.newInstance();
     }
 
 }
