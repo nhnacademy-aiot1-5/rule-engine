@@ -38,7 +38,7 @@ public class CreatePropertiesImpl implements CreateProperties {
             writer.write("bridge.server.protocol=mqtt" + "\n");
             writer.write("mqtt.server.uri=" + mqttInfo.getMqttHost() + "\n");
             writer.write("mqtt.client.id=" + mqttInfo.getMqttId() + "\n");
-            writer.write("mqtt.subscribe.topic=" + splitTopic(mqttInfo.getMqttTopic()) + "\n");
+            writer.write("mqtt.subscribe.topics=" + splitTopic(mqttInfo.getMqttTopic()) + "\n");
             rabbitmqConfigSet(writer);
         } catch (IOException e) {
             log.error("Create mqtt FIle false {}", e.getMessage());
@@ -55,9 +55,8 @@ public class CreatePropertiesImpl implements CreateProperties {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("spring.config.name=prod" + "\n");
             writer.write("bridge.server.protocol=modbus" + "\n");
-            writer.write("modbus.host=" + modbus.getHost() + "\n");
-            writer.write("modbus.port=" + modbus.getPort() + "\n");
-            writer.write("modbus.channels=" + modbus.getChannel() + "\n");
+            writer.write("modbus.server.uri=" + modbus.getHost() + "\n");
+            writer.write("modbus.request.channels=" + modbus.getChannel() + "\n");
             rabbitmqConfigSet(writer);
         } catch (IOException e) {
             log.error("Create modbus FIle false {}", e.getMessage());
