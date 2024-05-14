@@ -1,11 +1,11 @@
 package live.ioteatime.ruleengine.domain;
 
 public interface MappingData {
-    String getChannel_name();
+    String getChannelName();
 
     Integer getAddress();
 
-    String getPlace_name();
+    String getPlaceName();
 
     String getType();
 

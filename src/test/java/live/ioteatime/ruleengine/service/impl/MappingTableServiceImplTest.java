@@ -25,7 +25,7 @@ class MappingTableServiceImplTest {
     void getMappingTable() {
         MappingData mappingData = new MappingData() {
             @Override
-            public String getChannel_name() {
+            public String getChannelName() {
                 return "channel";
             }
 
@@ -35,7 +35,7 @@ class MappingTableServiceImplTest {
             }
 
             @Override
-            public String getPlace_name() {
+            public String getPlaceName() {
                 return "test";
             }
 
