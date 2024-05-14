@@ -2,13 +2,14 @@ package live.ioteatime.ruleengine.scheduler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import live.ioteatime.ruleengine.domain.*;
-import live.ioteatime.ruleengine.repository.OutlierRepository;
 import live.ioteatime.ruleengine.service.OutlierService;
 import live.ioteatime.ruleengine.service.impl.DailyPowerServiceImpl;
 import live.ioteatime.ruleengine.service.impl.QueryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +25,15 @@ public class ReportScheduler {
     private final DailyPowerServiceImpl dailyPowerService;
     private final QueryServiceImpl queryServiceImpl;
     private final OutlierService outlierService;
-    private final OutlierRepository outlierRepository;
     @Value("${schedule.flag}")
     private boolean cronFlag;
     LocalMidnightDto localMidnightDto = new LocalMidnightDto();
+    private static final String KEY = "hourly_outlier";
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void firstStart() throws JsonProcessingException {
+        outlierUpdate();
+    }
 
     @Scheduled(cron = "${schedule.cron1}")
     public void saveTodayPower() {
@@ -44,23 +50,22 @@ public class ReportScheduler {
     }
 
     @Scheduled(cron = "${schedule.cron2}")
-    public void updateOutlier() throws JsonProcessingException {
-        String key = "hourly_outlier";
+    public void outlierUpdater() throws JsonProcessingException {
+        outlierUpdate();
+    }
+
+    private void outlierUpdate() throws JsonProcessingException {
         LocalDateTimeDto localDateTimeDto = outlierService.localDateTime();
 
         if (cronFlag) {
-            OutlierDto outlier = outlierService.getOutlier(key);
+            OutlierDto outlier = outlierService.getOutlier(ReportScheduler.KEY);
             Optional<MinMaxDto> minMaxDto = outlierService.matchTime(outlier, localDateTimeDto);
 
             if (minMaxDto.isEmpty()) {
-                log.info("outlier not found {}", key);
+                log.info("outlier not found {}", ReportScheduler.KEY);
             }
-            if (minMaxDto.isPresent()) {
-                outlierRepository.setMin(minMaxDto.get().getMin());
-                outlierRepository.setMax(minMaxDto.get().getMax());
 
-                log.info("outlier update to min {} max {}", outlierRepository.getMin(), outlierRepository.getMax());
-            }
+            minMaxDto.ifPresent(outlierService::updateOutlier);
         }
     }
 

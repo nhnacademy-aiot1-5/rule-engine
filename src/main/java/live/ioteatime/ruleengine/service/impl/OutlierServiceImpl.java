@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
+import live.ioteatime.ruleengine.repository.OutlierRepository;
 import live.ioteatime.ruleengine.service.OutlierService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.util.Optional;
 public class OutlierServiceImpl implements OutlierService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final OutlierRepository outlierRepository;
 
     @Override
     public OutlierDto getOutlier(String key) throws JsonProcessingException {
@@ -44,13 +46,21 @@ public class OutlierServiceImpl implements OutlierService {
 
     @Override
     public Optional<MinMaxDto> matchTime(OutlierDto outlierDto, LocalDateTimeDto localDateTimeDto) {
-        Map<Integer, MinMaxDto> stream = outlierDto.getHour();
+        Map<Integer, MinMaxDto> outliers = outlierDto.getHour();
 
-        return stream.entrySet().stream()
+        return outliers.entrySet().stream()
                 .filter(h -> h.getKey() == localDateTimeDto.getTime())
-                .filter(e->e.getValue().getUpdatedAt().equals(localDateTimeDto.getDate()))
+                .filter(e -> e.getValue().getUpdatedAt().equals(localDateTimeDto.getDate()))
                 .map(Map.Entry::getValue)
                 .findFirst();
+    }
+
+    @Override
+    public void updateOutlier(MinMaxDto minMaxDto) {
+        outlierRepository.setMin(minMaxDto.getMin());
+        outlierRepository.setMax(minMaxDto.getMax());
+
+        log.info("outlier update to min {} max {}", outlierRepository.getMin(), outlierRepository.getMax());
     }
 
 }
