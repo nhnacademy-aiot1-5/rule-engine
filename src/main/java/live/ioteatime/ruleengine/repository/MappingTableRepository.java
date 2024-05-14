@@ -34,7 +34,7 @@ public class MappingTableRepository {
                 return;
             }
 
-            Map<String, String> tag = new HashMap<>(Map.of("type", mappingData.getChannel_name(), "place", mappingData.getPlace_name(), mappingData.getType(), mappingData.getValue()));
+            Map<String, String> tag = new HashMap<>(Map.of("type", mappingData.getChannelName(), "place", mappingData.getPlaceName(), mappingData.getType(), mappingData.getValue()));
             mappingTable.put(mappingData.getAddress(), tag);
         });
     }
