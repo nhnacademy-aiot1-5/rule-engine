@@ -2,7 +2,6 @@ package live.ioteatime.ruleengine.service.impl;
 
 import live.ioteatime.ruleengine.domain.QueryRequest;
 import live.ioteatime.ruleengine.domain.QueryResponse;
-import live.ioteatime.ruleengine.domain.Tags;
 import live.ioteatime.ruleengine.repository.ChannelsRepository;
 import live.ioteatime.ruleengine.repository.impl.InfluxQueryRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
