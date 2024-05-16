@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeoutException;
@@ -22,6 +23,14 @@ public class RabbitmqConfig {
     private final BlockingQueue<MqttModbusDTO> blockingQueue;
     private final ObjectMapper mapper;
     private final ConnectionFactory connectionFactory;
+    private Connection connection;
+    private Channel channel;
+
+    @PreDestroy
+    public void closeConnection() throws IOException, TimeoutException {
+        channel.close();
+        connection.close();
+    }
 
     /**
      * Rabbitmq 에서 데이터들을 불러와
@@ -29,8 +38,8 @@ public class RabbitmqConfig {
      */
     @Bean
     public Connection getMessage() throws IOException, TimeoutException {
-        Connection connection = connectionFactory.newConnection();
-        Channel channel = connection.createChannel();
+        connection = connectionFactory.newConnection();
+        channel = connection.createChannel();
         log.info("RabbitMQ connection established");
         String queueName = "MessageQueue";
         channel.queueDeclare(queueName, true, false, false, null);
@@ -38,20 +47,18 @@ public class RabbitmqConfig {
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody());
             MqttModbusDTO data = mapper.readValue(message, MqttModbusDTO.class);
-                try {
-                    blockingQueue.put(data);
-                } catch (InterruptedException e) {
-                    log.error("Blocking Queue Error : {}",e.getMessage());
-                    Thread.currentThread().interrupt();
-                }
+            try {
+                blockingQueue.put(data);
+            } catch (InterruptedException e) {
+                log.error("Blocking Queue Error : {}", e.getMessage());
+                Thread.currentThread().interrupt();
+            }
         };
-            // 컨슈머가 메시지를 소비하는 방법
-            // queueName = 가져올 큐 이름
-            // true = 자동으로 ack 전(작업 완료 신호인 ack가 rabbitmq에 도착해야 큐에서 데이터 삭제)
-            channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
-            });
+
+        channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+        });
 
         return connection;
-        }
+    }
 
 }
