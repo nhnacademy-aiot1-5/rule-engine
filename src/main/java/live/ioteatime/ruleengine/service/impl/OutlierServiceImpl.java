@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
-import live.ioteatime.ruleengine.repository.OutlierRepository;
+import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
 import live.ioteatime.ruleengine.service.OutlierService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

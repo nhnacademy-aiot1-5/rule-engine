@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(InfluxQueryController.class)
-class InfluxQueryRepositoryControllerTest {
+class InfluxQueryRepositoryImplControllerTest {
     @Autowired
     MockMvc mockMvc;
     @MockBean

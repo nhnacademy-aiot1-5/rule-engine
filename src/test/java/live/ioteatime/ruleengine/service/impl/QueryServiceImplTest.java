@@ -2,9 +2,8 @@ package live.ioteatime.ruleengine.service.impl;
 
 import live.ioteatime.ruleengine.domain.QueryRequest;
 import live.ioteatime.ruleengine.domain.QueryResponse;
-import live.ioteatime.ruleengine.domain.Tags;
 import live.ioteatime.ruleengine.repository.ChannelsRepository;
-import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
+import live.ioteatime.ruleengine.repository.impl.InfluxQueryRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 class QueryServiceImplTest {
     @Mock
-    InfluxQueryRepository influxQueryRepository;
+    InfluxQueryRepositoryImpl influxQueryRepository;
     @Mock
     ChannelsRepository channelsRepository;
     @InjectMocks
@@ -92,11 +91,6 @@ class QueryServiceImplTest {
 
     @Test
     void getChannelId() {
-        Tags tag = new Tags();
-        tag.setType("ads");
-        tag.setPhase("ads");
-        tag.setDescription("ads");
-        tag.setPlace("ads");
         String query1 = "import \"timezone\"option location = timezone.fixed(offset: 9h) from(bucket: \"test\") |> range(start: -2d) |> filter(fn: (r) => r[\"place\"] == \"test\") |> filter(fn: (r) => r[\"type\"] == \"test\") |> filter(fn: (r) => r[\"phase\"] == \"test\") |> filter(fn: (r) => r[\"description\"] == \"test\") |> aggregateWindow(every: 1h, fn: last, createEmpty: false) |> yield(name: \"last\")\n";
 
         when(influxQueryRepository.getQuery(1)).thenReturn(query1);

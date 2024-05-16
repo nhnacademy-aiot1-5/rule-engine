@@ -1,42 +1,29 @@
 package live.ioteatime.ruleengine.repository;
 
 import live.ioteatime.ruleengine.domain.MappingData;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+public interface MappingTableRepository {
 
-@Slf4j
-@Component
-public class MappingTableRepository {
-    private final Map<Integer, Map<String, String>> mappingTable = new HashMap<>();
+    /**
+     *  모든 매핑테이블 조회하는 메소드
+     * @return Set<Map.Entry<Integer, Map<String, String>>> 만들어진 맵 entry
+     */
+    Set<Map.Entry<Integer, Map<String, String>>> getTables();
 
-    public Set<Map.Entry<Integer, Map<String, String>>> getTables() {
+    /**
+     *  매핑테이블에서 원하는 태그 가져오는 메소드
+     * @param address 모드버스 address
+     * @return Map<String, String> address 에 따른 매핑테이블
+     */
+    Map<String, String> getTags(int address);
 
-        return mappingTable.entrySet();
-    }
-
-    public Map<String, String> getTags(int address) {
-
-        return mappingTable.get(address);
-    }
-
-    public void addValue(List<MappingData> table) {
-        table.forEach(mappingData -> {
-            if (mappingTable.containsKey(mappingData.getAddress())) {
-                Map<String, String> map = mappingTable.get(mappingData.getAddress());
-                map.put(mappingData.getType(), mappingData.getValue());
-
-                return;
-            }
-
-            Map<String, String> tag = new HashMap<>(Map.of("type", mappingData.getChannelName(), "place", mappingData.getPlaceName(), mappingData.getType(), mappingData.getValue()));
-            mappingTable.put(mappingData.getAddress(), tag);
-        });
-    }
-
+    /**
+     *  매핑테이블 매핑 추가하는 메소드
+     * @param table 추가할 테이블
+     */
+    void addValue(List<MappingData> table);
 }
