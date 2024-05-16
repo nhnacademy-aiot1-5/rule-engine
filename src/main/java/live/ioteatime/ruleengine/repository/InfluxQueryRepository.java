@@ -1,93 +1,54 @@
 package live.ioteatime.ruleengine.repository;
 
-import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxTable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
-@Component
-@Slf4j
-@RequiredArgsConstructor
-public class InfluxQueryRepository {
-    private final List<String> queries = new ArrayList<>();
-    private final QueryApi queryApi;
-    @Getter
-    @Value("${my.query.path}")
-    private String queryPath;
+public interface InfluxQueryRepository {
 
-    public List<FluxTable> query(String query) {
-        return queryApi.query(query);
-    }
+    /**
+     *  query 를 influxdb 날리는 메소드
+     * @param query 원하는 쿼리
+     * @return List<FluxTable> influxdb 의 응답
+     */
+    List<FluxTable> query(String query);
 
-    public int getQuerySize() {
-        return queries.size();
-    }
+    /**
+     *  현재 쿼리들의 개수
+     * @return int 쿼리 개수
+     */
+    int getQuerySize();
 
-    public String getQuery(int index) {
-        return queries.get(index);
-    }
+    /**
+     *  n 번째 쿼리 가져오는 메소드
+     * @param index n 번째
+     * @return String 쿼리
+     */
+    String getQuery(int index);
 
-    public void updateQuery(String queryPath) {
-        queries.clear();
+    /**
+     *  저장되어 있는 쿼리를 repository 에 업데이트하는 메소드
+     * @param queryPath 저장되어 있는 쿼리 파일 경로
+     */
+    void updateQuery(String queryPath);
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
-            String str;
+    /**
+     *  입력 받은 쿼리를 쿼리 저장소에 저장 하는 메소드
+     * @param query 저장할 쿼리
+     */
+    void writeQuery(String query);
 
-            while ((str = reader.readLine()) != null) {
-                queries.add(str);
-            }
-            log.info("query read {}", queries.size());
-        } catch (FileNotFoundException e) {
-            log.error("file not found {}", e.getMessage());
-        } catch (IOException e) {
-            log.error("read query file : {}", e.getMessage(), e);
-        }
-    }
+    /**
+     *  쿼리 삭제 메소드 , 기존 쿼리 파일 제거, 다시 쓰기
+     */
+    void modifyQuery();
 
-    public void writeQuery(String query) {
-        File file = new File(queryPath);
+    /**
+     *  n 번쨰 쿼리 repository 에서 제거 하는 메소드
+     * @param index n 번째
+     * @return String 제거한 쿼리
+     */
+    String removeQuery(int index);
 
-        try {
-            if (!file.exists() && file.createNewFile()) {
-                log.info("create query file : {}", file.getAbsolutePath());
-            }
-            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true))) {
-                bufferedWriter.write(query + "\n");
-            }
-        } catch (IOException e) {
-            log.error("write query file : {}", file.getAbsolutePath(), e);
-        }
-    }
-
-    public void modifyQuery() {
-        try {
-            Files.delete(Path.of(queryPath));
-            File file = new File(queryPath);
-
-            if (!file.exists() && file.createNewFile()) {
-                log.info("delete and create query file : {}", file.getAbsolutePath());
-            }
-            try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file, true))) {
-                for (String s : queries) {
-                    bufferedWriter.write(s + "\n");
-                }
-            }
-        } catch (IOException e) {
-            log.error("read query file : {}", e.getMessage());
-        }
-    }
-
-    public String removeQuery(int index) {
-        return queries.remove(index);
-    }
-
+    String getQueryPath();
 }

@@ -1,4 +1,4 @@
-package live.ioteatime.ruleengine.repository;
+package live.ioteatime.ruleengine.repository.impl;
 
 import lombok.Getter;
 import lombok.Setter;

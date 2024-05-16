@@ -5,7 +5,7 @@ import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import live.ioteatime.ruleengine.domain.MqttModbusDTO;
-import live.ioteatime.ruleengine.repository.OutlierRepository;
+import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
 import live.ioteatime.ruleengine.domain.TopicDto;
 import live.ioteatime.ruleengine.rule.Rule;
 import live.ioteatime.ruleengine.rule.RuleChain;

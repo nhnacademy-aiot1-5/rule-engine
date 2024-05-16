@@ -4,7 +4,7 @@ import live.ioteatime.ruleengine.domain.QueryRequest;
 import live.ioteatime.ruleengine.domain.QueryResponse;
 import live.ioteatime.ruleengine.domain.Tags;
 import live.ioteatime.ruleengine.repository.ChannelsRepository;
-import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
+import live.ioteatime.ruleengine.repository.impl.InfluxQueryRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 class QueryServiceImplTest {
     @Mock
-    InfluxQueryRepository influxQueryRepository;
+    InfluxQueryRepositoryImpl influxQueryRepository;
     @Mock
     ChannelsRepository channelsRepository;
     @InjectMocks
