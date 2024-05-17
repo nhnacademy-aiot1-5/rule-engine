@@ -33,7 +33,7 @@ public class QueryServiceImpl implements QueryService {
 
     @PostConstruct
     private void initQuery() {
-        influxQueryRepository.updateQuery(influxQueryRepository.getQueryPath());
+        influxQueryRepository.updateQuery();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class QueryServiceImpl implements QueryService {
         settingFilter(queryRequest);
         setWindow(queryRequest.getWindow(), queryRequest.getFn(), queryRequest.getYield());
         influxQueryRepository.writeQuery(query.toString());
-        influxQueryRepository.updateQuery(influxQueryRepository.getQueryPath());
+        influxQueryRepository.updateQuery();
 
         log.info("save influx query : {}", query);
     }
@@ -75,7 +75,7 @@ public class QueryServiceImpl implements QueryService {
     public String deleteQuery(int index) {
         String remove = influxQueryRepository.removeQuery(index);
         influxQueryRepository.modifyQuery();
-        influxQueryRepository.updateQuery(influxQueryRepository.getQueryPath());
+        influxQueryRepository.updateQuery();
         log.info("delete query : {}", remove);
 
         return remove;
