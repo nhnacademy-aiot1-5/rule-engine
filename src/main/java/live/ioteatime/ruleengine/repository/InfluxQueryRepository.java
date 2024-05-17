@@ -28,9 +28,8 @@ public interface InfluxQueryRepository {
 
     /**
      *  저장되어 있는 쿼리를 repository 에 업데이트하는 메소드
-     * @param queryPath 저장되어 있는 쿼리 파일 경로
      */
-    void updateQuery(String queryPath);
+    void updateQuery();
 
     /**
      *  입력 받은 쿼리를 쿼리 저장소에 저장 하는 메소드
