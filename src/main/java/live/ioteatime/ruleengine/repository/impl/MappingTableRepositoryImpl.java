@@ -1,6 +1,7 @@
 package live.ioteatime.ruleengine.repository.impl;
 
 import live.ioteatime.ruleengine.domain.MappingData;
+import live.ioteatime.ruleengine.exception.MappingTableIndexNotFoundException;
 import live.ioteatime.ruleengine.repository.MappingTableRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,8 +23,13 @@ public class MappingTableRepositoryImpl implements MappingTableRepository {
     }
 
     public Map<String, String> getTags(int address) {
+        Map<String, String> tags = mappingTable.get(address);
 
-        return mappingTable.get(address);
+        if (tags == null) {
+            throw new MappingTableIndexNotFoundException("Mapping table index does not exist");
+        }
+
+        return tags;
     }
 
     public void addValue(List<MappingData> table) {
@@ -34,7 +40,6 @@ public class MappingTableRepositoryImpl implements MappingTableRepository {
 
                 return;
             }
-
             Map<String, String> tag = new HashMap<>(Map.of("type", mappingData.getChannelName(), "place", mappingData.getPlaceName(), mappingData.getType(), mappingData.getValue()));
             mappingTable.put(mappingData.getAddress(), tag);
         });
