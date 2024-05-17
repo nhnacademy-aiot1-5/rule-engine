@@ -2,6 +2,7 @@ package live.ioteatime.ruleengine.repository.impl;
 
 import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxTable;
+import live.ioteatime.ruleengine.exception.QueryFileIsNotFound;
 import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,22 +24,26 @@ public class InfluxQueryRepositoryImpl implements InfluxQueryRepository {
     @Value("${my.query.path}")
     private String queryPath;
 
+    @Override
     public List<FluxTable> query(String query) {
         return queryApi.query(query);
     }
 
+    @Override
     public int getQuerySize() {
         return queries.size();
     }
 
+    @Override
     public String getQuery(int index) {
         return queries.get(index);
     }
 
-    public void updateQuery(String queryPath) {
+    @Override
+    public void updateQuery() {
         queries.clear();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(queryPath))) {
+        try (BufferedReader reader = createBufferedReader(queryPath)) {
             String str;
 
             while ((str = reader.readLine()) != null) {
@@ -52,6 +57,7 @@ public class InfluxQueryRepositoryImpl implements InfluxQueryRepository {
         }
     }
 
+    @Override
     public void writeQuery(String query) {
         File file = new File(queryPath);
 
@@ -67,6 +73,7 @@ public class InfluxQueryRepositoryImpl implements InfluxQueryRepository {
         }
     }
 
+    @Override
     public void modifyQuery() {
         try {
             Files.delete(Path.of(queryPath));
@@ -85,6 +92,7 @@ public class InfluxQueryRepositoryImpl implements InfluxQueryRepository {
         }
     }
 
+    @Override
     public String removeQuery(int index) {
         return queries.remove(index);
     }
@@ -92,6 +100,15 @@ public class InfluxQueryRepositoryImpl implements InfluxQueryRepository {
     @Override
     public String getQueryPath() {
         return queryPath;
+    }
+
+    protected BufferedReader createBufferedReader(String queryPath) {
+        try {
+
+            return new BufferedReader(new FileReader(queryPath));
+        } catch (FileNotFoundException e) {
+            throw new QueryFileIsNotFound(e.getMessage(), e);
+        }
     }
 
 }
