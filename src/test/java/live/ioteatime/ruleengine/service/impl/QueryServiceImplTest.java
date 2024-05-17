@@ -29,6 +29,8 @@ class QueryServiceImplTest {
     ChannelsRepository channelsRepository;
     @InjectMocks
     QueryServiceImpl queryService;
+    @Value("${my.query.path}")
+    String queryPath;
 
     @BeforeEach
     void setUp() {
@@ -42,11 +44,7 @@ class QueryServiceImplTest {
                 return new BufferedReader(new StringReader("query1\nquery2\nquery3"));
             }
         };
-
     }
-
-    @Value("${my.query.path}")
-    String queryPath;
 
     @Test
     void addQuery() {
@@ -61,7 +59,7 @@ class QueryServiceImplTest {
         queryService.addQuery(queryRequest);
 
         verify(influxQueryRepository).writeQuery(anyString());
-        verify(influxQueryRepository).updateQuery(queryPath);
+        verify(influxQueryRepository).updateQuery();
     }
 
     @Test
@@ -72,7 +70,6 @@ class QueryServiceImplTest {
         assertEquals("query1", queries.get(0).getQuery());
         assertEquals("query2", queries.get(1).getQuery());
         assertEquals("query3", queries.get(2).getQuery());
-
     }
 
     @Test
@@ -86,7 +83,7 @@ class QueryServiceImplTest {
 
         verify(influxQueryRepository).removeQuery(index);
         verify(influxQueryRepository).modifyQuery();
-        verify(influxQueryRepository).updateQuery(anyString());
+        verify(influxQueryRepository).updateQuery();
     }
 
     @Test
@@ -101,4 +98,5 @@ class QueryServiceImplTest {
         assertEquals(1, channelId);
         verify(channelsRepository).findChannelIdByTags(anyString(), anyString(), anyString(), anyString());
     }
+
 }
