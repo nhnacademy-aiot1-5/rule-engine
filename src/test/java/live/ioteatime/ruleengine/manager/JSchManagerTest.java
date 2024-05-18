@@ -1,7 +1,6 @@
 package live.ioteatime.ruleengine.manager;
 
 
-
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -37,7 +36,7 @@ class JSchManagerTest {
     JSchManager jSchManager;
 
     @BeforeEach
-    public void setUp() throws JSchException {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(jSchManager, "jSch", jsch);
         ReflectionTestUtils.setField(jSchManager, "session", mockSession);
@@ -84,9 +83,8 @@ class JSchManagerTest {
         when(jschProperties.getHost()).thenReturn("host");
         when(jsch.getSession(anyString(), anyString(), anyInt())).thenThrow(new JSchException());
 
-        assertThrows(CreateJSchSessionException.class, () -> {
-            jSchManager.createSession();
-        });
+        assertThrows(CreateJSchSessionException.class, () ->
+                jSchManager.createSession());
     }
 
     @Test
@@ -107,9 +105,8 @@ class JSchManagerTest {
 
         when(mockSession.openChannel(channelName)).thenThrow(new JSchException());
 
-        assertThrows(CreateChannelSftpException.class, () -> {
-           jSchManager.createChannelSftp(mockSession);
-        });
+        assertThrows(CreateChannelSftpException.class, () ->
+                jSchManager.createChannelSftp(mockSession));
     }
 
     @Test
@@ -129,9 +126,8 @@ class JSchManagerTest {
 
         when(mockSession.openChannel(channelName)).thenThrow(new JSchException());
 
-        assertThrows(CreateChannelExecException.class, () -> {
-            jSchManager.createChannelExec(mockSession);
-        });
+        assertThrows(CreateChannelExecException.class, () ->
+                jSchManager.createChannelExec(mockSession));
     }
 
 }
