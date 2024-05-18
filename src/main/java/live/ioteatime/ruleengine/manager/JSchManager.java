@@ -19,13 +19,14 @@ import javax.annotation.PostConstruct;
 @Slf4j
 public class JSchManager {
     private final JschProperties jschProperties;
+    private final JSch jSch = new JSch();
 
     /**
-     *  처음 빈 생성 직후 자동으로 호출
-     *  정상적으로 세션이 연결 되는지 확인
+     * 처음 빈 생성 직후 자동으로 호출
+     * 정상적으로 세션이 연결 되는지 확인
      */
     @PostConstruct
-    public void sessionCheck() throws CreateJSchSessionException {
+    private void sessionCheck() throws CreateJSchSessionException {
         Session session = createSession();
         if (session == null || !session.isConnected()) {
             log.error("session check failed");
@@ -43,7 +44,6 @@ public class JSchManager {
      */
     public Session createSession() throws CreateJSchSessionException {
         try {
-            JSch jSch = new JSch();
             jSch.addIdentity(jschProperties.getPrivateKey());
             Session session = jSch.getSession(jschProperties.getUser(), jschProperties.getHost(), 22);
             session.setConfig("StrictHostKeyChecking", "no");
@@ -51,12 +51,12 @@ public class JSchManager {
 
             return session;
         } catch (JSchException e) {
-            throw new CreateJSchSessionException("create JSch session failed",e);
+            throw new CreateJSchSessionException("create JSch session failed", e);
         }
     }
 
     /**
-     *  scp 하기위한 인스턴스와의 연결 메소드
+     * scp 하기위한 인스턴스와의 연결 메소드
      * @return ChannelSftp
      */
     public ChannelSftp createChannelSftp(Session session) {
@@ -74,10 +74,10 @@ public class JSchManager {
     }
 
     /**
-     *  인스턴스의 startup.sh 를 실행시키기위한 연결
+     * 인스턴스의 startup.sh 를 실행시키기위한 연결
      * @return ChannelExec
      */
-    public com.jcraft.jsch.ChannelExec createChannelExec(Session session) {
+    public ChannelExec createChannelExec(Session session) {
         try {
             ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
             channelExec.setPty(true);
