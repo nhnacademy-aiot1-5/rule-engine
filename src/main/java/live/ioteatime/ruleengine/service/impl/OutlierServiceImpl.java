@@ -1,10 +1,11 @@
 package live.ioteatime.ruleengine.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.MinMaxDto;
-import live.ioteatime.ruleengine.domain.OutlierDto;
+import live.ioteatime.ruleengine.exception.MissingFieldException;
 import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
 import live.ioteatime.ruleengine.service.OutlierService;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -26,11 +26,39 @@ public class OutlierServiceImpl implements OutlierService {
     private final OutlierRepository outlierRepository;
 
     @Override
-    public OutlierDto getOutlier(String key) throws JsonProcessingException {
-        String o = Optional.ofNullable(redisTemplate.opsForValue().get(key))
-                .map(Object::toString).orElse(null);
+    public Map<String, Map<Integer, MinMaxDto>> getOutlier(List<String> keys) {
 
-        return objectMapper.readValue(o, OutlierDto.class);
+        Map<String, Map<Integer, MinMaxDto>> outlierMap = getOutlierMap(keys);
+        log.info("testMap {}", outlierMap.entrySet());
+
+        return outlierMap;
+    }
+
+    private Map<String, Map<Integer, MinMaxDto>> getOutlierMap(List<String> key) {
+        Map<String, Map<Integer, MinMaxDto>> stringMapMap = new LinkedHashMap<>();
+
+        for (String string : key) {
+            String s = Optional.ofNullable(redisTemplate.opsForValue().get(string)).map(Object::toString)
+                    .orElse(null);
+
+            try {
+                Map<String, Map<Integer, MinMaxDto>> stringMapMap1 = objectMapper.readValue(s,
+                        new TypeReference<>() {
+                        });
+
+                stringMapMap.putAll(stringMapMap1);
+            } catch (JsonProcessingException e) {
+                throw new MissingFieldException(e.getMessage());
+            }
+        }
+
+        return stringMapMap;
+    }
+
+    public List<String> getKeys(Map<String, Map<Integer, MinMaxDto>> outlierMap) {
+        Set<String> keySet = outlierMap.keySet();
+
+        return new ArrayList<>(keySet);
     }
 
     @Override
@@ -45,22 +73,31 @@ public class OutlierServiceImpl implements OutlierService {
     }
 
     @Override
-    public Optional<MinMaxDto> matchTime(OutlierDto outlierDto, LocalDateTimeDto localDateTimeDto) {
-        Map<Integer, MinMaxDto> outliers = outlierDto.getHour();
+    public Map<String, MinMaxDto> matchTime(Map<String, Map<Integer, MinMaxDto>> outlier, LocalDateTimeDto localDateTimeDto) {
+        Map<String, MinMaxDto> outlierMap = new HashMap<>();
+        List<String> keys = getKeys(outlier);
 
-        return outliers.entrySet().stream()
-                .filter(h -> h.getKey() == localDateTimeDto.getTime())
-                .filter(e -> e.getValue().getUpdatedAt().equals(localDateTimeDto.getDate()))
-                .map(Map.Entry::getValue)
-                .findFirst();
+        for (int i = 0; i < outlier.size(); i++) {
+            String key = keys.get(i);
+
+            outlier.get(keys.get(i)).forEach((integer, minMaxDto) -> {
+                if (integer.equals(localDateTimeDto.getTime()) && minMaxDto.getUpdatedAt().equals(localDateTimeDto.getDate())) {
+                    outlierMap.put(key, minMaxDto);
+                }
+            });
+        }
+        log.info("matchTime : {}", outlierMap.entrySet());
+
+        return outlierMap;
     }
 
     @Override
-    public void updateOutlier(MinMaxDto minMaxDto) {
-        outlierRepository.setMin(minMaxDto.getMin());
-        outlierRepository.setMax(minMaxDto.getMax());
+    public void updateOutlier(Map<String, MinMaxDto> outlier) {
+        outlierRepository.clearOutlier();
+        Map<String, MinMaxDto> outliers = outlierRepository.getOutliers();
+        outliers.putAll(outlier);
 
-        log.info("outlier update to min {} max {}", outlierRepository.getMin(), outlierRepository.getMax());
+        log.info("outlier update {}", outliers.entrySet());
     }
 
 }
