@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Setter
@@ -16,6 +18,10 @@ public class OutlierRepository {
 
     public void clearOutlier() {
         outliers.clear();
+    }
+
+    public List<String> getKeys() {
+        return  new ArrayList<>(outliers.keySet());
     }
 
 }
