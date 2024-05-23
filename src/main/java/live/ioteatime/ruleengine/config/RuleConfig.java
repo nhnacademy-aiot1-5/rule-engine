@@ -4,12 +4,14 @@ import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
+import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.MqttModbusDTO;
-import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
 import live.ioteatime.ruleengine.domain.TopicDto;
+import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
 import live.ioteatime.ruleengine.rule.Rule;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import live.ioteatime.ruleengine.service.MappingTableService;
+import live.ioteatime.ruleengine.service.WebClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +26,8 @@ import java.util.Map;
 public class RuleConfig {
     private final OutlierRepository outlierRepository;
     private final MappingTableService mappingTableService;
-    private static final String PHASE = "kwh";
+    private final WebClientService webClientService;
+    private static final String DESCRIPTION = "w";
     private enum Protocol {
         MODBUS, MQTT
     }
@@ -36,13 +39,10 @@ public class RuleConfig {
                 ruleChain.doProcess(mqttModbusDTO);
                 return;
             }
-
             TopicDto topicDto = splitTopic(mqttModbusDTO);
-
             if (mqttModbusDTO.getValue() == null) {
                 return;
             }
-
             if (mqttModbusDTO.getValue().equals(0.0f)) {
                 if (topicDto.getType().equals("temperature")) {
                     ruleChain.doProcess(mqttModbusDTO);
@@ -57,10 +57,19 @@ public class RuleConfig {
     public Rule outlierCheck() {
         return ((mqttModbusDTO, ruleChain) -> {
             TopicDto topicDto = splitTopic(mqttModbusDTO);
-            if (Protocol.MQTT.toString().equals(mqttModbusDTO.getProtocol()) && PHASE.equals(topicDto.getPhase()) &&
-                    (mqttModbusDTO.getValue() > outlierRepository.getMax() || mqttModbusDTO.getValue() < outlierRepository.getMin())) {
 
-                log.info("{} is Outlier!!", mqttModbusDTO.getValue());
+            if (!outlierRepository.getKeys().contains(topicDto.getPlace())) return;
+
+            if (!topicDto.getDescription().equals(DESCRIPTION)){
+                ruleChain.doProcess(mqttModbusDTO);
+
+                return;
+            }
+            MinMaxDto minMaxDto = outlierRepository.getOutliers().get(topicDto.getPlace());
+
+            if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
+                log.error("outlier! place : {}, description : {}, value : {} ", topicDto.getPlace(),topicDto.getDescription(),mqttModbusDTO.getValue());
+                webClientService.sendOutlier(topicDto, mqttModbusDTO);
             }
 
             ruleChain.doProcess(mqttModbusDTO);
@@ -72,6 +81,7 @@ public class RuleConfig {
         return ((mqttModbusDTO, ruleChain) -> {
             if (String.valueOf(Protocol.MQTT).equals(mqttModbusDTO.getProtocol())) {
                 insertMqtt(influxDBClient, mqttModbusDTO, ruleChain);
+
                 return;
             }
 
