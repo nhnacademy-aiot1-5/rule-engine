@@ -1,10 +1,9 @@
 package live.ioteatime.ruleengine.service;
 
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
-import live.ioteatime.ruleengine.domain.MinMaxDto;
+import live.ioteatime.ruleengine.domain.OutlierDto;
 
 import java.util.List;
-import java.util.Map;
 
 public interface OutlierService {
 
@@ -13,7 +12,7 @@ public interface OutlierService {
      *
      * @return Map<String, Map < Integer, MinMaxDto>>  매핑된 이상치
      */
-    Map<String, Map<Integer, MinMaxDto>> getOutlier(List<String> keys);
+    List<OutlierDto> getOutlier(String keys);
 
     /**
      * 현재날짜 현재 시간을 가져온다
@@ -27,14 +26,7 @@ public interface OutlierService {
      *
      * @param outlier          이상치
      * @param localDateTimeDto 현재 날짜, 시간
-     * @return MinMaxDto 이상치 최소값, 최대값
      */
-    Map<String, MinMaxDto> matchTime(Map<String, Map<Integer, MinMaxDto>> outlier, LocalDateTimeDto localDateTimeDto);
+    void matchTime(List<OutlierDto> outlier, LocalDateTimeDto localDateTimeDto);
 
-    /**
-     * 이상치를 outlierRepository 에 저장한다
-     *
-     * @param outlier 이상치 최소값 최대 값
-     */
-    void updateOutlier(Map<String, MinMaxDto> outlier);
 }

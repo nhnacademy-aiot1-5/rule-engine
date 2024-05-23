@@ -2,7 +2,7 @@ package live.ioteatime.ruleengine.scheduler;
 
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.LocalMidnightDto;
-import live.ioteatime.ruleengine.domain.MinMaxDto;
+import live.ioteatime.ruleengine.domain.OutlierDto;
 import live.ioteatime.ruleengine.service.OutlierService;
 import live.ioteatime.ruleengine.service.impl.DailyPowerServiceImpl;
 import live.ioteatime.ruleengine.service.impl.QueryServiceImpl;
@@ -29,7 +29,6 @@ public class ReportScheduler {
     @Value("${schedule.flag}")
     private boolean cronFlag;
     LocalMidnightDto localMidnightDto = new LocalMidnightDto();
-    List<String> tempKeys = List.of("office", "class_a");
 
     @EventListener(ApplicationReadyEvent.class)
     public void firstStart() {
@@ -59,10 +58,9 @@ public class ReportScheduler {
         LocalDateTimeDto localDateTimeDto = outlierService.localDateTime();
 
         if (cronFlag) {
-            Map<String, Map<Integer, MinMaxDto>> outlier = outlierService.getOutlier(tempKeys);
-            Map<String, MinMaxDto> stringMinMaxDtoMap = outlierService.matchTime(outlier, localDateTimeDto);
-
-            outlierService.updateOutlier(stringMinMaxDtoMap);
+            String key = "outliers";
+            List<OutlierDto> outlier = outlierService.getOutlier(key);
+            outlierService.matchTime(outlier, localDateTimeDto);
         }
     }
 
