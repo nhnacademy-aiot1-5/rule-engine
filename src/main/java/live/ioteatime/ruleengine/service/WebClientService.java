@@ -16,5 +16,5 @@ public interface WebClientService {
      * 이상치 감지 시 control 서버에 신호를 보내는 메소드
      * @param sensorName light(경광등)
      */
-    void setReadLight(String sensorName);
+    void setRedLightSignal(String sensorName);
 }

@@ -19,17 +19,21 @@ public class WebClientServiceImpl implements WebClientService {
     private final WebClient webClient;
     @Value("${control.dev.eui}")
     private String devEui;
+    @Value("${control.base.uri}")
+    private String controlBaseUri;
+    @Value("${api.base.uri}")
+    private String apiBaseUri;
 
     @Override
     public void sendOutlier(String endPoint, TopicDto topicDto, MqttModbusDTO mqttModbusDTO) {
-
+        String url = apiBaseUri + endPoint;
         SendOutlierDto sendOutlierDto = new SendOutlierDto(topicDto.getPlace()
                 , topicDto.getType()
                 , mqttModbusDTO.getTime()
                 , mqttModbusDTO.getValue());
 
         webClient.post()
-                .uri(endPoint)
+                .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(sendOutlierDto), SendOutlierDto.class)
                 .retrieve()
@@ -40,8 +44,8 @@ public class WebClientServiceImpl implements WebClientService {
     }
 
     @Override
-    public void setReadLight(String sensorName) {
-        String url = String.format("/sensor/on?sensorName=%s&devEui=%s", sensorName, devEui);
+    public void setRedLightSignal(String sensorName) {
+        String url = String.format("%s/sensor/on?sensorName=%s&devEui=%s",controlBaseUri ,sensorName, devEui);
 
         webClient.get()
                 .uri(url)
