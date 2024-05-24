@@ -12,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,11 +25,15 @@ public class OutlierServiceImpl implements OutlierService {
 
     @Override
     public List<OutlierDto> getOutlier(String key) {
-        try {
+
             List<OutlierDto> outlierList;
             String outliers = Optional.ofNullable(redisTemplate.opsForValue().get(key)).map(Object::toString)
                     .orElse(null);
 
+            if (outliers ==null) {
+                throw new NullPointerException("redis is empty");
+            }
+        try {
             outlierList = objectMapper.readValue(outliers, objectMapper.getTypeFactory().constructCollectionType(List.class, OutlierDto.class));
             log.info("outlierList {}", outlierList);
 
@@ -39,17 +41,6 @@ public class OutlierServiceImpl implements OutlierService {
         } catch (JsonProcessingException e) {
             throw new MissingFieldException(e.getMessage());
         }
-    }
-
-    @Override
-    public LocalDateTimeDto localDateTime() {
-        int time = Integer.parseInt(LocalTime.now().toString().split(":")[0]);
-        LocalDate localDate = LocalDate.now();
-
-        log.info("time: {}", time);
-        log.info("localDate: {}", localDate);
-
-        return new LocalDateTimeDto(localDate, time);
     }
 
     @Override

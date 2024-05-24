@@ -6,6 +6,7 @@ import live.ioteatime.ruleengine.domain.OutlierDto;
 import live.ioteatime.ruleengine.service.OutlierService;
 import live.ioteatime.ruleengine.service.impl.DailyPowerServiceImpl;
 import live.ioteatime.ruleengine.service.impl.QueryServiceImpl;
+import live.ioteatime.ruleengine.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +28,6 @@ public class ReportScheduler {
     private final OutlierService outlierService;
     @Value("${schedule.flag}")
     private boolean cronFlag;
-    LocalMidnightDto localMidnightDto = new LocalMidnightDto();
 
     @EventListener(ApplicationReadyEvent.class)
     public void firstStart() {
@@ -38,13 +37,13 @@ public class ReportScheduler {
     @Scheduled(cron = "${schedule.cron1}")
     public void saveTodayPower() {
         if (cronFlag) {
-            createMidnight();
+            LocalMidnightDto midnight = TimeUtils.createMidnight();
 
             for (int i = 0; i < dailyPowerService.getQueryCount(); i++) {
                 Map<LocalDateTime, Object> queryResult = dailyPowerService.convertInfluxDbResponseToLocalTime(dailyPowerService.getQuery(i));
                 int channelId = queryServiceImpl.getChannelId(i);
-                double dailyPower = dailyPowerService.calculateDailyPower(queryResult, localMidnightDto);
-                dailyPowerService.insertMysql(localMidnightDto.getYesterday(), dailyPower, channelId, 0D);
+                double dailyPower = dailyPowerService.calculateDailyPower(queryResult, midnight);
+                dailyPowerService.insertMysql(midnight.getYesterday(), dailyPower, channelId, 0D);
             }
         }
     }
@@ -55,26 +54,13 @@ public class ReportScheduler {
     }
 
     private void outlierUpdate() {
-        LocalDateTimeDto localDateTimeDto = outlierService.localDateTime();
+        LocalDateTimeDto localDateTimeDto = TimeUtils.localDateTime();
 
         if (cronFlag) {
             String key = "outliers";
             List<OutlierDto> outlier = outlierService.getOutlier(key);
             outlierService.matchTime(outlier, localDateTimeDto);
         }
-    }
-
-    public void createMidnight() {
-        LocalDateTime date = LocalDateTime.now();
-        LocalDateTime todayMidNight = date.with(LocalTime.MIN);
-        LocalDateTime yesterday = date.minusDays(1);
-        LocalDateTime yesterdayMidnight = yesterday.with(LocalTime.MIN);
-
-        log.info("Today Midnight {} ", todayMidNight);
-        log.info("Yesterday Midnight {} ", yesterdayMidnight);
-
-        localMidnightDto.setToday(todayMidNight);
-        localMidnightDto.setYesterday(yesterdayMidnight);
     }
 
 }

@@ -7,6 +7,7 @@ import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
 import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
+import live.ioteatime.ruleengine.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,7 @@ class OutlierServiceImplTest {
         LocalDate localDate = LocalDate.now();
         LocalDateTimeDto localDateTimeDto = new LocalDateTimeDto(localDate, time);
 
-        LocalDateTimeDto localDateTimeDto1 = service.localDateTime();
+        LocalDateTimeDto localDateTimeDto1 = TimeUtils.localDateTime();
 
         assertEquals(localDateTimeDto.getDate(), localDateTimeDto1.getDate());
         assertEquals(localDateTimeDto.getTime(), localDateTimeDto1.getTime());

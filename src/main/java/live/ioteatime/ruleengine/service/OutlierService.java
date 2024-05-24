@@ -15,13 +15,6 @@ public interface OutlierService {
     List<OutlierDto> getOutlier(String keys);
 
     /**
-     * 현재날짜 현재 시간을 가져온다
-     *
-     * @return LocalDateTimeDto 현재 날짜 시간 매핑
-     */
-    LocalDateTimeDto localDateTime();
-
-    /**
      * 현재 날짜, 시간에 맞는 이상치를 가져온다
      *
      * @param outlier          이상치
