@@ -69,7 +69,8 @@ public class RuleConfig {
 
             if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
                 log.error("outlier! place : {}, description : {}, value : {} ", topicDto.getPlace(),topicDto.getDescription(),mqttModbusDTO.getValue());
-                webClientService.sendOutlier(topicDto, mqttModbusDTO);
+                webClientService.setReadLight("light");
+                webClientService.sendOutlier("/outlier",topicDto, mqttModbusDTO);
             }
 
             ruleChain.doProcess(mqttModbusDTO);
