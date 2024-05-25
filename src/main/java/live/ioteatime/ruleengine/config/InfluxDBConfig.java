@@ -16,9 +16,7 @@ public class InfluxDBConfig {
     public InfluxDBClient influxDBClient(InfluxDBProperties influxDBProperties) {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(
             influxDBProperties.getUrl(),
-            influxDBProperties.getToken().toCharArray(),
-            influxDBProperties.getOrg(),
-            influxDBProperties.getBucket());
+            influxDBProperties.getToken().toCharArray());
         log.info("InfluxDBClient connect success: {}", influxDBProperties.getUrl());
 
         return influxDBClient;

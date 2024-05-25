@@ -3,8 +3,8 @@ package live.ioteatime.ruleengine.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
-import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
+import live.ioteatime.ruleengine.exception.MissingFieldException;
 import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
 import live.ioteatime.ruleengine.service.OutlierService;
 import lombok.RequiredArgsConstructor;
@@ -12,9 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,41 +24,37 @@ public class OutlierServiceImpl implements OutlierService {
     private final OutlierRepository outlierRepository;
 
     @Override
-    public OutlierDto getOutlier(String key) throws JsonProcessingException {
-        String o = Optional.ofNullable(redisTemplate.opsForValue().get(key))
-                .map(Object::toString).orElse(null);
+    public List<OutlierDto> getOutlier(String key) {
 
-        return objectMapper.readValue(o, OutlierDto.class);
+            List<OutlierDto> outlierList;
+            String outliers = Optional.ofNullable(redisTemplate.opsForValue().get(key)).map(Object::toString)
+                    .orElse(null);
+
+            if (outliers ==null) {
+                throw new NullPointerException("redis is empty");
+            }
+        try {
+            outlierList = objectMapper.readValue(outliers, objectMapper.getTypeFactory().constructCollectionType(List.class, OutlierDto.class));
+            log.info("outlierList {}", outlierList);
+
+            return outlierList;
+        } catch (JsonProcessingException e) {
+            throw new MissingFieldException(e.getMessage());
+        }
     }
 
     @Override
-    public LocalDateTimeDto localDateTime() {
-        int time = Integer.parseInt(LocalTime.now().toString().split(":")[0]);
-        LocalDate localDate = LocalDate.now();
+    public void matchTime(List<OutlierDto> outlier, LocalDateTimeDto localDateTimeDto) {
+        outlierRepository.clearOutlier();
 
-        log.info("time: {}", time);
-        log.info("localDate: {}", localDate);
-
-        return new LocalDateTimeDto(localDate, time);
-    }
-
-    @Override
-    public Optional<MinMaxDto> matchTime(OutlierDto outlierDto, LocalDateTimeDto localDateTimeDto) {
-        Map<Integer, MinMaxDto> outliers = outlierDto.getHour();
-
-        return outliers.entrySet().stream()
-                .filter(h -> h.getKey() == localDateTimeDto.getTime())
-                .filter(e -> e.getValue().getUpdatedAt().equals(localDateTimeDto.getDate()))
-                .map(Map.Entry::getValue)
-                .findFirst();
-    }
-
-    @Override
-    public void updateOutlier(MinMaxDto minMaxDto) {
-        outlierRepository.setMin(minMaxDto.getMin());
-        outlierRepository.setMax(minMaxDto.getMax());
-
-        log.info("outlier update to min {} max {}", outlierRepository.getMin(), outlierRepository.getMax());
+        for (OutlierDto outlierDto : outlier) {
+            outlierDto.getValues().forEach(minMaxDto -> {
+                if ((localDateTimeDto.getTime() == minMaxDto.getId()) && localDateTimeDto.getDate().equals(minMaxDto.getUpdatedAt())) {
+                    outlierRepository.getOutliers().put(outlierDto.getPlace(), minMaxDto);
+                }
+            });
+        }
+        log.info("outliers {}", outlierRepository.getOutliers().entrySet());
     }
 
 }

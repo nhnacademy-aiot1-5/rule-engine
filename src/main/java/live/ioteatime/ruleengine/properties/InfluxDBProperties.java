@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class InfluxDBProperties {
     private String url;
     private String org;
-    private String bucket;
+    private String main;
+    private String outlier;
     private String token;
 }

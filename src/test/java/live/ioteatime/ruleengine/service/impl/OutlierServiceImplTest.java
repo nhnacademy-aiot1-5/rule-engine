@@ -1,11 +1,15 @@
 package live.ioteatime.ruleengine.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
 import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
+import live.ioteatime.ruleengine.util.TimeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,16 +19,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.lang.reflect.Constructor;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
@@ -34,37 +36,38 @@ class OutlierServiceImplTest {
     @Mock
     ValueOperations<String, Object> valueOperations;
     @Mock
+    OutlierRepository outlierRepository;
+    @Mock
     ObjectMapper objectMapper;
     @InjectMocks
     OutlierServiceImpl service;
+    ObjectMapper mapper = new ObjectMapper();
 
-    @Test
-    void getOutlierTest() throws Exception {
-        String key = "key";
-        String redisResponse = "{\"field1\":\"value1\"}";
+    String key = "test";
+    String json = "[{\"place\": \"class_a\", \"values\": [{\"id\": 0, \"min\": -1601.77, \"max\": 3355.83, \"updated_at\": \"2024-05-23\"}, {\"id\": 1, \"min\": -1379.65, \"max\": 2597.18, \"updated_at\": \"2024-05-23\"}, {\"id\": 2, \"min\": -952.17, \"max\": 1970.77, \"updated_at\": \"2024-05-23\"}]}, {\"place\": \"office\", \"values\": [{\"id\": 0, \"min\": -1379.55, \"max\": 4610.01, \"updated_at\": \"2024-05-23\"}, {\"id\": 1, \"min\": -575.72, \"max\": 3000.02, \"updated_at\": \"2024-05-23\"}, {\"id\": 2, \"min\": -492.42, \"max\": 2873.64, \"updated_at\": \"2024-05-23\"}]}]";
+    List<OutlierDto> outlierDto;
 
-        MinMaxDto minMaxDto = new MinMaxDto();
-        minMaxDto.setMin(1d);
-        minMaxDto.setMax(2d);
+    @BeforeEach
+    void setUp() throws JsonProcessingException {
+        mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
 
-        Map<Integer, MinMaxDto> hour = new HashMap<>();
-        hour.put(1, minMaxDto);
-
-        Constructor<OutlierDto> constructor = OutlierDto.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        OutlierDto outlierDto = constructor.newInstance();
-        outlierDto.setHour(hour);
+        ReflectionTestUtils.setField(service, "objectMapper", mapper);
+        ReflectionTestUtils.setField(service, "outlierRepository", outlierRepository);
 
         lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        lenient().when(valueOperations.get(key)).thenReturn(redisResponse);
-        lenient().when(objectMapper.readValue(redisResponse, OutlierDto.class)).thenReturn(outlierDto);
+        lenient().when(valueOperations.get(key)).thenReturn(json);
+        lenient().when(objectMapper.readValue(json, mapper.getTypeFactory().constructCollectionType(List.class, OutlierDto.class))).thenReturn(outlierDto);
 
-        OutlierDto outlier = service.getOutlier(key);
+        outlierDto = mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(List.class, OutlierDto.class));
+    }
 
-        assertEquals(outlierDto, outlier);
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).get(key);
-        verify(objectMapper).readValue(redisResponse, OutlierDto.class);
+    @Test
+    void getOutlierTest() {
+
+        List<OutlierDto> outlier = service.getOutlier(key);
+
+        assertEquals(outlierDto.size(), outlier.size());
     }
 
     @Test
@@ -73,51 +76,37 @@ class OutlierServiceImplTest {
         LocalDate localDate = LocalDate.now();
         LocalDateTimeDto localDateTimeDto = new LocalDateTimeDto(localDate, time);
 
-        LocalDateTimeDto localDateTimeDto1 = service.localDateTime();
+        LocalDateTimeDto localDateTimeDto1 = TimeUtils.localDateTime();
 
         assertEquals(localDateTimeDto.getDate(), localDateTimeDto1.getDate());
         assertEquals(localDateTimeDto.getTime(), localDateTimeDto1.getTime());
     }
 
     @Test
-    void matchTimeTest() throws Exception {
+    void matchTimeTest() {
         int time = Integer.parseInt(LocalTime.now().toString().split(":")[0]);
-
-        MinMaxDto minMaxDto = new MinMaxDto();
-        minMaxDto.setMin(1d);
-        minMaxDto.setMax(2d);
-        minMaxDto.setUpdatedAt(LocalDate.now());
-
-        Map<Integer, MinMaxDto> hour = new HashMap<>();
-        hour.put(time, minMaxDto);
-
-        Constructor<OutlierDto> constructor = OutlierDto.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        OutlierDto outlierDto = constructor.newInstance();
-        outlierDto.setHour(hour);
 
         LocalDate localDate = LocalDate.now();
         LocalDateTimeDto localDateTimeDto = new LocalDateTimeDto(localDate, time);
 
-        MinMaxDto result = service.matchTime(outlierDto, localDateTimeDto).orElse(null);
-
-        assertNotNull(result);
-        assertEquals(hour.get(time).getUpdatedAt(),result.getUpdatedAt());
-    }
-
-    @Test
-    void updateOutlierTest() {
-        OutlierRepository outlierRepository1 = new OutlierRepository();
-        ReflectionTestUtils.setField(service, "outlierRepository", outlierRepository1);
-
         MinMaxDto minMaxDto = new MinMaxDto();
-        minMaxDto.setMin(1d);
-        minMaxDto.setMax(2d);
-        minMaxDto.setUpdatedAt(LocalDate.now());
+        minMaxDto.setMin(1D);
+        minMaxDto.setMin(-1D);
 
-        service.updateOutlier(minMaxDto);
+        OutlierDto outlierDto1 = new OutlierDto();
+        outlierDto1.setPlace("class");
+        outlierDto1.setValues(List.of(minMaxDto));
 
-        assertEquals(minMaxDto.getMin(), outlierRepository1.getMin());
-        assertEquals(minMaxDto.getMax(), outlierRepository1.getMax());
+        Map<String, MinMaxDto> minMaxDtoMap = new HashMap<>();
+        minMaxDtoMap.put("min", minMaxDto);
+        List<OutlierDto> outlierDtos = List.of(outlierDto1);
+
+        when(outlierRepository.getOutliers()).thenReturn(minMaxDtoMap);
+
+        service.matchTime(outlierDtos, localDateTimeDto);
+
+        verify(outlierRepository).clearOutlier();
+        verify(outlierRepository, times(outlierDtos.size())).getOutliers();
     }
+
 }
