@@ -1,6 +1,7 @@
 package live.ioteatime.ruleengine.service;
 
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
+import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
 
 import java.util.List;
@@ -22,4 +23,17 @@ public interface OutlierService {
      */
     void matchTime(List<OutlierDto> outlier, LocalDateTimeDto localDateTimeDto);
 
+    /**
+     * 장소에 따른 이상치가 있는지 확인 하는 메소드
+     * @param topicPlace 확인할 장소
+     * @return 있으면 true
+     */
+    boolean checkOutlier(String topicPlace);
+
+    /**
+     * 장소에 맞는 이상치를 가져오는 메소드
+     * @param topicPlace 확인할 장소
+     * @return 장소에 따른 이상치
+     */
+    MinMaxDto getMinMax(String topicPlace);
 }

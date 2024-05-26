@@ -3,6 +3,7 @@ package live.ioteatime.ruleengine.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
+import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
 import live.ioteatime.ruleengine.exception.MissingFieldException;
 import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
@@ -55,6 +56,16 @@ public class OutlierServiceImpl implements OutlierService {
             });
         }
         log.info("outliers {}", outlierRepository.getOutliers().entrySet());
+    }
+
+    @Override
+    public boolean checkOutlier(String topicPlace) {
+        return outlierRepository.getKeys().contains(topicPlace);
+    }
+
+    @Override
+    public MinMaxDto getMinMax(String topicPlace) {
+        return outlierRepository.getOutliers().get(topicPlace);
     }
 
 }
