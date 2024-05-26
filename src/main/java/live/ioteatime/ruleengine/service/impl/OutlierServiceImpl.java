@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,22 +27,25 @@ public class OutlierServiceImpl implements OutlierService {
 
     @Override
     public List<OutlierDto> getOutlier(String key) {
+        List<OutlierDto> outlierList = new ArrayList<>();
 
-            List<OutlierDto> outlierList;
+        try {
             String outliers = Optional.ofNullable(redisTemplate.opsForValue().get(key)).map(Object::toString)
                     .orElse(null);
 
-            if (outliers ==null) {
-                throw new NullPointerException("redis is empty");
+            if (outliers == null) {
+                log.warn("redis is empty for key {}", key);
+                return outlierList;
             }
-        try {
+
             outlierList = objectMapper.readValue(outliers, objectMapper.getTypeFactory().constructCollectionType(List.class, OutlierDto.class));
             log.info("outlierList {}", outlierList);
 
-            return outlierList;
         } catch (JsonProcessingException e) {
             throw new MissingFieldException(e.getMessage());
         }
+
+        return outlierList;
     }
 
     @Override
