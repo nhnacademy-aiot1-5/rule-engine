@@ -41,11 +41,11 @@ public class RuleConfig {
         return ((mqttModbusDTO, ruleChain) -> {
             if (mqttModbusDTO.getId().contains("occupancy")) {
                 if (mqttModbusDTO.getValue() == 0) {
-                    webClientService.offYellowLightSignal(Outlier.AC.getLowercase());
+                    webClientService.lightControl(Outlier.AC.getLowercase(), "off");
                     return;
                 }
                 if (mqttModbusDTO.getValue() == 1) {
-                    webClientService.setYellowLightSignal(Outlier.AC.getLowercase());
+                    webClientService.lightControl(Outlier.AC.getLowercase(), "on");
                     return;
                 }
                 return;
@@ -90,7 +90,7 @@ public class RuleConfig {
             if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
                 log.error("outlier! place : {}, description : {}, value : {} ", topicDto.getPlace(), topicDto.getDescription(), mqttModbusDTO.getValue());
 
-                webClientService.setRedLightSignal(Outlier.LIGHT.getLowercase());
+                webClientService.lightControl(Outlier.LIGHT.getLowercase(), "on");
                 webClientService.sendOutlierToApi("/api", topicDto, mqttModbusDTO);
                 webClientService.sendOutlierToFront("/outlier", topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
             }
