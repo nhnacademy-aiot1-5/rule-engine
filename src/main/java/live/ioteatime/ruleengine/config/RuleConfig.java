@@ -36,8 +36,6 @@ public class RuleConfig {
         MODBUS, MQTT
     }
 
-    private boolean outlierCheck = false;
-
     @Bean
     public Rule acRule() {
         return ((mqttModbusDTO, ruleChain) -> {
@@ -81,12 +79,11 @@ public class RuleConfig {
             MinMaxDto minMaxDto = outlierService.getMinMax(topicDto.getPlace());
 
             if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
-                outlierCheck = true;
                 log.error("outlier! place : {}, description : {}, value : {} ", topicDto.getPlace(), topicDto.getDescription(), mqttModbusDTO.getValue());
 
                 webClientService.setRedLightSignal(Outlier.LIGHT.getLowercase());
                 webClientService.sendOutlierToApi("/api", topicDto, mqttModbusDTO);
-                webClientService.sendOutlierToFront("/outlier", topicDto, mqttModbusDTO,Outlier.LIGHT.getLowercase());
+                webClientService.sendOutlierToFront("/outlier", topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
             }
             ruleChain.doProcess(mqttModbusDTO);
         });
@@ -96,21 +93,20 @@ public class RuleConfig {
     public Rule inputInflux(InfluxDBClient influxDBClient) {
         return ((mqttModbusDTO, ruleChain) -> {
             if (String.valueOf(Protocol.MQTT).equals(mqttModbusDTO.getProtocol())) {
-                insertData(influxDBClient, mqttModbusDTO, ruleChain, outlierCheck,true);
+                insertData(influxDBClient, mqttModbusDTO, ruleChain, true);
 
                 return;
             }
-            insertData(influxDBClient, mqttModbusDTO, ruleChain, outlierCheck,false);
+            insertData(influxDBClient, mqttModbusDTO, ruleChain, false);
         });
     }
 
-    private void insertData(InfluxDBClient influxDBClient, MqttModbusDTO mqttModbusDTO, RuleChain ruleChain, boolean isOutlier,boolean isMqtt) {
-        String bucket = isOutlier ? influxDBProperties.getOutlier() : influxDBProperties.getMain();
+    private void insertData(InfluxDBClient influxDBClient, MqttModbusDTO mqttModbusDTO, RuleChain ruleChain, boolean isMqtt) {
+        String bucket = influxDBProperties.getBucket();
         WriteApiBlocking writeApiBlocking = influxDBClient.getWriteApiBlocking();
         Point point = buildPoint(mqttModbusDTO, isMqtt);
 
         writeApiBlocking.writePoint(bucket, influxDBProperties.getOrg(), point);
-        outlierCheck = false;
         ruleChain.doProcess(mqttModbusDTO);
     }
 
