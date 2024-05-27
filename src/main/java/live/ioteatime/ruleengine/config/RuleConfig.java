@@ -39,9 +39,18 @@ public class RuleConfig {
     @Bean
     public Rule acRule() {
         return ((mqttModbusDTO, ruleChain) -> {
-            if (mqttModbusDTO.getId().contains("sensor")) {
-                log.info("ac role");
+            if (mqttModbusDTO.getId().contains("occupancy")) {
+                if (mqttModbusDTO.getValue() == 0) {
+                    webClientService.offYellowLightSignal(Outlier.AC.getLowercase());
+                    return;
+                }
+                if (mqttModbusDTO.getValue() == 1) {
+                    webClientService.setYellowLightSignal(Outlier.AC.getLowercase());
+                    return;
+                }
+                return;
             }
+            ruleChain.doProcess(mqttModbusDTO);
         });
     }
 
