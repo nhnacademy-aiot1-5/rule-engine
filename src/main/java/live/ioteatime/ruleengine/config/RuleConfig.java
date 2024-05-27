@@ -39,6 +39,15 @@ public class RuleConfig {
     private boolean outlierCheck = false;
 
     @Bean
+    public Rule acRule() {
+        return ((mqttModbusDTO, ruleChain) -> {
+            if (mqttModbusDTO.getId().contains("sensor")) {
+                log.info("ac role");
+            }
+        });
+    }
+
+    @Bean
     public Rule nullCheck() {
         return ((mqttModbusDTO, ruleChain) -> {
             if (Protocol.MODBUS.toString().equals(mqttModbusDTO.getProtocol())) {
@@ -50,9 +59,7 @@ public class RuleConfig {
             if (mqttModbusDTO.getValue() == null) {
                 return;
             }
-            if (mqttModbusDTO.getValue().equals(0.0f) && topicDto.getType().equals("temperature")) {
-                ruleChain.doProcess(mqttModbusDTO);
-
+            if (!(mqttModbusDTO.getValue().equals(0.0f) && topicDto.getType().equals("temperature"))) {
                 return;
             }
             ruleChain.doProcess(mqttModbusDTO);
