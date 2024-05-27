@@ -25,18 +25,7 @@ public interface WebClientService {
     /**
      * 이상치 감지 시 control 서버에 신호를 보내는 메소드
      * @param sensorName light(경광등)
+     * @param flag light state , on or off
      */
-    void setRedLightSignal(String sensorName);
-
-    /**
-     *  재실센서가 사람 있으면 에어컨(노란 불) 켜짐
-     * @param sensorName 센서 이름
-     */
-    void setYellowLightSignal(String sensorName);
-
-    /**
-     *  재실센서가 사람 없으면 에어컨(노란 불) 꺼짐
-     * @param sensorName 센서 이름
-     */
-    void offYellowLightSignal(String sensorName);
+    void lightControl(String sensorName, String flag);
 }

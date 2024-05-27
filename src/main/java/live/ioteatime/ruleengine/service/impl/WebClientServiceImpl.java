@@ -55,23 +55,8 @@ public class WebClientServiceImpl implements WebClientService {
     }
 
     @Override
-    public void setRedLightSignal(String sensorName) {
-        String url = String.format("%s/sensor/on?sensorName=%s&devEui=%s", controlBaseUri, sensorName, devEui);
-
-        sendGetRequest(url);
-    }
-
-    @Override
-    public void setYellowLightSignal(String sensorName) {
-        String url = String.format("%s/sensor/on?sensorName=%s&devEui=%s", controlBaseUri, sensorName, devEui);
-
-        sendGetRequest(url);
-    }
-
-    @Override
-    public void offYellowLightSignal(String sensorName) {
-        String url = String.format("%s/sensor/off?sensorName=%s&devEui=%s", controlBaseUri, sensorName, devEui);
-
+    public void lightControl(String sensorName,String flag) {
+        String url = String.format("%s/sensor/%s?sensorName=%s&devEui=%s", controlBaseUri,flag ,sensorName, devEui);
         sendGetRequest(url);
     }
 
