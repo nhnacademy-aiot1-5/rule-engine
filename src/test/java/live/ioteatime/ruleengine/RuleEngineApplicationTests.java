@@ -4,7 +4,6 @@ import com.influxdb.client.InfluxDBClient;
 import com.rabbitmq.client.Connection;
 import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.repository.ChannelsRepository;
-import live.ioteatime.ruleengine.repository.InfluxQueryRepository;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import live.ioteatime.ruleengine.scheduler.ReportScheduler;
 import org.junit.jupiter.api.Test;
@@ -23,8 +22,6 @@ class RuleEngineApplicationTests {
     JSchManager jSchManager;
     @MockBean
     ReportScheduler reportScheduler;
-    @MockBean
-    InfluxQueryRepository influxQueryRepository;
     @MockBean
     ChannelsRepository channelsRepository;
 
