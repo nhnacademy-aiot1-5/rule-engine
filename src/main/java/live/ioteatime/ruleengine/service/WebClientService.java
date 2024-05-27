@@ -27,4 +27,16 @@ public interface WebClientService {
      * @param sensorName light(경광등)
      */
     void setRedLightSignal(String sensorName);
+
+    /**
+     *  재실센서가 사람 있으면 에어컨(노란 불) 켜짐
+     * @param sensorName 센서 이름
+     */
+    void setYellowLightSignal(String sensorName);
+
+    /**
+     *  재실센서가 사람 없으면 에어컨(노란 불) 꺼짐
+     * @param sensorName 센서 이름
+     */
+    void offYellowLightSignal(String sensorName);
 }

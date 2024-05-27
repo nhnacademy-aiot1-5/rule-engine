@@ -61,6 +61,20 @@ public class WebClientServiceImpl implements WebClientService {
         sendGetRequest(url);
     }
 
+    @Override
+    public void setYellowLightSignal(String sensorName) {
+        String url = String.format("%s/sensor/on?sensorName=%s&devEui=%s", controlBaseUri, sensorName, devEui);
+
+        sendGetRequest(url);
+    }
+
+    @Override
+    public void offYellowLightSignal(String sensorName) {
+        String url = String.format("%s/sensor/off?sensorName=%s&devEui=%s", controlBaseUri, sensorName, devEui);
+
+        sendGetRequest(url);
+    }
+
     private void sendPostRequest(String url, Object body) {
         webClient.post()
                 .uri(url)
