@@ -1,6 +1,7 @@
 package live.ioteatime.ruleengine.repository.impl;
 
 import live.ioteatime.ruleengine.domain.MappingData;
+import live.ioteatime.ruleengine.exception.MappingTableIndexNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,12 @@ class MappingTableRepositoryImplTest {
         assertEquals(test1.getPlaceName(), tags.get("place"));
         assertEquals(test1.getChannelName(), tags.get("type"));
         assertEquals(test1.getValue(), tags.get("typeTest"));
+    }
+
+    @Test
+    void getTags_MappingException() {
+        assertThrows(MappingTableIndexNotFoundException.class, () ->
+                repository.getTags(4));
     }
 
     @Test
