@@ -6,7 +6,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
-import live.ioteatime.ruleengine.exception.MappingTableIndexNotFoundException;
 import live.ioteatime.ruleengine.exception.MissingFieldException;
 import live.ioteatime.ruleengine.repository.impl.OutlierRepository;
 import live.ioteatime.ruleengine.util.TimeUtils;
@@ -23,7 +22,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
