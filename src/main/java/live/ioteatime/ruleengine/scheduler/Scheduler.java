@@ -8,11 +8,10 @@ import live.ioteatime.ruleengine.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
@@ -24,7 +23,7 @@ public class Scheduler {
     @Value("${schedule.flag}")
     private boolean cronFlag;
 
-    @EventListener(ApplicationReadyEvent.class)
+    @PostConstruct
     private void firstStart() {
         outlierUpdate();
     }

@@ -29,6 +29,8 @@ class SchedulerTest {
         ReflectionTestUtils.setField(scheduler, "cronFlag", true);
         List<OutlierDto> outlierDtos = new ArrayList<>(List.of(new OutlierDto()));
 
+        doNothing().when(mqttDataHandlerContext).pauseAll();
+        doNothing().when(mqttDataHandlerContext).restartAll();
         when(outlierService.getOutlier(anyString())).thenReturn(outlierDtos);
 
         scheduler.outlierUpdater();
