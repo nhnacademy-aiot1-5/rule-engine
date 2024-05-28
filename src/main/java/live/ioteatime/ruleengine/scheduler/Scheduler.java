@@ -25,7 +25,7 @@ public class Scheduler {
     private boolean cronFlag;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void firstStart() {
+    private void firstStart() {
         outlierUpdate();
     }
 
