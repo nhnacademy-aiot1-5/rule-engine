@@ -5,7 +5,6 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
 import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.properties.JschProperties;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
