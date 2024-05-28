@@ -5,7 +5,7 @@ import com.rabbitmq.client.Connection;
 import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.repository.ChannelsRepository;
 import live.ioteatime.ruleengine.rule.RuleChain;
-import live.ioteatime.ruleengine.scheduler.ReportScheduler;
+import live.ioteatime.ruleengine.scheduler.Scheduler;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,7 +21,7 @@ class RuleEngineApplicationTests {
     @MockBean
     JSchManager jSchManager;
     @MockBean
-    ReportScheduler reportScheduler;
+    Scheduler scheduler;
     @MockBean
     ChannelsRepository channelsRepository;
 

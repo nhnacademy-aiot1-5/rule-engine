@@ -2,6 +2,7 @@ package live.ioteatime.ruleengine.scheduler;
 
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
+import live.ioteatime.ruleengine.handler.MqttDataHandlerContext;
 import live.ioteatime.ruleengine.service.OutlierService;
 import live.ioteatime.ruleengine.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ import java.util.List;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ReportScheduler {
-
+public class Scheduler {
+    private final MqttDataHandlerContext mqttDataHandlerContext;
     private final OutlierService outlierService;
     @Value("${schedule.flag}")
     private boolean cronFlag;
@@ -36,11 +37,13 @@ public class ReportScheduler {
     private void outlierUpdate() {
         LocalDateTimeDto localDateTimeDto = TimeUtils.localDateTime();
 
+        mqttDataHandlerContext.pauseAll();
         if (cronFlag) {
             String key = "outliers";
             List<OutlierDto> outlier = outlierService.getOutlier(key);
             outlierService.matchTime(outlier, localDateTimeDto);
         }
+        mqttDataHandlerContext.restartAll();
     }
 
 }
