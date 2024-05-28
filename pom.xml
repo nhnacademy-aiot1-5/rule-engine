@@ -138,9 +138,10 @@
 
                 <configuration>
                     <excludes>
-                        <exclude>live/ioteatime/ruleengine/entity/**</exclude>
-                        <exclude>live/ioteatime/ruleengine/adaptor/**</exclude>
-                        <exclude>live/ioteatime/ruleengine/properties/**</exclude>
+                        <exclude>live/ioteatime/ruleengine/entity/*</exclude>
+                        <exclude>live/ioteatime/ruleengine/adaptor/*</exclude>
+                        <exclude>live/ioteatime/ruleengine/properties/*</exclude>
+                        <exclude>live/ioteatime/ruleengine/domain/**</exclude>
                         <exclude>live/ioteatime/ruleengine/config/CommonConfig.java</exclude>
                         <exclude>live/ioteatime/ruleengine/config/InfluxDBConfig.java</exclude>
                         <exclude>live/ioteatime/ruleengine/config/RabbitClientConfig.java</exclude>
