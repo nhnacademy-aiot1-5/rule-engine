@@ -34,12 +34,6 @@ public class MappingTableRepositoryImpl implements MappingTableRepository {
 
     public void addValue(List<MappingData> table) {
         table.forEach(mappingData -> {
-            if (mappingTable.containsKey(mappingData.getAddress())) {
-                Map<String, String> map = mappingTable.get(mappingData.getAddress());
-                map.put(mappingData.getType(), mappingData.getValue());
-
-                return;
-            }
             Map<String, String> tag = new HashMap<>(Map.of("type", mappingData.getChannelName(), "place", mappingData.getPlaceName(), mappingData.getType(), mappingData.getValue()));
             mappingTable.put(mappingData.getAddress(), tag);
         });
