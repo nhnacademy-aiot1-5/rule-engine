@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
-
     private final List<MqttDataHandler> handlers;
     private final ObjectFactory<MqttDataHandler> factory;
     private final Integer totalThread;
@@ -38,4 +37,23 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
                  .forEach(i -> handlers.add(factory.getObject()));
         log.info("{} handlers have been created.", handlers.size());
     }
+
+    @Override
+    public void pauseAll() {
+        boolean isWait = false;
+
+        handlers.forEach(MqttDataHandler::pause);
+
+        while (!isWait) {
+            isWait = handlers.stream().allMatch(MqttDataHandler::isWait);
+        }
+        log.info("{} handlers have been paused.", handlers.size());
+    }
+
+    @Override
+    public void restartAll() {
+        handlers.forEach(MqttDataHandler::reStart);
+        log.info("{} handlers have been restarted.", handlers.size());
+    }
+
 }
