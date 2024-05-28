@@ -1,5 +1,6 @@
 package live.ioteatime.ruleengine.service.impl;
 
+import live.ioteatime.ruleengine.adaptor.ClientAdaptor;
 import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import live.ioteatime.ruleengine.domain.SaveOutlierDto;
 import live.ioteatime.ruleengine.domain.SendOutlierDto;
@@ -8,16 +9,13 @@ import live.ioteatime.ruleengine.service.WebClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class WebClientServiceImpl implements WebClientService {
-    private final WebClient webClient;
+    private final ClientAdaptor clientAdaptor;
     @Value("${control.dev.eui}")
     private String devEui;
     @Value("${control.base.uri}")
@@ -38,7 +36,7 @@ public class WebClientServiceImpl implements WebClientService {
                 , mqttModbusDTO.getValue()
                 , 1);
 
-        sendPostRequest(url,sendOutlierDto);
+        clientAdaptor.sendPostRequest(url,sendOutlierDto);
     }
 
     @Override
@@ -51,37 +49,13 @@ public class WebClientServiceImpl implements WebClientService {
                 , 1
                 , 0);
 
-        sendPostRequest(url,saveOutlierDto);
+        clientAdaptor.sendPostRequest(url,saveOutlierDto);
     }
 
     @Override
     public void lightControl(String sensorName,String flag) {
         String url = String.format("%s/sensor/%s?sensorName=%s&devEui=%s", controlBaseUri,flag ,sensorName, devEui);
-        sendGetRequest(url);
-    }
-
-    private void sendPostRequest(String url, Object body) {
-        webClient.post()
-                .uri(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(body), body.getClass())
-                .retrieve()
-                .bodyToMono(String.class)
-                .subscribe(
-                        response -> log.info("post response: {}", response),
-                        error -> log.error("send post request error", error)
-                );
-    }
-
-    private void sendGetRequest(String url) {
-        webClient.get()
-                .uri(url)
-                .retrieve()
-                .bodyToMono(String.class)
-                .subscribe(
-                        response -> log.info("get response: {}", response),
-                        error -> log.error("send get request error", error)
-                );
+        clientAdaptor.sendGetRequest(url);
     }
 
 }
