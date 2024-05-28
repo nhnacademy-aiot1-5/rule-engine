@@ -56,12 +56,12 @@ public class JschServiceImpl implements JschService {
             channelExec.disconnect();
             session.disconnect();
             log.info("done");
-        } catch (JSchException | IOException e) {
+        } catch (Exception e) {
             log.error("deleteBridge Error {}", e.getMessage());
         }
     }
 
-    private static void scriptMessage(ChannelExec channelExec) throws IOException {
+    private void scriptMessage(ChannelExec channelExec) throws IOException {
         InputStream in = channelExec.getInputStream();
         byte[] buffer = new byte[1024];
         int i;
@@ -76,7 +76,7 @@ public class JschServiceImpl implements JschService {
         }
     }
 
-    private static void safeSleep() {
+    private void safeSleep() {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -89,7 +89,7 @@ public class JschServiceImpl implements JschService {
      * @param channel        연결한 인스턴스의 채널
      * @param destinationDir 인스턴스에 생성할 디렉토리 경로
      */
-    private static void mkdirAndPut(String filePath, ChannelSftp channel, String destinationDir) {
+    private void mkdirAndPut(String filePath, ChannelSftp channel, String destinationDir) {
         try {
             channel.mkdir(destinationDir);
             putFile(filePath, destinationDir, channel);
@@ -99,7 +99,7 @@ public class JschServiceImpl implements JschService {
         }
     }
 
-    private static void putFile(String filePath, String destinationDir, ChannelSftp channel) {
+    private void putFile(String filePath, String destinationDir, ChannelSftp channel) {
         try {
             channel.put(filePath, destinationDir, ChannelSftp.OVERWRITE);
             log.info("upload {}", filePath);
@@ -112,7 +112,7 @@ public class JschServiceImpl implements JschService {
      * @param filePath - 삭제할 파일 경로
      *                 작업 완료후 전송된 디렉토리, 파일을 삭제 하는 메서드
      */
-    private static void deleteFile(String filePath) throws IOException {
+    private void deleteFile(String filePath) throws IOException {
         Files.delete(Path.of(filePath));
         log.info("deleteFile {}", filePath);
     }
@@ -121,7 +121,7 @@ public class JschServiceImpl implements JschService {
      * @param fileName    실행 시킬 스크립트 경로
      * @param channelExec commandline 채널
      */
-    private static void giveCommand(String command,String type,String fileName, ChannelExec channelExec) throws JSchException {
+    private void giveCommand(String command,String type,String fileName, ChannelExec channelExec) throws JSchException {
         String commands = command + type + " " + fileName;
         channelExec.setCommand(commands);
         log.info("giveCommand {}", commands);
@@ -135,7 +135,7 @@ public class JschServiceImpl implements JschService {
      * @param channelSftp JSch 채널
      * @param channelExec JSch 채널
      */
-    private static void jschDisconnect(Session session, ChannelSftp channelSftp, ChannelExec channelExec) {
+    private void jschDisconnect(Session session, ChannelSftp channelSftp, ChannelExec channelExec) {
         session.disconnect();
         channelSftp.disconnect();
         channelExec.disconnect();
