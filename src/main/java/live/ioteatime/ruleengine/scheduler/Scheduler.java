@@ -36,7 +36,7 @@ public class Scheduler {
      * 레디스에 저장된 이상치를 가져와 이상치 저장소에 저장
      * 24시간제 시간, 현재 시간을 기준으로 시간만 잘라 이상치 저장소의 key 로 사용
      */
-    @Scheduled(cron = "${schedule.cron2}")
+    @Scheduled(cron = "${schedule.cron}")
     public void outlierUpdater() {
         outlierUpdate();
     }
