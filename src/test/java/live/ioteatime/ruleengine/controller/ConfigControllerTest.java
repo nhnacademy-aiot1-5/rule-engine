@@ -6,12 +6,10 @@ import live.ioteatime.ruleengine.domain.MqttInfo;
 import live.ioteatime.ruleengine.service.CreateProperties;
 import live.ioteatime.ruleengine.service.JschService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,17 +24,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
 @WebMvcTest(ConfigController.class)
 class ConfigControllerTest {
-    @Autowired
-    MockMvc mvc;
     @MockBean
     CreateProperties createProperties;
     @MockBean
     JschService jschService;
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
 
     @Test
     void addBroker() throws Exception {
@@ -51,7 +46,7 @@ class ConfigControllerTest {
         String filePath = "/src/asdadsa.properties";
 
         when(createProperties.createConfig(any(MqttInfo.class))).thenReturn(filePath);
-        doNothing().when(jschService).scpFile(anyString(), anyString(),anyString());
+        doNothing().when(jschService).scpFile(anyString(), anyString(), anyString());
 
         mockMvc.perform(post("/mqtt")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -65,14 +60,14 @@ class ConfigControllerTest {
 
     @Test
     void deleteBroker() throws Exception {
-        doNothing().when(jschService).deleteBridge(anyString(),anyString());
+        doNothing().when(jschService).deleteBridge(anyString(), anyString());
 
-        mockMvc.perform(get("/delete/{type}/{bridgeName}", "test","test")
+        mockMvc.perform(get("/delete/{type}/{bridgeName}", "test", "test")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Delete Bridge ")));
 
-        verify(jschService).deleteBridge(anyString(),anyString());
+        verify(jschService).deleteBridge(anyString(), anyString());
     }
 
     @Test
@@ -86,15 +81,15 @@ class ConfigControllerTest {
         String filePath = "/src/asdadsa.properties";
 
         when(createProperties.createConfig(any(ModbusInfo.class))).thenReturn(filePath);
-        doNothing().when(jschService).scpFile(anyString(), anyString(),anyString());
+        doNothing().when(jschService).scpFile(anyString(), anyString(), anyString());
 
         mockMvc.perform(post("/modbus")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(modbusInfo)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(modbusInfo)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("create modbus Bridge properties ")));
 
-        verify(jschService).scpFile(eq(filePath),eq(modbusInfo.getName()),anyString());
+        verify(jschService).scpFile(eq(filePath), eq(modbusInfo.getName()), anyString());
         verify(createProperties).createConfig(any(ModbusInfo.class));
     }
 
