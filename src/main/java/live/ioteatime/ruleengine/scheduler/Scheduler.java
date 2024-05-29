@@ -23,11 +23,19 @@ public class Scheduler {
     @Value("${schedule.flag}")
     private boolean cronFlag;
 
+    /**
+     * 빈 생성시에 이상치 갱신
+     */
     @PostConstruct
     private void firstStart() {
         outlierUpdate();
     }
 
+    /**
+     * 이상치 갱신 전 모든 워커 스레드 종료, 다음 이상치 갱신
+     * 레디스에 저장된 이상치를 가져와 이상치 저장소에 저장
+     * 24시간제 시간, 현재 시간을 기준으로 시간만 잘라 이상치 저장소의 key 로 사용
+     */
     @Scheduled(cron = "${schedule.cron2}")
     public void outlierUpdater() {
         outlierUpdate();

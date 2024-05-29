@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class MappingTableController {
     private final MappingTableService mappingTableService;
 
+    /**
+     * database 에 저장된 매핑 테이블을 가져와 매핑테이블 갱신
+     * @return update mapping-table
+     */
     @GetMapping("/update/mapping-table")
     public ResponseEntity<String> getMappingTable() {
         mappingTableService.getMappingTable();
