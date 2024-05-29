@@ -1,5 +1,6 @@
 package live.ioteatime.ruleengine.controller;
 
+import live.ioteatime.ruleengine.handler.MqttDataHandlerContext;
 import live.ioteatime.ruleengine.service.MappingTableService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,23 @@ class MappingTableControllerTest {
     MockMvc mockMvc;
     @MockBean
     MappingTableService mappingTableService;
+    @MockBean
+    MqttDataHandlerContext mqttDataHandlerContext;
 
     @Test
     void getMappingTableTest() throws Exception {
         doNothing().when(mappingTableService).getMappingTable();
+        doNothing().when(mqttDataHandlerContext).pauseAll();
+        doNothing().when(mqttDataHandlerContext).restartAll();
 
         mockMvc.perform(get("/update/mapping-table")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("update mapping-table")));
 
+        verify(mqttDataHandlerContext).pauseAll();
         verify(mappingTableService).getMappingTable();
+        verify(mqttDataHandlerContext).restartAll();
     }
 
 }
