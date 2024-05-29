@@ -33,6 +33,8 @@ public class RuleConfig {
     private String apiEndpoint;
     @Value("${outlier.description}")
     private String outlierDesc;
+    @Value("${sensor.flag}")
+    private String sensorFlag;
     private final OutlierService outlierService;
     private final MappingTableService mappingTableService;
     private final WebClientService webClientService;
@@ -98,7 +100,7 @@ public class RuleConfig {
                 if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
                     log.error("outlier! place : {}, type {} ,description : {}, value : {} , phase {} ", topicDto.getPlace(), topicDto.getType(), topicDto.getDescription(), mqttModbusDTO.getValue(),topicDto.getPhase());
 
-                    webClientService.lightControl(Outlier.LIGHT.getLowercase(), "on");
+                    webClientService.lightControl(Outlier.LIGHT.getLowercase(), sensorFlag);
                     webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
                     webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
                     return;
