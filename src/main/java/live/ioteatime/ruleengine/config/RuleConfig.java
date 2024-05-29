@@ -94,9 +94,9 @@ public class RuleConfig {
             }
             MinMaxDto minMaxDto = outlierService.getMinMax(topicDto.getPlace());
 
-            if ("main".equals(topicDto.getType())) {
+            if ("main".equals(topicDto.getType()) && "total".equals(topicDto.getPhase())) {
                 if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
-                    log.error("outlier! place : {}, type {} ,description : {}, value : {} ", topicDto.getPlace(), topicDto.getType(), topicDto.getDescription(), mqttModbusDTO.getValue());
+                    log.error("outlier! place : {}, type {} ,description : {}, value : {} , phase {} ", topicDto.getPlace(), topicDto.getType(), topicDto.getDescription(), mqttModbusDTO.getValue(),topicDto.getPhase());
 
                     webClientService.lightControl(Outlier.LIGHT.getLowercase(), "on");
                     webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
