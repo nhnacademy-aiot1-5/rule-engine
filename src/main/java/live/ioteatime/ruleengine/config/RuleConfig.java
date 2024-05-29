@@ -17,6 +17,7 @@ import live.ioteatime.ruleengine.service.WebClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,14 +27,20 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class RuleConfig {
+    @Value("${front.outlier.endpoint}")
+    private String frontEndpoint;
+    @Value("${api.endpoint}")
+    private String apiEndpoint;
+    @Value("${outlier.description}")
+    private String outlierDesc;
     private final OutlierService outlierService;
     private final MappingTableService mappingTableService;
     private final WebClientService webClientService;
     private final InfluxDBProperties influxDBProperties;
-    private static final String DESCRIPTION = "w";
+
 
     private enum Protocol {
-        MODBUS, MQTT
+        MODBUS, MQTT;
     }
 
     @Bean
@@ -80,19 +87,22 @@ public class RuleConfig {
 
             if (!outlierService.checkOutlier(topicDto.getPlace())) ruleChain.doProcess(mqttModbusDTO);
 
-            if (!DESCRIPTION.equals(topicDto.getDescription())) {
+            if (!outlierDesc.equals(topicDto.getDescription())) {
                 ruleChain.doProcess(mqttModbusDTO);
 
                 return;
             }
             MinMaxDto minMaxDto = outlierService.getMinMax(topicDto.getPlace());
 
-            if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
-                log.error("outlier! place : {}, description : {}, value : {} ", topicDto.getPlace(), topicDto.getDescription(), mqttModbusDTO.getValue());
+            if ("main".equals(topicDto.getType())) {
+                if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
+                    log.error("outlier! place : {}, type {} ,description : {}, value : {} ", topicDto.getPlace(), topicDto.getType(), topicDto.getDescription(), mqttModbusDTO.getValue());
 
-                webClientService.lightControl(Outlier.LIGHT.getLowercase(), "on");
-                webClientService.sendOutlierToApi("/api", topicDto, mqttModbusDTO);
-                webClientService.sendOutlierToFront("/outlier", topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
+                    webClientService.lightControl(Outlier.LIGHT.getLowercase(), "on");
+                    webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
+                    webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
+                    return;
+                }
             }
             ruleChain.doProcess(mqttModbusDTO);
         });
