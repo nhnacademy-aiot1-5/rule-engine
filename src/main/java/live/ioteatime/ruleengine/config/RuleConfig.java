@@ -66,7 +66,7 @@ public class RuleConfig {
             if (mqttModbusDTO.getValue() == null) {
                 return;
             }
-            if (!(mqttModbusDTO.getValue().equals(0.0f) && topicDto.getType().equals("temperature"))) {
+            if ((!topicDto.getType().equals("temperature")) && mqttModbusDTO.getValue().equals(0.0f)) {
                 return;
             }
             ruleChain.doProcess(mqttModbusDTO);
