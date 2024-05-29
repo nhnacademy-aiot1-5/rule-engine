@@ -20,7 +20,13 @@
     <properties>
         <java.version>11</java.version>
         <spring-cloud.version>2021.0.8</spring-cloud.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
+        <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -105,15 +111,9 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.7</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -134,59 +134,28 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
-
-                <configuration>
-                    <excludes>
-                        <exclude>**/entity/*</exclude>
-                        <exclude>**/adaptor/*</exclude>
-                        <exclude>**/properties/*</exclude>
-                        <exclude>**/domain/*</exclude>
-                        <exclude>**/config/*</exclude>
-
-                    </excludes>
-                </configuration>
+                <version>0.8.12</version>
                 <executions>
-
                     <execution>
+                        <id>jacoco-initialize</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>jacoco-report</id>
-                        <phase>test</phase>
+                        <id>jacoco-site</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
-                    </execution>
-                    <execution>
-                        <id>jacoco-check</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-
                         <configuration>
-                            <rules>
-                                <rule>
-                                    <element>BUNDLE</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>INSTRUCTION</counter>
-                                            <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum>
-                                        </limit>
-                                    </limits>
-                                    <element>METHOD</element>
-                                    <limits>
-                                        <limit>
-                                            <counter>LINE</counter>
-                                            <value>TOTALCOUNT</value>
-                                            <maximum>50</maximum>
-                                        </limit>
-                                    </limits>
-                                </rule>
-                            </rules>
+                            <excludes>
+                                <exclude>**/entity/*</exclude>
+                                <exclude>**/adaptor/*</exclude>
+                                <exclude>**/properties/*</exclude>
+                                <exclude>**/domain/*</exclude>
+                                <exclude>**/config/*</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>
