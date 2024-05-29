@@ -1,7 +1,5 @@
 package live.ioteatime.ruleengine.handler.impl;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import live.ioteatime.ruleengine.handler.MqttDataHandler;
 import live.ioteatime.ruleengine.rule.RuleChain;
@@ -9,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * MQTT 데이터 핸들러입니다.
@@ -25,6 +26,8 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     private final Thread thread;
     private final BlockingQueue<MqttModbusDTO> blockingQueue;
     private final RuleChain ruleChain;
+    private boolean paused = false;
+    private final Object pauseLock = new Object(); // 별도의 모니터 객체
 
     /**
      * 핸들러를 생성합니다.
@@ -48,6 +51,16 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     public void run() {
         preProcess();
         while (!Thread.currentThread().isInterrupted()) {
+            synchronized (pauseLock) {
+                while (paused) {
+                    try {
+                        pauseLock.wait();
+                        log.info("MqttDataHandlerThread is paused {}", thread.getName());
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
             process();
         }
         postProcess();
@@ -80,4 +93,26 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
         thread.interrupt();
         log.debug("interrupting {}", thread.getName());
     }
+
+    @Override
+    public void pause() {
+        synchronized (pauseLock) {
+            paused = true;
+        }
+    }
+
+    @Override
+    public void reStart() {
+        synchronized (pauseLock) {
+            pauseLock.notify();
+            paused = false;
+            log.info("restarting {}", thread.getName());
+        }
+    }
+
+    @Override
+    public boolean isWait() {
+        return Thread.State.WAITING.equals(thread.getState());
+    }
+
 }

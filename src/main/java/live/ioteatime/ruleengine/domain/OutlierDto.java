@@ -1,16 +1,15 @@
 package live.ioteatime.ruleengine.domain;
 
-
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-import java.util.Map;
+import java.util.List;
 
 @Setter
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class OutlierDto {
-    private Map<Integer, MinMaxDto> hour;
+    private String place;
+    private List<MinMaxDto> values;
 }

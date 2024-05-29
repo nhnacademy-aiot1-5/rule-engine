@@ -29,7 +29,7 @@ public class MappingTableServiceImpl implements MappingTableService {
         List<MappingData> mappingDataDto = channelsRepository.loadMappingTable();
 
         mappingTableRepository.addValue(mappingDataDto);
-        log.info("----{}", mappingTableRepository.getTables());
+        log.info("getMappingTable {}", mappingTableRepository.getTables());
     }
 
     @Override

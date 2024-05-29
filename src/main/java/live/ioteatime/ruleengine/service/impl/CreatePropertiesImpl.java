@@ -23,11 +23,6 @@ public class CreatePropertiesImpl implements CreateProperties {
     @Value("${create.folder.path}")
     private String path;
 
-    /**
-     * @param mqttInfo - 브로커 설정을 위한 변수들
-     * @return - 생성한 파일 경로
-     * 브로커 추가를 위한 설정 파일을 만드는 메서드
-     */
     @Override
     public String createConfig(MqttInfo mqttInfo) {
         String fileName = "application-prod.properties";
