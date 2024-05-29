@@ -142,23 +142,17 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>jacoco-site</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <excludes>
-                                <exclude>**/entity/*</exclude>
-                                <exclude>**/adaptor/*</exclude>
-                                <exclude>**/properties/*</exclude>
-                                <exclude>**/domain/*</exclude>
-                                <exclude>**/config/*</exclude>
-                            </excludes>
-                        </configuration>
-                    </execution>
                 </executions>
+
+                <configuration>
+                    <excludes>
+                        <exclude>**/entity/*</exclude>
+                        <exclude>**/adaptor/*</exclude>
+                        <exclude>**/properties/*</exclude>
+                        <exclude>**/domain/*</exclude>
+                        <exclude>**/config/*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
