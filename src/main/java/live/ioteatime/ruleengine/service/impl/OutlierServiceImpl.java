@@ -40,7 +40,6 @@ public class OutlierServiceImpl implements OutlierService {
 
             outlierList = objectMapper.readValue(outliers, objectMapper.getTypeFactory().constructCollectionType(List.class, OutlierDto.class));
             log.info("outlierList {}", outlierList);
-
         } catch (JsonProcessingException e) {
             throw new MissingFieldException(e.getMessage());
         }

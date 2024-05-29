@@ -16,7 +16,7 @@ public interface OutlierService {
     List<OutlierDto> getOutlier(String keys);
 
     /**
-     * 현재 날짜, 시간에 맞는 이상치를 가져온다
+     * 현재 날짜, 시간에 맞는 이상치를 이상치 저장소에서 가져온다
      *
      * @param outlier          이상치
      * @param localDateTimeDto 현재 날짜, 시간
