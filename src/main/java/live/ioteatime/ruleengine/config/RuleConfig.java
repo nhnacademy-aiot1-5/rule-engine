@@ -78,7 +78,7 @@ public class RuleConfig {
         return ((mqttModbusDTO, ruleChain) -> {
             TopicDto topicDto = splitTopic(mqttModbusDTO);
 
-            if (!outlierService.checkOutlier(topicDto.getPlace())) return;
+            if (!outlierService.checkOutlier(topicDto.getPlace())) ruleChain.doProcess(mqttModbusDTO);
 
             if (!DESCRIPTION.equals(topicDto.getDescription())) {
                 ruleChain.doProcess(mqttModbusDTO);
