@@ -34,7 +34,7 @@ class ConfigControllerTest {
     MockMvc mockMvc;
 
     @Test
-    void addBroker() throws Exception {
+    void mqttBridge() throws Exception {
         Constructor<MqttInfo> constructor = MqttInfo.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         MqttInfo mqttInfo = constructor.newInstance();
@@ -71,7 +71,7 @@ class ConfigControllerTest {
     }
 
     @Test
-    void addModbusTest() throws Exception {
+    void modbusBridgeTest() throws Exception {
         Constructor<ModbusInfo> constructor = ModbusInfo.class.getDeclaredConstructor();
         constructor.setAccessible(true);
         ModbusInfo modbusInfo = constructor.newInstance();
