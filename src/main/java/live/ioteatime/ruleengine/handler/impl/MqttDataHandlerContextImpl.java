@@ -13,14 +13,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
-    private final List<MqttDataHandler> handlers;
-    private final ObjectFactory<MqttDataHandler> factory;
-    private final Integer totalThread;
-
     private static final String LOGGING_START_HANDLER = "{} handlers have been started.";
     private static final String LOGGING_CREATE_HANDLER = "{} handlers have been created.";
     private static final String LOGGING_PAUSE_HANDLER = "{} handlers have been paused.";
     private static final String LOGGING_RESTART_HANDLER = "{} handlers have been restarted.";
+
+    private final List<MqttDataHandler> handlers;
+    private final ObjectFactory<MqttDataHandler> factory;
+    private final Integer totalThread;
 
     public MqttDataHandlerContextImpl(ObjectFactory<MqttDataHandler> factory,
         @Value("${datahandler.thread.total}") Integer totalThread) {
