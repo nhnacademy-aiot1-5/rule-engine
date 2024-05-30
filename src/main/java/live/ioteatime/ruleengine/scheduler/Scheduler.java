@@ -24,6 +24,7 @@ public class Scheduler {
     private boolean cronFlag;
     @Value("${outlier.redis.key}")
     private String outlierRedisKey;
+
     /**
      * 빈 생성시에 이상치 갱신
      */
