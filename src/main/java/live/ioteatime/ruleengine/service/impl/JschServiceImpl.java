@@ -11,6 +11,7 @@ import live.ioteatime.ruleengine.properties.JschProperties;
 import live.ioteatime.ruleengine.service.JschService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,12 +23,27 @@ import java.nio.file.Path;
 @Slf4j
 @RequiredArgsConstructor
 public class JschServiceImpl implements JschService {
+    private static final String LOGGING_SCP_ERROR = "scpFile Error {}";
+    private static final String LOGGING_DELETE_BRIDGE_ERROR = "deleteBridge Error {}";
+    private static final String LOGGING_DELETE_BRIDGE = "deleteBridge done";
+    private static final String LOGGING_SCRIPT_MESSAGE = "exit-status {}";
+    private static final String LOGGING_SCP_EXIST = "This setting already exists. overlay";
+    private static final String LOGGING_PUT_FILE = "upload {}";
+    private static final String LOGGING_PUT_FILE_ERROR = "uploadInstance {}";
+    private static final String LOGGING_DELETE_FILE= "deleteFile {}";
+    private static final String LOGGING_COMMAND= "giveCommand {}";
+    private static final String LOGGING_DISCONNECT_JSCH= "JSch disconnected";
+
+    @Value("${jsch.start.shell}")
+    private String startShell;
+    @Value("${jsch.stop.shell}")
+    private String stopShell;
+
     private final JschProperties jschProperties;
     private final JSchManager jSchManager;
 
     @Override
     public void scpFile(String filePath, String fileName,String type) throws CreateJSchSessionException {
-        String startShell = "./startup.sh ";
         String destinationDir = jschProperties.getSavePath()+"/"+type + "/" + fileName;
         Session session = jSchManager.createSession();
         ChannelSftp channelSftp = jSchManager.createChannelSftp(session);
@@ -40,13 +56,12 @@ public class JschServiceImpl implements JschService {
             scriptMessage(channelExec);
             jschDisconnect(session, channelSftp, channelExec);
         } catch (Exception e) {
-            log.error("scpFile Error {}", e.getMessage());
+            log.error(LOGGING_SCP_ERROR, e.getMessage());
         }
     }
 
     @Override
     public void deleteBridge(String type,String bridgeName) throws CreateJSchSessionException {
-        String stopShell = "./stop.sh ";
         Session session = jSchManager.createSession();
         ChannelExec channelExec = jSchManager.createChannelExec(session);
 
@@ -55,9 +70,9 @@ public class JschServiceImpl implements JschService {
             scriptMessage(channelExec);
             channelExec.disconnect();
             session.disconnect();
-            log.info("done");
+            log.info(LOGGING_DELETE_BRIDGE);
         } catch (Exception e) {
-            log.error("deleteBridge Error {}", e.getMessage());
+            log.error(LOGGING_DELETE_BRIDGE_ERROR, e.getMessage());
         }
     }
 
@@ -69,7 +84,7 @@ public class JschServiceImpl implements JschService {
         while ((i = in.read(buffer)) != -1) {
             if (channelExec.isClosed()) {
                 log.info("{}", new String(buffer, 0, i));
-                log.info("exit-status {}", channelExec.getExitStatus());
+                log.info(LOGGING_SCRIPT_MESSAGE, channelExec.getExitStatus());
                 break;
             }
             safeSleep();
@@ -94,7 +109,7 @@ public class JschServiceImpl implements JschService {
             channel.mkdir(destinationDir);
             putFile(filePath, destinationDir, channel);
         } catch (SftpException e) {
-            log.info("이미 존재하는 설정입니다. 덮어 씌우기");
+            log.info(LOGGING_SCP_EXIST);
             putFile(filePath, destinationDir, channel);
         }
     }
@@ -102,9 +117,9 @@ public class JschServiceImpl implements JschService {
     private void putFile(String filePath, String destinationDir, ChannelSftp channel) {
         try {
             channel.put(filePath, destinationDir, ChannelSftp.OVERWRITE);
-            log.info("upload {}", filePath);
+            log.info(LOGGING_PUT_FILE, filePath);
         } catch (SftpException e) {
-            log.error("uploadInstance {}", e.getMessage());
+            log.error(LOGGING_PUT_FILE_ERROR, e.getMessage());
         }
     }
 
@@ -114,7 +129,7 @@ public class JschServiceImpl implements JschService {
      */
     private void deleteFile(String filePath) throws IOException {
         Files.delete(Path.of(filePath));
-        log.info("deleteFile {}", filePath);
+        log.info(LOGGING_DELETE_FILE, filePath);
     }
 
     /**
@@ -124,7 +139,7 @@ public class JschServiceImpl implements JschService {
     private void giveCommand(String command,String type,String fileName, ChannelExec channelExec) throws JSchException {
         String commands = command + type + " " + fileName;
         channelExec.setCommand(commands);
-        log.info("giveCommand {}", commands);
+        log.info(LOGGING_COMMAND, commands);
         channelExec.connect();
     }
 
@@ -139,7 +154,7 @@ public class JschServiceImpl implements JschService {
         session.disconnect();
         channelSftp.disconnect();
         channelExec.disconnect();
-        log.info("JSch disconnected");
+        log.info(LOGGING_DISCONNECT_JSCH);
     }
 
 }
