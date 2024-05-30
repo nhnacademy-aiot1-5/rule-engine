@@ -13,6 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
+    private static final String LOGGING_START_HANDLER = "{} handlers have been started.";
+    private static final String LOGGING_CREATE_HANDLER = "{} handlers have been created.";
+    private static final String LOGGING_PAUSE_HANDLER = "{} handlers have been paused.";
+    private static final String LOGGING_RESTART_HANDLER = "{} handlers have been restarted.";
+
     private final List<MqttDataHandler> handlers;
     private final ObjectFactory<MqttDataHandler> factory;
     private final Integer totalThread;
@@ -29,13 +34,13 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
 
     private void startHandlers() {
         handlers.forEach(MqttDataHandler::start);
-        log.info("{} handlers have been started.", handlers.size());
+        log.info(LOGGING_START_HANDLER, handlers.size());
     }
 
     private void createHandlers() {
         IntStream.range(0, totalThread)
                  .forEach(i -> handlers.add(factory.getObject()));
-        log.info("{} handlers have been created.", handlers.size());
+        log.info(LOGGING_CREATE_HANDLER, handlers.size());
     }
 
     @Override
@@ -47,13 +52,13 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
         while (!isWait) {
             isWait = handlers.stream().allMatch(MqttDataHandler::isWait);
         }
-        log.info("{} handlers have been paused.", handlers.size());
+        log.info(LOGGING_PAUSE_HANDLER, handlers.size());
     }
 
     @Override
     public void restartAll() {
         handlers.forEach(MqttDataHandler::reStart);
-        log.info("{} handlers have been restarted.", handlers.size());
+        log.info(LOGGING_RESTART_HANDLER, handlers.size());
     }
 
 }

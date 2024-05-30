@@ -22,7 +22,8 @@ public class Scheduler {
     private final OutlierService outlierService;
     @Value("${schedule.flag}")
     private boolean cronFlag;
-
+    @Value("${outlier.redis.key}")
+    private String outlierRedisKey;
     /**
      * 빈 생성시에 이상치 갱신
      */
@@ -46,7 +47,7 @@ public class Scheduler {
 
         mqttDataHandlerContext.pauseAll();
         if (cronFlag) {
-            String key = "outliers";
+            String key = outlierRedisKey;
             List<OutlierDto> outlier = outlierService.getOutlier(key);
             outlierService.matchTime(outlier, localDateTimeDto);
         }
