@@ -5,6 +5,7 @@ import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Session;
 import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.properties.JschProperties;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
@@ -38,11 +40,20 @@ class JschServiceImplTest {
     String filePath = "filePath";
     String fileName = "test";
     String type = "mqtt";
+    String start = "start";
+    String stop = "stop";
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(jschService,"startShell",start);
+        ReflectionTestUtils.setField(jschService,"stopShell",stop);
+    }
+
 
     @Test
     void scpFile() throws Exception {
         String destinationPath = destination + "/" + type + "/" + fileName;
-        String command = "./startup.sh " + type + " " + fileName;
+        String command = start + type + " " + fileName;
 
         when(properties.getSavePath()).thenReturn(destination);
         when(jSchManager.createSession()).thenReturn(session);
@@ -66,7 +77,7 @@ class JschServiceImplTest {
 
     @Test
     void deleteBridgeTest() throws Exception {
-        String command = "./stop.sh " + type + " " + fileName;
+        String command = stop + type + " " + fileName;
 
         when(jSchManager.createSession()).thenReturn(session);
         when(jSchManager.createChannelExec(session)).thenReturn(channelExec);
