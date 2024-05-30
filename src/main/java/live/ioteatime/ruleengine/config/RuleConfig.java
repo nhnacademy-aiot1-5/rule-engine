@@ -87,22 +87,34 @@ public class RuleConfig {
         return ((mqttModbusDTO, ruleChain) -> {
             TopicDto topicDto = splitTopic(mqttModbusDTO);
 
-            if (!outlierService.checkOutlier(topicDto.getPlace())) ruleChain.doProcess(mqttModbusDTO);
+            if (!outlierService.checkOutlier(topicDto.getPlace())) {
+                ruleChain.doProcess(mqttModbusDTO);
+                return;
+            }
 
             if (!outlierDesc.equals(topicDto.getDescription())) {
                 ruleChain.doProcess(mqttModbusDTO);
-
                 return;
             }
+
             MinMaxDto minMaxDto = outlierService.getMinMax(topicDto.getPlace());
+            if (minMaxDto == null) {
+                return;
+            }
 
             if ("main".equals(topicDto.getType()) && "total".equals(topicDto.getPhase())) {
                 if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
-                    log.error("outlier! place : {}, type {} ,description : {}, value : {} , phase {} ", topicDto.getPlace(), topicDto.getType(), topicDto.getDescription(), mqttModbusDTO.getValue(),topicDto.getPhase());
+                    log.warn(" outlier! place : {}, type {} ,description : {}, value : {} , phase {} "
+                            , topicDto.getPlace()
+                            , topicDto.getType()
+                            , topicDto.getDescription()
+                            , mqttModbusDTO.getValue()
+                            , topicDto.getPhase());
 
                     webClientService.lightControl(Outlier.LIGHT.getLowercase(), sensorFlag);
                     webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
                     webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
+
                     return;
                 }
             }
