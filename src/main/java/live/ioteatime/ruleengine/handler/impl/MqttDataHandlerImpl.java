@@ -20,6 +20,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MqttDataHandlerImpl implements MqttDataHandler {
+    private static final String LOGGING_CREATE_THREAD = "MqttDataHandlerThread-";
+    private static final String LOGGING_PAUSE_THREAD = "MqttDataHandlerThread is paused {}";
+    private static final String LOGGING_START_THREAD = "{} has been started.";
+    private static final String LOGGING_STOP_THREAD = "{} has been stopped.";
+    private static final String LOGGING_REQUEST_THREAD = "requesting {} to start.";
+    private static final String LOGGING_INTERRUPT_THREAD = "interrupting {}";
+    private static final String LOGGING_RESTARTING_THREAD = "restarting {}";
 
     private static final AtomicInteger counter = new AtomicInteger(0);
 
@@ -36,7 +43,7 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
      * @param ruleChain     데이터를 처리할 룰 체인입니다.
      */
     public MqttDataHandlerImpl(BlockingQueue<MqttModbusDTO> blockingQueue, RuleChain ruleChain) {
-        thread = new Thread(this, "MqttDataHandlerThread-" + counter.incrementAndGet());
+        thread = new Thread(this, LOGGING_CREATE_THREAD + counter.incrementAndGet());
         this.blockingQueue = blockingQueue;
         this.ruleChain = ruleChain;
     }
@@ -55,7 +62,7 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
                 while (paused) {
                     try {
                         pauseLock.wait();
-                        log.info("MqttDataHandlerThread is paused {}", thread.getName());
+                        log.debug(LOGGING_PAUSE_THREAD, thread.getName());
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -67,7 +74,7 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     }
 
     private void preProcess() {
-        log.debug("{} has been started.", thread.getName());
+        log.debug(LOGGING_START_THREAD, thread.getName());
     }
 
     private void process() {
@@ -79,19 +86,19 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     }
 
     private void postProcess() {
-        log.debug("{} has been stopped.", thread.getName());
+        log.debug(LOGGING_STOP_THREAD, thread.getName());
     }
 
     @Override
     public void start() {
         thread.start();
-        log.debug("requesting {} to start.", thread.getName());
+        log.debug(LOGGING_REQUEST_THREAD, thread.getName());
     }
 
     @Override
     public void stop() {
         thread.interrupt();
-        log.debug("interrupting {}", thread.getName());
+        log.debug(LOGGING_INTERRUPT_THREAD, thread.getName());
     }
 
     @Override
@@ -104,9 +111,9 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     @Override
     public void reStart() {
         synchronized (pauseLock) {
-            pauseLock.notify();
+            pauseLock.notifyAll();
             paused = false;
-            log.info("restarting {}", thread.getName());
+            log.debug(LOGGING_RESTARTING_THREAD, thread.getName());
         }
     }
 
