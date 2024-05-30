@@ -21,6 +21,10 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class OutlierServiceImpl implements OutlierService {
+    private static final String LOGGING_NOT_FOUND_REDIS_KEY = "redis is empty for key {}";
+    private static final String LOGGING_GET_REDIS = "outlierList {}";
+    private static final String LOGGING_GET_OUTLIER = "outliers {}";
+
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
     private final OutlierRepository outlierRepository;
@@ -34,12 +38,12 @@ public class OutlierServiceImpl implements OutlierService {
                     .orElse(null);
 
             if (outliers == null) {
-                log.warn("redis is empty for key {}", key);
+                log.warn(LOGGING_NOT_FOUND_REDIS_KEY, key);
                 return outlierList;
             }
 
             outlierList = objectMapper.readValue(outliers, objectMapper.getTypeFactory().constructCollectionType(List.class, OutlierDto.class));
-            log.info("outlierList {}", outlierList);
+            log.info(LOGGING_GET_REDIS, outlierList);
         } catch (JsonProcessingException e) {
             throw new MissingFieldException(e.getMessage());
         }
@@ -58,7 +62,7 @@ public class OutlierServiceImpl implements OutlierService {
                 }
             });
         }
-        log.info("outliers {}", outlierRepository.getOutliers().entrySet());
+        log.info(LOGGING_GET_OUTLIER, outlierRepository.getOutliers().entrySet());
     }
 
     @Override
