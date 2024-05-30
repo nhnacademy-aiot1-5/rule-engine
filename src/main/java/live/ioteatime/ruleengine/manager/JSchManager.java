@@ -20,6 +20,12 @@ import javax.annotation.PostConstruct;
 @RequiredArgsConstructor
 @Slf4j
 public class JSchManager {
+    private static final String LOGGING_CHECK_SESSION = "session check failed";
+    private static final String LOGGING_CONNECT_SESSION = "Session connected. User: {}, Host: {}";
+    private static final String LOGGING_CREATE_SESSION_FAIL = "create JSch session failed";
+    private static final String LOGGING_CREATE_SFTP = "ChannelSftp connected.";
+    private static final String LOGGING_CREATE_EXEC = "ChannelExec connected.";
+
     private final JschProperties jschProperties;
     private final JSch jSch = new JSch();
     private Session session;
@@ -33,12 +39,11 @@ public class JSchManager {
         session = createSession();
 
         if (session == null || !session.isConnected()) {
-            log.error("session check failed");
+            log.error(LOGGING_CHECK_SESSION);
 
             return;
         }
-        log.info("Session connected. User: {}, Host: {}", session.getUserName(), session.getHost());
-        log.info("session check success");
+        log.info(LOGGING_CONNECT_SESSION, session.getUserName(), session.getHost());
         session.disconnect();
     }
 
@@ -56,7 +61,7 @@ public class JSchManager {
 
             return session;
         } catch (JSchException e) {
-            throw new CreateJSchSessionException("create JSch session failed", e);
+            throw new CreateJSchSessionException(LOGGING_CREATE_SESSION_FAIL, e);
         }
     }
 
@@ -69,7 +74,7 @@ public class JSchManager {
         try {
             ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
             channelSftp.connect();
-            log.info("ChannelSftp connected.");
+            log.info(LOGGING_CREATE_SFTP);
 
             return channelSftp;
         } catch (JSchException e) {
@@ -86,7 +91,7 @@ public class JSchManager {
         try {
             ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
             channelExec.setPty(true);
-            log.info("ChannelExec connected.");
+            log.info(LOGGING_CREATE_EXEC);
 
             return channelExec;
         } catch (JSchException e) {

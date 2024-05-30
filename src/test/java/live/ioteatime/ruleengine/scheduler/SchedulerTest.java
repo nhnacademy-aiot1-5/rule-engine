@@ -24,9 +24,12 @@ class SchedulerTest {
     @InjectMocks
     Scheduler scheduler;
 
+    String key = "key";
+
     @Test
     void outlierUpdater() {
         ReflectionTestUtils.setField(scheduler, "cronFlag", true);
+        ReflectionTestUtils.setField(scheduler, "outlierRedisKey", key);
         List<OutlierDto> outlierDtos = new ArrayList<>(List.of(new OutlierDto()));
 
         doNothing().when(mqttDataHandlerContext).pauseAll();

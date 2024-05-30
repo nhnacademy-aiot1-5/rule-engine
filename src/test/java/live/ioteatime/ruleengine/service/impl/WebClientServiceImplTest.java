@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,11 +27,13 @@ class WebClientServiceImplTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
     String json = "{\"protocol\":\"exampleProtocol\",\"id\":\"exampleId\",\"time\":1716718698871,\"value\":12.34}";
+    String url = "testUrl";
 
     @BeforeEach
     void setUp() throws JsonProcessingException {
         MockitoAnnotations.openMocks(this);
 
+        ReflectionTestUtils.setField(webClientService, "controlUrlFormat", url);
         topicDto = new TopicDto("place", "type", "phase", "des");
         mqttModbusDTO = objectMapper.readValue(json, MqttModbusDTO.class);
 
@@ -42,7 +45,7 @@ class WebClientServiceImplTest {
 
         webClientService.sendOutlierToFront("test", topicDto, mqttModbusDTO, "sensor");
 
-        verify(clientAdaptor).sendPostRequest(anyString(), any());
+        verify(clientAdaptor).sendPostRequestFront(anyString(), any());
 
     }
 

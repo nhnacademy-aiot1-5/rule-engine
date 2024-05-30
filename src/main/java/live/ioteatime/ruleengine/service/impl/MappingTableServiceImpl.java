@@ -16,6 +16,8 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class MappingTableServiceImpl implements MappingTableService {
+    private static final String LOGGING_GET_MAPPING = "getMappingTable {}";
+
     private final ChannelsRepository channelsRepository;
     private final MappingTableRepository mappingTableRepository;
 
@@ -29,7 +31,7 @@ public class MappingTableServiceImpl implements MappingTableService {
         List<MappingData> mappingDataDto = channelsRepository.loadMappingTable();
 
         mappingTableRepository.addValue(mappingDataDto);
-        log.info("getMappingTable {}", mappingTableRepository.getTables());
+        log.debug(LOGGING_GET_MAPPING, mappingTableRepository.getTables());
     }
 
     @Override

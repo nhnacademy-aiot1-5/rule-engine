@@ -15,10 +15,11 @@ import java.util.Set;
 @Slf4j
 @Component
 public class MappingTableRepositoryImpl implements MappingTableRepository {
+    private static final String LOGGING_MAPPING = "Mapping table index does not exist";
+
     private final Map<Integer, Map<String, String>> mappingTable = new HashMap<>();
 
     public Set<Map.Entry<Integer, Map<String, String>>> getTables() {
-
         return mappingTable.entrySet();
     }
 
@@ -26,9 +27,8 @@ public class MappingTableRepositoryImpl implements MappingTableRepository {
         Map<String, String> tags = mappingTable.get(address);
 
         if (tags == null) {
-            throw new MappingTableIndexNotFoundException("Mapping table index does not exist");
+            throw new MappingTableIndexNotFoundException(LOGGING_MAPPING);
         }
-
         return tags;
     }
 

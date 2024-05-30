@@ -35,11 +35,22 @@ public class RuleConfig {
     private String outlierDesc;
     @Value("${sensor.flag}")
     private String sensorFlag;
+    @Value("${sensor.occupancy}")
+    private String sensorOccupancy;
+    @Value("${outlier.type}")
+    private String outlierType;
+    @Value("${outlier.phase}")
+    private String outlierPhase;
+
+    private static final String LOGGING_LIGHT_OFF = "light control off";
+    private static final String LOGGING_LIGHT_ON = "light control on";
+    private static final String LOGGING_OUTLIER = "outlier! place : {}, type {} ,description : {}, value : {} , phase {}";
+    private static final String ZERO_TYPE = "temperature";
+
     private final OutlierService outlierService;
     private final MappingTableService mappingTableService;
     private final WebClientService webClientService;
     private final InfluxDBProperties influxDBProperties;
-
 
     private enum Protocol {
         MODBUS, MQTT;
@@ -48,13 +59,15 @@ public class RuleConfig {
     @Bean
     public Rule acRule() {
         return ((mqttModbusDTO, ruleChain) -> {
-            if (mqttModbusDTO.getId().contains("occupancy")) {
+            if (mqttModbusDTO.getId().contains(sensorOccupancy)) {
                 if (mqttModbusDTO.getValue() == 0) {
                     webClientService.lightControl(Outlier.AC.getLowercase(), "off");
+                    loggingLightState(LOGGING_LIGHT_OFF);
                     return;
                 }
                 if (mqttModbusDTO.getValue() == 1) {
                     webClientService.lightControl(Outlier.AC.getLowercase(), "on");
+                    loggingLightState(LOGGING_LIGHT_ON);
                     return;
                 }
                 return;
@@ -75,7 +88,7 @@ public class RuleConfig {
             if (mqttModbusDTO.getValue() == null) {
                 return;
             }
-            if ((!topicDto.getType().equals("temperature")) && mqttModbusDTO.getValue().equals(0.0f)) {
+            if ((!topicDto.getType().equals(ZERO_TYPE)) && mqttModbusDTO.getValue().equals(0.0f)) {
                 return;
             }
             ruleChain.doProcess(mqttModbusDTO);
@@ -87,24 +100,39 @@ public class RuleConfig {
         return ((mqttModbusDTO, ruleChain) -> {
             TopicDto topicDto = splitTopic(mqttModbusDTO);
 
-            if (!outlierService.checkOutlier(topicDto.getPlace())) ruleChain.doProcess(mqttModbusDTO);
+            if (!outlierService.checkOutlier(topicDto.getPlace())) {
+                ruleChain.doProcess(mqttModbusDTO);
+                return;
+            }
 
             if (!outlierDesc.equals(topicDto.getDescription())) {
                 ruleChain.doProcess(mqttModbusDTO);
-
                 return;
             }
+
             MinMaxDto minMaxDto = outlierService.getMinMax(topicDto.getPlace());
+            if (minMaxDto == null) {
+                return;
+            }
 
-            if ("main".equals(topicDto.getType()) && "total".equals(topicDto.getPhase())) {
-                if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
-                    log.error("outlier! place : {}, type {} ,description : {}, value : {} , phase {} ", topicDto.getPlace(), topicDto.getType(), topicDto.getDescription(), mqttModbusDTO.getValue(),topicDto.getPhase());
+            if (!(outlierType.equals(topicDto.getType()) && outlierPhase.equals(topicDto.getPhase()))) {
+                ruleChain.doProcess(mqttModbusDTO);
+                return;
+            }
 
-                    webClientService.lightControl(Outlier.LIGHT.getLowercase(), sensorFlag);
-                    webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
-                    webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
-                    return;
-                }
+            if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
+                log.warn(LOGGING_OUTLIER
+                        , topicDto.getPlace()
+                        , topicDto.getType()
+                        , topicDto.getDescription()
+                        , mqttModbusDTO.getValue()
+                        , topicDto.getPhase());
+
+                webClientService.lightControl(Outlier.LIGHT.getLowercase(), sensorFlag);
+                webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
+                webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
+
+                return;
             }
             ruleChain.doProcess(mqttModbusDTO);
         });
@@ -161,6 +189,10 @@ public class RuleConfig {
         String description = tags[16];
 
         return new TopicDto(place, type, phase, description);
+    }
+
+    private static void loggingLightState(String message) {
+        log.info(message);
     }
 
 }

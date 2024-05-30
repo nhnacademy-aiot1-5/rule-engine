@@ -16,8 +16,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class WebClientServiceImpl implements WebClientService {
     private final ClientAdaptor clientAdaptor;
+
     @Value("${control.dev.eui}")
     private String devEui;
+    @Value("${control.url.format}")
+    private String controlUrlFormat;
     @Value("${control.base.uri}")
     private String controlBaseUri;
     @Value("${api.base.uri}")
@@ -36,7 +39,7 @@ public class WebClientServiceImpl implements WebClientService {
                 , mqttModbusDTO.getValue()
                 , 1);
 
-        clientAdaptor.sendPostRequest(url,sendOutlierDto);
+        clientAdaptor.sendPostRequestFront(url,sendOutlierDto);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class WebClientServiceImpl implements WebClientService {
 
     @Override
     public void lightControl(String sensorName,String flag) {
-        String url = String.format("%s/sensor/%s?sensorName=%s&devEui=%s", controlBaseUri,flag ,sensorName, devEui);
+        String url = String.format(controlUrlFormat, controlBaseUri,flag ,sensorName, devEui);
         clientAdaptor.sendGetRequest(url);
     }
 

@@ -19,6 +19,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class CreatePropertiesImpl implements CreateProperties {
+    private static final String LOGGING_CREATE_FILE_FAIL = "Create mqtt FIle false {}";
+
     private final RabbitProperties rabbitProperties;
     @Value("${create.folder.path}")
     private String path;
@@ -36,7 +38,7 @@ public class CreatePropertiesImpl implements CreateProperties {
             writer.write("mqtt.subscribe.topics=" + splitTopic(mqttInfo.getMqttTopic()) + "\n");
             rabbitmqConfigSet(writer);
         } catch (IOException e) {
-            log.error("Create mqtt FIle false {}", e.getMessage());
+            createFileFail(e);
         }
 
         return file.getPath();
@@ -54,10 +56,14 @@ public class CreatePropertiesImpl implements CreateProperties {
             writer.write("modbus.request.channels=" + modbus.getChannel() + "\n");
             rabbitmqConfigSet(writer);
         } catch (IOException e) {
-            log.error("Create modbus FIle false {}", e.getMessage());
+            createFileFail(e);
         }
 
         return file.getPath();
+    }
+
+    private static void createFileFail(IOException e) {
+        log.error(LOGGING_CREATE_FILE_FAIL, e.getMessage());
     }
 
     private void rabbitmqConfigSet(BufferedWriter writer) throws IOException {
