@@ -1,7 +1,9 @@
 package live.ioteatime.ruleengine.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public class SaveOutlierDto {
     private String place;
