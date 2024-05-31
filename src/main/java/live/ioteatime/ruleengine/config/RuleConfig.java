@@ -60,7 +60,7 @@ public class RuleConfig {
     private final InfluxDBProperties influxDBProperties;
 
     private enum Protocol {
-        MODBUS, MQTT;
+        MODBUS, MQTT
     }
 
     @Bean
