@@ -20,6 +20,7 @@ import javax.annotation.PostConstruct;
 @RequiredArgsConstructor
 @Slf4j
 public class JSchManager {
+
     private static final String LOGGING_CHECK_SESSION = "session check failed";
     private static final String LOGGING_CONNECT_SESSION = "Session connected. User: {}, Host: {}";
     private static final String LOGGING_CREATE_SESSION_FAIL = "create JSch session failed";
@@ -40,7 +41,6 @@ public class JSchManager {
 
         if (session == null || !session.isConnected()) {
             log.error(LOGGING_CHECK_SESSION);
-
             return;
         }
         log.info(LOGGING_CONNECT_SESSION, session.getUserName(), session.getHost());
@@ -98,5 +98,4 @@ public class JSchManager {
             throw new CreateChannelExecException(e.getMessage(), e);
         }
     }
-
 }
