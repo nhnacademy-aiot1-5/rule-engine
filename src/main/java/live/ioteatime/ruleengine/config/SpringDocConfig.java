@@ -18,5 +18,4 @@ public class SpringDocConfig {
         return new OpenAPI()
                 .info(info);
     }
-
 }
