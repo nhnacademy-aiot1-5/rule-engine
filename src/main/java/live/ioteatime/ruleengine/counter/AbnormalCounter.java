@@ -1,12 +1,16 @@
 package live.ioteatime.ruleengine.counter;
 
 import java.util.concurrent.Semaphore;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class AbnormalCounter implements Runnable {
 
     private static final int DELAY = 60 * 1_000;
+    private static final String ABNORMAL_COUNTER = "Abnormal counter: {}";
+    private static final String ABNORMAL_DATA_DETECTED = "Abnormal data detected!";
 
     private final Semaphore semaphore;
 
@@ -40,10 +44,12 @@ public class AbnormalCounter implements Runnable {
                 // API 호출
                 count = 0;
                 semaphore.release();
+                log.warn(ABNORMAL_DATA_DETECTED);
                 return;
             }
             count++;
             semaphore.release();
+            log.debug(ABNORMAL_COUNTER, count);
         } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
@@ -58,6 +64,7 @@ public class AbnormalCounter implements Runnable {
             }
             count--;
             semaphore.release();
+            log.debug(ABNORMAL_COUNTER, count);
         } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         }
