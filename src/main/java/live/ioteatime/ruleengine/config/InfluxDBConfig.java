@@ -24,7 +24,6 @@ public class InfluxDBConfig {
 
     @Bean
     public QueryApi queryApi(InfluxDBClient influxDBClient) {
-
         return influxDBClient.getQueryApi();
     }
 
