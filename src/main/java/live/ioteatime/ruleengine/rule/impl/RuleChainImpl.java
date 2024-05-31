@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class RuleChainImpl implements RuleChain {
+
     private final List<Rule> rules;
     private final ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
 
@@ -31,11 +32,9 @@ public class RuleChainImpl implements RuleChain {
     public void doProcess(MqttModbusDTO mqttModbusDTO) {
         Integer index = threadLocal.get();
         if (index >= rules.size()) {
-
             return;
         }
         threadLocal.set(index + 1);
         rules.get(index).doProcess(mqttModbusDTO,this);
     }
-
 }
