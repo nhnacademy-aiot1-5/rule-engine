@@ -12,6 +12,7 @@ import java.util.Map;
 @Getter
 @Component
 public class OutlierRepository {
+
     Map<String, MinMaxDto> outliers = new HashMap<>();
 
     public void clearOutlier() {
@@ -21,5 +22,4 @@ public class OutlierRepository {
     public List<String> getKeys() {
         return new ArrayList<>(outliers.keySet());
     }
-
 }

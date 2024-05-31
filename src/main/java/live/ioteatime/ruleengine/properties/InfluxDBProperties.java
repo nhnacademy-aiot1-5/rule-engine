@@ -8,8 +8,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 public class InfluxDBProperties {
+
     private String url;
+
     private String org;
+
     private String bucket;
+
     private String token;
 }

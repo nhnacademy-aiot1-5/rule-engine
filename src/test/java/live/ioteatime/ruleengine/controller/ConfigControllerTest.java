@@ -52,7 +52,7 @@ class ConfigControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(mqttInfo)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("create mqtt Bridge properties ")));
+                .andExpect(content().string(containsString("create mqtt Bridge properties")));
 
         verify(jschService).scpFile(eq(filePath), eq(mqttInfo.getMqttId()), anyString());
         verify(createProperties).createConfig(any(MqttInfo.class));
@@ -65,7 +65,7 @@ class ConfigControllerTest {
         mockMvc.perform(get("/delete/{type}/{bridgeName}", "test", "test")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Delete Bridge ")));
+                .andExpect(content().string(containsString("Delete Bridge")));
 
         verify(jschService).deleteBridge(anyString(), anyString());
     }
@@ -87,7 +87,7 @@ class ConfigControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(modbusInfo)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("create modbus Bridge properties ")));
+                .andExpect(content().string(containsString("create modbus Bridge properties")));
 
         verify(jschService).scpFile(eq(filePath), eq(modbusInfo.getName()), anyString());
         verify(createProperties).createConfig(any(ModbusInfo.class));

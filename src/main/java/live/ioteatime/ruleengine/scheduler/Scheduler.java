@@ -18,12 +18,15 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class Scheduler {
-    private final MqttDataHandlerContext mqttDataHandlerContext;
-    private final OutlierService outlierService;
+
     @Value("${schedule.flag}")
     private boolean cronFlag;
+
     @Value("${outlier.redis.key}")
     private String outlierRedisKey;
+
+    private final MqttDataHandlerContext mqttDataHandlerContext;
+    private final OutlierService outlierService;
 
     /**
      * 빈 생성시에 이상치 갱신
@@ -54,5 +57,4 @@ public class Scheduler {
         }
         mqttDataHandlerContext.restartAll();
     }
-
 }

@@ -10,6 +10,8 @@ import java.util.List;
 @Getter
 @ToString
 public class OutlierDto {
+
     private String place;
+
     private List<MinMaxDto> values;
 }
