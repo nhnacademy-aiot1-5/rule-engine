@@ -138,7 +138,6 @@ public class RuleConfig {
                 webClientService.lightControl(Outlier.LIGHT.getLowercase(), sensorFlag);
                 webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
                 webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
-
                 return;
             }
             ruleChain.doProcess(mqttModbusDTO);
