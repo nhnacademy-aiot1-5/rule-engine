@@ -10,6 +10,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
+
     private final RedisConnectionFactory redisConnectionFactory;
 
     @Bean
