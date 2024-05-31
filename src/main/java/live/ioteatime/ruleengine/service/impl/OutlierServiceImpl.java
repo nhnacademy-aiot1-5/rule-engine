@@ -21,6 +21,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class OutlierServiceImpl implements OutlierService {
+
     private static final String LOGGING_NOT_FOUND_REDIS_KEY = "redis is empty for key {}";
     private static final String LOGGING_GET_REDIS = "outlierList {}";
     private static final String LOGGING_GET_OUTLIER = "outliers {}";
@@ -39,6 +40,7 @@ public class OutlierServiceImpl implements OutlierService {
 
             if (outliers == null) {
                 log.warn(LOGGING_NOT_FOUND_REDIS_KEY, key);
+
                 return outlierList;
             }
 
@@ -47,7 +49,6 @@ public class OutlierServiceImpl implements OutlierService {
         } catch (JsonProcessingException e) {
             throw new MissingFieldException(e.getMessage());
         }
-
         return outlierList;
     }
 
@@ -74,5 +75,4 @@ public class OutlierServiceImpl implements OutlierService {
     public MinMaxDto getMinMax(String topicPlace) {
         return outlierRepository.getOutliers().get(topicPlace);
     }
-
 }
