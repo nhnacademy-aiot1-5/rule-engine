@@ -127,6 +127,12 @@ public class RuleConfig {
                 return;
             }
 
+            log.debug("out place {} | type {} | description {} | value {} | phase {}",topicDto.getPlace()
+                    , topicDto.getType()
+                    , topicDto.getDescription()
+                    , mqttModbusDTO.getValue()
+                    , topicDto.getPhase());
+
             if (mqttModbusDTO.getValue() < minMaxDto.getMin() || mqttModbusDTO.getValue() > minMaxDto.getMax()) {
                 log.warn(LOGGING_OUTLIER
                         , topicDto.getPlace()
@@ -138,6 +144,8 @@ public class RuleConfig {
                 webClientService.lightControl(Outlier.LIGHT.getLowercase(), sensorFlag);
                 webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
                 webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
+
+                ruleChain.doProcess(mqttModbusDTO);
                 return;
             }
             ruleChain.doProcess(mqttModbusDTO);
