@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class MqttDataHandlerImpl implements MqttDataHandler {
+
     private static final String LOGGING_CREATE_THREAD = "MqttDataHandlerThread-";
     private static final String LOGGING_PAUSE_THREAD = "MqttDataHandlerThread is paused {}";
     private static final String LOGGING_START_THREAD = "{} has been started.";
@@ -57,6 +58,7 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     @Override
     public void run() {
         preProcess();
+
         while (!Thread.currentThread().isInterrupted()) {
             synchronized (pauseLock) {
                 while (paused) {
@@ -70,6 +72,7 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
             }
             process();
         }
+
         postProcess();
     }
 
@@ -121,5 +124,4 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     public boolean isWait() {
         return Thread.State.WAITING.equals(thread.getState());
     }
-
 }
