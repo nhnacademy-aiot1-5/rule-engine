@@ -27,18 +27,25 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 public class RuleConfig {
+
     @Value("${front.outlier.endpoint}")
     private String frontEndpoint;
+
     @Value("${api.endpoint}")
     private String apiEndpoint;
+
     @Value("${outlier.description}")
     private String outlierDesc;
+
     @Value("${sensor.flag}")
     private String sensorFlag;
+
     @Value("${sensor.occupancy}")
     private String sensorOccupancy;
+
     @Value("${outlier.type}")
     private String outlierType;
+
     @Value("${outlier.phase}")
     private String outlierPhase;
 
@@ -143,7 +150,6 @@ public class RuleConfig {
         return ((mqttModbusDTO, ruleChain) -> {
             if (String.valueOf(Protocol.MQTT).equals(mqttModbusDTO.getProtocol())) {
                 insertData(influxDBClient, mqttModbusDTO, ruleChain, true);
-
                 return;
             }
             insertData(influxDBClient, mqttModbusDTO, ruleChain, false);
@@ -163,6 +169,7 @@ public class RuleConfig {
     private Point buildPoint(MqttModbusDTO mqttModbusDTO, boolean isMqtt) {
         if (isMqtt) {
             TopicDto topicDto = splitTopic(mqttModbusDTO);
+
             return Point.measurement("test-measurement")
                     .time(mqttModbusDTO.getTime(), WritePrecision.MS)
                     .addTag("topic", mqttModbusDTO.getId())
@@ -174,6 +181,7 @@ public class RuleConfig {
         } else {
             String address = mqttModbusDTO.getId().split("/")[1];
             Map<String, String> tags = mappingTableService.getTags(Integer.parseInt(address));
+
             return Point.measurement("test-measurement")
                     .time(mqttModbusDTO.getTime(), WritePrecision.MS)
                     .addTags(tags)
@@ -194,5 +202,4 @@ public class RuleConfig {
     private static void loggingLightState(String message) {
         log.info(message);
     }
-
 }
