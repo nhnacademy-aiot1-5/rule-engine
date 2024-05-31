@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 public class LocalMidnightDto {
+
     private LocalDateTime yesterday;
+
     private LocalDateTime today;
 }

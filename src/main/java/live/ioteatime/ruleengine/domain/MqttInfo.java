@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class MqttInfo {
+
     @Schema(description = "MQTT HOST",example = "tcp://host:port")
     private String mqttHost;
 
