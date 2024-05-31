@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
+
     private static final String LOGGING_START_HANDLER = "{} handlers have been started.";
     private static final String LOGGING_CREATE_HANDLER = "{} handlers have been created.";
     private static final String LOGGING_PAUSE_HANDLER = "{} handlers have been paused.";
@@ -52,6 +53,7 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
         while (!isWait) {
             isWait = handlers.stream().allMatch(MqttDataHandler::isWait);
         }
+
         log.info(LOGGING_PAUSE_HANDLER, handlers.size());
     }
 
@@ -60,5 +62,4 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
         handlers.forEach(MqttDataHandler::reStart);
         log.info(LOGGING_RESTART_HANDLER, handlers.size());
     }
-
 }

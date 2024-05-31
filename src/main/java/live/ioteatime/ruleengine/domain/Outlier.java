@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Outlier {
+
     LIGHT("do_1","light"),
     AC("do_2","ac");
 

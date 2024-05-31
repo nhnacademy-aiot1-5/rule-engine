@@ -15,16 +15,21 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class WebClientServiceImpl implements WebClientService {
+
     private final ClientAdaptor clientAdaptor;
 
     @Value("${control.dev.eui}")
     private String devEui;
+
     @Value("${control.url.format}")
     private String controlUrlFormat;
+
     @Value("${control.base.uri}")
     private String controlBaseUri;
+
     @Value("${api.base.uri}")
     private String apiBaseUri;
+
     @Value("${front.base.uri}")
     private String frontBaseUri;
 
@@ -60,5 +65,4 @@ public class WebClientServiceImpl implements WebClientService {
         String url = String.format(controlUrlFormat, controlBaseUri,flag ,sensorName, devEui);
         clientAdaptor.sendGetRequest(url);
     }
-
 }

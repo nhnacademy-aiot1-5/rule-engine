@@ -11,9 +11,13 @@ import java.time.LocalDate;
 @Setter
 @ToString
 public class MinMaxDto {
+
     private int id;
+
     @JsonProperty("updated_at")
     private LocalDate updatedAt;
+
     private Double min;
+
     private Double max;
 }

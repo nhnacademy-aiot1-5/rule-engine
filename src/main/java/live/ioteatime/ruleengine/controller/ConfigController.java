@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 public class ConfigController {
+
     private final CreateProperties createProperties;
     private final JschService jschService;
 
@@ -55,10 +56,11 @@ public class ConfigController {
             description = "type(MQTT,MODBUS) 에 따른 브릿지를 제거 합니다.")
     @ApiResponse(responseCode = "200", description = "Delete Bridge")
     @GetMapping("/delete/{type}/{bridgeName}")
-    public ResponseEntity<String> deleteBridge(@Parameter(description = "제거할 브릿지의 타입 (MQTT, MODBUS)")
-                                               @PathVariable(name = "type") String type
-            , @Parameter(description = "제거할 브릿지의 이름") @PathVariable String bridgeName)
-            throws CreateJSchSessionException {
+    public ResponseEntity<String> deleteBridge(
+            @Parameter(description = "제거할 브릿지의 타입 (MQTT, MODBUS)")
+            @PathVariable(name = "type") String type,
+            @Parameter(description = "제거할 브릿지의 이름")
+            @PathVariable String bridgeName) throws CreateJSchSessionException {
         jschService.deleteBridge(type, bridgeName);
 
         return ResponseEntity.ok("Delete Bridge");
@@ -83,5 +85,4 @@ public class ConfigController {
 
         return ResponseEntity.ok("create modbus Bridge properties");
     }
-
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ModbusInfo {
+
     @Schema(description = "MODBUS NAME",example = "modbus name")
     private String name;
 

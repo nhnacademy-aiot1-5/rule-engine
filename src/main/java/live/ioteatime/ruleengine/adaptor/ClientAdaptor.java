@@ -12,8 +12,10 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Component
 public class ClientAdaptor {
+
     @Value("${front.header.name}")
     private String headerName;
+
     @Value("${front.header.value}")
     private String headerValue;
 

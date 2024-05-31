@@ -16,6 +16,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class MappingTableServiceImpl implements MappingTableService {
+
     private static final String LOGGING_GET_MAPPING = "getMappingTable {}";
 
     private final ChannelsRepository channelsRepository;
@@ -38,5 +39,4 @@ public class MappingTableServiceImpl implements MappingTableService {
     public Map<String, String> getTags(int address) {
         return mappingTableRepository.getTags(address);
     }
-
 }

@@ -19,9 +19,11 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class CreatePropertiesImpl implements CreateProperties {
+
     private static final String LOGGING_CREATE_FILE_FAIL = "Create mqtt FIle false {}";
 
     private final RabbitProperties rabbitProperties;
+
     @Value("${create.folder.path}")
     private String path;
 
@@ -88,5 +90,4 @@ public class CreatePropertiesImpl implements CreateProperties {
 
         return result.toString();
     }
-
 }

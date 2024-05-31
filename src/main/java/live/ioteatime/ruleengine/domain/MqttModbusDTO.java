@@ -8,10 +8,14 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class MqttModbusDTO {
+
     @Getter
     private String protocol;
+
     @Setter
     private String id;
+
     private Long time;
+
     private Float value;
 }

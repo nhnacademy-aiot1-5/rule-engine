@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class MappingTableController {
+
     private final MappingTableService mappingTableService;
     private final MqttDataHandlerContext mqttDataHandlerContext;
 
@@ -29,7 +30,7 @@ public class MappingTableController {
         mqttDataHandlerContext.pauseAll();
         mappingTableService.getMappingTable();
         mqttDataHandlerContext.restartAll();
+
         return ResponseEntity.ok("update mapping-table");
     }
-
 }
