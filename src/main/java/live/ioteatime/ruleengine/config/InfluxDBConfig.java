@@ -26,5 +26,4 @@ public class InfluxDBConfig {
     public QueryApi queryApi(InfluxDBClient influxDBClient) {
         return influxDBClient.getQueryApi();
     }
-
 }
