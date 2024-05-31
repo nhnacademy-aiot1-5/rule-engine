@@ -23,6 +23,7 @@ import java.nio.file.Path;
 @Slf4j
 @RequiredArgsConstructor
 public class JschServiceImpl implements JschService {
+
     private static final String LOGGING_SCP_ERROR = "scpFile Error {}";
     private static final String LOGGING_DELETE_BRIDGE_ERROR = "deleteBridge Error {}";
     private static final String LOGGING_DELETE_BRIDGE = "deleteBridge done";
@@ -156,5 +157,4 @@ public class JschServiceImpl implements JschService {
         channelExec.disconnect();
         log.info(LOGGING_DISCONNECT_JSCH);
     }
-
 }
