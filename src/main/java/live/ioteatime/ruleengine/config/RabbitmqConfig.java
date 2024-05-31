@@ -20,6 +20,7 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @RequiredArgsConstructor
 public class RabbitmqConfig {
+
     private final BlockingQueue<MqttModbusDTO> blockingQueue;
     private final ObjectMapper mapper;
     private final ConnectionFactory connectionFactory;
@@ -28,8 +29,12 @@ public class RabbitmqConfig {
 
     @PreDestroy
     public void closeConnection() throws IOException, TimeoutException {
-        channel.close();
-        connection.close();
+        if (channel != null && channel.isOpen()) {
+            channel.close();
+        }
+        if (connection != null && connection.isOpen()) {
+            connection.close();
+        }
     }
 
     /**
@@ -55,10 +60,8 @@ public class RabbitmqConfig {
             }
         };
 
-        channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
-        });
+        channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {});
 
         return connection;
     }
-
 }
