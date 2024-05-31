@@ -15,6 +15,7 @@ import java.util.Set;
 @Slf4j
 @Component
 public class MappingTableRepositoryImpl implements MappingTableRepository {
+
     private static final String LOGGING_MAPPING = "Mapping table index does not exist";
 
     private final Map<Integer, Map<String, String>> mappingTable = new HashMap<>();
@@ -29,6 +30,7 @@ public class MappingTableRepositoryImpl implements MappingTableRepository {
         if (tags == null) {
             throw new MappingTableIndexNotFoundException(LOGGING_MAPPING);
         }
+
         return tags;
     }
 
@@ -38,5 +40,4 @@ public class MappingTableRepositoryImpl implements MappingTableRepository {
             mappingTable.put(mappingData.getAddress(), tag);
         });
     }
-
 }
