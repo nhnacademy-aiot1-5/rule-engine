@@ -14,7 +14,6 @@ public class CommonConfig {
 
     @Bean
     public BlockingQueue<MqttModbusDTO> blockingQueue() {
-
         return new LinkedBlockingQueue<>();
     }
 
