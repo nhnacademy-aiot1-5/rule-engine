@@ -12,12 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class InfluxDBConfig {
 
+    private static final String LOGGING_CONNECT = "InfluxDBClient connect success: {}";
+
     @Bean
     public InfluxDBClient influxDBClient(InfluxDBProperties influxDBProperties) {
         InfluxDBClient influxDBClient = InfluxDBClientFactory.create(
             influxDBProperties.getUrl(),
             influxDBProperties.getToken().toCharArray());
-        log.info("InfluxDBClient connect success: {}", influxDBProperties.getUrl());
+        log.info(LOGGING_CONNECT, influxDBProperties.getUrl());
 
         return influxDBClient;
     }

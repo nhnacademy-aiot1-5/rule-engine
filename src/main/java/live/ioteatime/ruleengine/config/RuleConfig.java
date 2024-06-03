@@ -53,6 +53,8 @@ public class RuleConfig {
     private static final String LOGGING_LIGHT_ON = "light control on";
     private static final String LOGGING_OUTLIER = "outlier! place : {}, type {} ,description : {}, value : {} , phase {}";
     private static final String ZERO_TYPE = "temperature";
+    private static final String LOGGING_OUTLIER_STATUE = "empty outlier!";
+    private static final String LOGGING_OUTLIER_TRACE = "in outlierCheck place {} | type {} | description {} | value {} | phase {}";
 
     private final OutlierService outlierService;
     private final MappingTableService mappingTableService;
@@ -119,6 +121,8 @@ public class RuleConfig {
 
             MinMaxDto minMaxDto = outlierService.getMinMax(topicDto.getPlace());
             if (minMaxDto == null) {
+                log.error(LOGGING_OUTLIER_STATUE);
+                ruleChain.doProcess(mqttModbusDTO);
                 return;
             }
 
@@ -127,7 +131,7 @@ public class RuleConfig {
                 return;
             }
 
-            log.debug("out place {} | type {} | description {} | value {} | phase {}",topicDto.getPlace()
+            log.debug(LOGGING_OUTLIER_TRACE,topicDto.getPlace()
                     , topicDto.getType()
                     , topicDto.getDescription()
                     , mqttModbusDTO.getValue()

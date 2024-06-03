@@ -13,7 +13,7 @@ import java.util.Map;
 @Component
 public class OutlierRepository {
 
-    Map<String, MinMaxDto> outliers = new HashMap<>();
+    private final Map<String, MinMaxDto> outliers = new HashMap<>();
 
     public void clearOutlier() {
         outliers.clear();
