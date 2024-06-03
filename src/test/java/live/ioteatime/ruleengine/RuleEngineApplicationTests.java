@@ -1,6 +1,7 @@
 package live.ioteatime.ruleengine;
 
 import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.WriteApiBlocking;
 import com.rabbitmq.client.Connection;
 import live.ioteatime.ruleengine.manager.JSchManager;
 import live.ioteatime.ruleengine.properties.InfluxDBProperties;
@@ -33,6 +34,8 @@ class RuleEngineApplicationTests {
     Scheduler scheduler;
     @MockBean
     ChannelsRepository channelsRepository;
+    @MockBean
+    WriteApiBlocking writeApiBlocking;
 
     @Autowired
     InfluxDBProperties influxDBProperties;
