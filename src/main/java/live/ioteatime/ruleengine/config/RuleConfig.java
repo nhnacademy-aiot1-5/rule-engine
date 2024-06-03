@@ -1,6 +1,5 @@
 package live.ioteatime.ruleengine.config;
 
-import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
@@ -21,7 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 
 @Configuration
 @RequiredArgsConstructor
@@ -53,11 +54,16 @@ public class RuleConfig {
     private static final String LOGGING_LIGHT_ON = "light control on";
     private static final String LOGGING_OUTLIER = "outlier! place : {}, type {} ,description : {}, value : {} , phase {}";
     private static final String ZERO_TYPE = "temperature";
+    private static final String LOGGING_OUTLIER_STATUE = "empty outlier!";
+    private static final String LOGGING_OUTLIER_TRACE = "in outlierCheck place {} | type {} | description {} | value {} | phase {}";
 
     private final OutlierService outlierService;
     private final MappingTableService mappingTableService;
     private final WebClientService webClientService;
+    private final BlockingQueue<MqttModbusDTO> blockingQueue;
+    private final WriteApiBlocking writeApiBlocking;
     private final InfluxDBProperties influxDBProperties;
+    private final List<Point> points;
 
     private enum Protocol {
         MODBUS, MQTT
@@ -91,7 +97,6 @@ public class RuleConfig {
                 return;
             }
             TopicDto topicDto = splitTopic(mqttModbusDTO);
-
             if (mqttModbusDTO.getValue() == null) {
                 return;
             }
@@ -119,6 +124,8 @@ public class RuleConfig {
 
             MinMaxDto minMaxDto = outlierService.getMinMax(topicDto.getPlace());
             if (minMaxDto == null) {
+                log.error(LOGGING_OUTLIER_STATUE);
+                ruleChain.doProcess(mqttModbusDTO);
                 return;
             }
 
@@ -127,7 +134,7 @@ public class RuleConfig {
                 return;
             }
 
-            log.debug("out place {} | type {} | description {} | value {} | phase {}",topicDto.getPlace()
+            log.debug(LOGGING_OUTLIER_TRACE, topicDto.getPlace()
                     , topicDto.getType()
                     , topicDto.getDescription()
                     , mqttModbusDTO.getValue()
@@ -153,25 +160,31 @@ public class RuleConfig {
     }
 
     @Bean
-    public Rule inputInflux(InfluxDBClient influxDBClient) {
+    public Rule inputInflux() {
         return ((mqttModbusDTO, ruleChain) -> {
             if (String.valueOf(Protocol.MQTT).equals(mqttModbusDTO.getProtocol())) {
-                insertData(influxDBClient, mqttModbusDTO, ruleChain, true);
+                insertData(mqttModbusDTO, ruleChain, true);
                 return;
             }
-            insertData(influxDBClient, mqttModbusDTO, ruleChain, false);
+            insertData(mqttModbusDTO, ruleChain, false);
         });
     }
 
-    private void insertData(InfluxDBClient influxDBClient, MqttModbusDTO mqttModbusDTO, RuleChain ruleChain, boolean isMqtt) {
+    private void insertData(MqttModbusDTO mqttModbusDTO, RuleChain ruleChain, boolean isMqtt) {
         String bucket = influxDBProperties.getBucket();
-        WriteApiBlocking writeApiBlocking = influxDBClient.getWriteApiBlocking();
         Point point = buildPoint(mqttModbusDTO, isMqtt);
 
-        writeApiBlocking.writePoint(bucket, influxDBProperties.getOrg(), point);
+        synchronized (points) {
+            if (blockingQueue.isEmpty() && (!points.isEmpty())) {
+                writeApiBlocking.writePoints(bucket, influxDBProperties.getOrg(), points);
+                points.clear();
+            }
+        }
+
+        points.add(point);
+
         ruleChain.doProcess(mqttModbusDTO);
     }
-
 
     private Point buildPoint(MqttModbusDTO mqttModbusDTO, boolean isMqtt) {
         if (isMqtt) {

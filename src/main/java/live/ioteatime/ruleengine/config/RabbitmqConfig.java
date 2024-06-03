@@ -8,6 +8,7 @@ import com.rabbitmq.client.DeliverCallback;
 import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,6 +21,12 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 @RequiredArgsConstructor
 public class RabbitmqConfig {
+
+    @Value("${rabbitmq.queue}")
+    private String queue;
+
+    private static final String LOGGING_CONNECT = "RabbitMQ connection established";
+    private static final String LOGGING_QUEUE_ERROR = "Blocking Queue Error : {}";
 
     private final BlockingQueue<MqttModbusDTO> blockingQueue;
     private final ObjectMapper mapper;
@@ -45,9 +52,8 @@ public class RabbitmqConfig {
     public Connection getMessage() throws IOException, TimeoutException {
         connection = connectionFactory.newConnection();
         channel = connection.createChannel();
-        log.info("RabbitMQ connection established");
-        String queueName = "MessageQueue";
-        channel.queueDeclare(queueName, true, false, false, null);
+        log.info(LOGGING_CONNECT);
+        channel.queueDeclare(queue, true, false, false, null);
 
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody());
@@ -55,12 +61,12 @@ public class RabbitmqConfig {
             try {
                 blockingQueue.put(data);
             } catch (InterruptedException e) {
-                log.error("Blocking Queue Error : {}", e.getMessage());
+                log.error(LOGGING_QUEUE_ERROR, e.getMessage());
                 Thread.currentThread().interrupt();
             }
         };
 
-        channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {});
+        channel.basicConsume(queue, true, deliverCallback, consumerTag -> {});
 
         return connection;
     }
