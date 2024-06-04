@@ -1,13 +1,11 @@
 package live.ioteatime.ruleengine.config;
 
-import com.influxdb.client.WriteApiBlocking;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import live.ioteatime.ruleengine.domain.MinMaxDto;
 import live.ioteatime.ruleengine.domain.MqttModbusDTO;
 import live.ioteatime.ruleengine.domain.Outlier;
 import live.ioteatime.ruleengine.domain.TopicDto;
-import live.ioteatime.ruleengine.properties.InfluxDBProperties;
 import live.ioteatime.ruleengine.rule.Rule;
 import live.ioteatime.ruleengine.rule.RuleChain;
 import live.ioteatime.ruleengine.service.MappingTableService;
@@ -22,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 
 @Configuration
 @RequiredArgsConstructor
@@ -59,14 +56,10 @@ public class RuleConfig {
     private static final String ZERO_TYPE = "temperature";
     private static final String LOGGING_OUTLIER_STATUE = "empty outlier!";
     private static final String LOGGING_OUTLIER_TRACE = "in outlierCheck place {} | type {} | description {} | value {} | phase {}";
-    private static final String LOGGING_INFLUX_INSERT = "insert points {}";
 
     private final OutlierService outlierService;
     private final MappingTableService mappingTableService;
     private final WebClientService webClientService;
-    private final BlockingQueue<MqttModbusDTO> blockingQueue;
-    private final WriteApiBlocking writeApiBlocking;
-    private final InfluxDBProperties influxDBProperties;
     private final List<Point> points;
 
     private enum Protocol {
@@ -176,16 +169,7 @@ public class RuleConfig {
     }
 
     private void insertData(MqttModbusDTO mqttModbusDTO, RuleChain ruleChain, boolean isMqtt) {
-        String bucket = influxDBProperties.getBucket();
         Point point = buildPoint(mqttModbusDTO, isMqtt);
-
-        synchronized (points) {
-            if (blockingQueue.isEmpty() && (!points.isEmpty())) {
-                writeApiBlocking.writePoints(bucket, influxDBProperties.getOrg(), points);
-                log.info(LOGGING_INFLUX_INSERT, points.size());
-                points.clear();
-            }
-        }
 
         points.add(point);
 
