@@ -13,6 +13,13 @@ import reactor.core.publisher.Mono;
 @Component
 public class ClientAdaptor {
 
+    private static final String LOGGING_POST_RESPONSE = "post response: {}";
+    private static final String LOGGING_POST_ERROR = "send post request error: {}";
+    private static final String LOGGING_FRONT_RESPONSE = "front post response: {}";
+    private static final String LOGGING_FRONT_ERROR = "send post request error: {}";
+    private static final String LOGGING_GET_RESPONSE = "get response: {}";
+    private static final String LOGGING_GET_ERROR = "send get request error {}";
+
     @Value("${front.header.name}")
     private String headerName;
 
@@ -29,8 +36,8 @@ public class ClientAdaptor {
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(
-                        response -> log.info("post response: {}", response),
-                        error -> log.error("send post request error", error)
+                        response -> log.info(LOGGING_POST_RESPONSE, response),
+                        error -> log.error(LOGGING_POST_ERROR, error.getMessage())
                 );
     }
 
@@ -43,8 +50,8 @@ public class ClientAdaptor {
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(
-                        response -> log.info("front post response: {}", response),
-                        error -> log.error("send post request error", error)
+                        response -> log.info(LOGGING_FRONT_RESPONSE, response),
+                        error -> log.error(LOGGING_FRONT_ERROR, error.getMessage())
                 );
     }
 
@@ -54,9 +61,8 @@ public class ClientAdaptor {
                 .retrieve()
                 .bodyToMono(String.class)
                 .subscribe(
-                        response -> log.info("get response: {}", response),
-                        error -> log.error("send get request error", error)
+                        response -> log.info(LOGGING_GET_RESPONSE, response),
+                        error -> log.error(LOGGING_GET_ERROR, error.getMessage())
                 );
     }
-
 }
