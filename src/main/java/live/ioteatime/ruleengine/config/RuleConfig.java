@@ -200,13 +200,18 @@ public class RuleConfig {
     }
 
     private @NotNull TopicDto splitTopic(MqttModbusDTO mqttModbusDTO) {
-        String[] tags = mqttModbusDTO.getId().split("/");
-        String place = tags[6];
-        String type = tags[12];
-        String phase = tags[14];
-        String description = tags[16];
+        try {
+            String[] tags = mqttModbusDTO.getId().split("/");
+            String place = tags[6];
+            String type = tags[12];
+            String phase = tags[14];
+            String description = tags[16];
 
-        return new TopicDto(place, type, phase, description);
+            return new TopicDto(place, type, phase, description);
+        }catch (Exception e) {
+            log.error("not valid {}",mqttModbusDTO.getId());
+            throw new ArrayIndexOutOfBoundsException(e.getMessage());
+        }
     }
 
     private static void loggingLightState(String message) {
