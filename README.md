@@ -1,5 +1,5 @@
 # ⚙️ 룰 엔진
-<img width="1117" alt="image" src="https://github.com/nhnacademy-aiot1-5/ai-service/assets/98167706/12c79f7e-f0a5-4662-bdca-8bd58ff9c919">
+<img width="1403" alt="image" src="https://github.com/nhnacademy-aiot1-5/bridge-server/assets/98167706/f9d576bd-b7d5-462e-bbd7-c2f83f51843d">
 <br>
 <br>
 실시간 데이터 가공, 처리를 위한 서버입니다.
