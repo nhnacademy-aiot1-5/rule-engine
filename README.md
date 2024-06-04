@@ -1,34 +1,46 @@
-# <div align=center>🌱☕️ 아이오티타임(IOTEATIME) 룰 엔진(Rule-Engine)</div> 
-<div align=center>
-  
-![319399050-6d0d1fca-13ac-4d66-ae40-4962f8c3c0c5](https://github.com/nhnacademy-aiot1-5/.github/assets/98167706/3d23f643-97ba-44ad-878b-e5bab3184d3b)
+# ⚙️ 룰 엔진
+<img width="1117" alt="image" src="https://github.com/nhnacademy-aiot1-5/ai-service/assets/98167706/12c79f7e-f0a5-4662-bdca-8bd58ff9c919">
 <br>
 <br>
-👋 반갑습니다,<br>
-IOTEATIME의 룰 엔진 리포지토리입니다.
+실시간 데이터 가공, 처리를 위한 서버입니다.
 <br>
 <br>
-<br>
-<br>
+<div>
 <img src="https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white">
-<img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+<br>
+<img src="https://img.shields.io/badge/spring boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
+<br>
+<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+<img src="https://img.shields.io/badge/influxdb-22ADF6?style=for-the-badge&logo=influxdb&logoColor=white">
+<img src="https://img.shields.io/badge/redis-BF3633?style=for-the-badge&logo=redis&logoColor=white">
+<img src="https://img.shields.io/badge/rabbit mq-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white">
+<br>
 <img src="https://img.shields.io/badge/maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white">
 <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
 <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
 <img src="https://img.shields.io/badge/nhncloud-2B5CDE?style=for-the-badge&logo=cloudera&logoColor=white">
 <img src="https://img.shields.io/badge/sonarqube-4E9BCD?style=for-the-badge&logo=sonarqube&logoColor=white">
-
 </div>
 <br>
+<br>
 
+## 🛠️ 개발 내용
+### 👨‍💻 이동민
+- 추가 브릿지 프로퍼티 생성 및 삭제
+- 외부 인스턴스에 설정 파일 scp, 스크립트 실행
+- 모드 버스 매핑테이블 갱신
+- 모드버스 데이터 파싱
+- influxdb에 저장
+- 이상치 갱신 및 이상치 감지
+- 이상치 감지 프론트,API,Control 서버 전송
+- 스케줄링
+- Rabbit MQ 연결
 
-## 담당자
+### 👨‍💻 이정용
+- 이벤트 기반 처리를 위한 아키텍처 및 인터페이스 설계
+- 큐에 담긴 데이터를 룰체인에 통과시키는 데이터 핸들러 개발
+<br>
+<br>
 
-- 이동민
-- 이정용
-<div align=center>
-  
-#### 세부 아키텍처 
-  
-![image](https://github.com/nhnacademy-aiot1-5/rule-engine/assets/98167706/6644c885-936b-44a1-82b0-adc9dee81c8c)
-</div>
+## 📄 참고 자료
+![Image](https://github.com/nhnacademy-aiot1-5/study/assets/98167706/f73e5d21-b709-42e9-9f91-bd7a6b5b2de9)
