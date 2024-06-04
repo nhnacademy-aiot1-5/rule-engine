@@ -49,10 +49,10 @@ public class Scheduler {
     /**
      * 3초마다 points(데이터 리스트) 를 확인하여 들어온 데이터들 추가 데이터 있는지 확인후 한번에 insert
      */
-    @Scheduled(fixedRate = 3000)
+    @Scheduled(fixedRate = 30000)
     public void bulkInsert() {
         if (!points.isEmpty()) {
-            if (preSize == points.size()) {
+            if ((preSize == points.size()) || points.size() == 1000) {
                 synchronized (points) {
                     writeApiBlocking.writePoints(influxDBProperties.getBucket(), influxDBProperties.getOrg(), points);
                     log.info(LOGGING_INFLUX_INSERT, points.size());
