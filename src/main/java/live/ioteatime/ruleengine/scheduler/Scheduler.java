@@ -1,8 +1,11 @@
 package live.ioteatime.ruleengine.scheduler;
 
+import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.write.Point;
 import live.ioteatime.ruleengine.domain.LocalDateTimeDto;
 import live.ioteatime.ruleengine.domain.OutlierDto;
 import live.ioteatime.ruleengine.handler.MqttDataHandlerContext;
+import live.ioteatime.ruleengine.properties.InfluxDBProperties;
 import live.ioteatime.ruleengine.service.OutlierService;
 import live.ioteatime.ruleengine.util.TimeUtils;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Scheduler {
 
+    private static final String LOGGING_INFLUX_INSERT = "insert data {}";
+
     @Value("${schedule.flag}")
     private boolean cronFlag;
 
@@ -27,6 +32,10 @@ public class Scheduler {
 
     private final MqttDataHandlerContext mqttDataHandlerContext;
     private final OutlierService outlierService;
+    private final InfluxDBProperties influxDBProperties;
+    private final WriteApiBlocking writeApiBlocking;
+    private final List<Point> points;
+    int preSize;
 
     /**
      * 빈 생성시에 이상치 갱신
@@ -34,6 +43,24 @@ public class Scheduler {
     @PostConstruct
     private void firstStart() {
         outlierUpdate();
+        preSize = points.size();
+    }
+
+    /**
+     * 3초마다 points(데이터 리스트) 를 확인하여 들어온 데이터들 추가 데이터 있는지 확인후 한번에 insert
+     */
+    @Scheduled(fixedRate = 3000)
+    public void bulkInsert() {
+        if (!points.isEmpty()) {
+            if (preSize == points.size()) {
+                synchronized (points) {
+                    writeApiBlocking.writePoints(influxDBProperties.getBucket(), influxDBProperties.getOrg(), points);
+                    log.info(LOGGING_INFLUX_INSERT, points.size());
+                    points.clear();
+                }
+            }
+            preSize = points.size();
+        }
     }
 
     /**
