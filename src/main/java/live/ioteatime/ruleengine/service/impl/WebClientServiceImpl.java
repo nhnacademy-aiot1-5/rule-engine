@@ -1,10 +1,7 @@
 package live.ioteatime.ruleengine.service.impl;
 
 import live.ioteatime.ruleengine.adaptor.ClientAdaptor;
-import live.ioteatime.ruleengine.domain.MqttModbusDTO;
-import live.ioteatime.ruleengine.domain.SaveOutlierDto;
-import live.ioteatime.ruleengine.domain.SendOutlierDto;
-import live.ioteatime.ruleengine.domain.TopicDto;
+import live.ioteatime.ruleengine.domain.*;
 import live.ioteatime.ruleengine.service.WebClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +41,7 @@ public class WebClientServiceImpl implements WebClientService {
                 , mqttModbusDTO.getValue()
                 , 1);
 
-        clientAdaptor.sendPostRequestFront(url,sendOutlierDto);
+        clientAdaptor.sendPostRequestFront(url, sendOutlierDto);
     }
 
     @Override
@@ -57,12 +54,21 @@ public class WebClientServiceImpl implements WebClientService {
                 , 1
                 , 0);
 
-        clientAdaptor.sendPostRequest(url,saveOutlierDto);
+        clientAdaptor.sendPostRequest(url, saveOutlierDto);
     }
 
     @Override
-    public void lightControl(String sensorName,String flag) {
-        String url = String.format(controlUrlFormat, controlBaseUri,flag ,sensorName, devEui);
+    public void lightControl(String sensorName, String flag) {
+        String url = String.format(controlUrlFormat, controlBaseUri, flag, sensorName, devEui);
         clientAdaptor.sendGetRequest(url);
+    }
+
+    @Override
+    public void sendDooray(String endPoint, TopicDto topicDto, MqttModbusDTO mqttModbusDTO) {
+        String url = controlBaseUri + endPoint;
+        String message = topicDto.getPlace() + " | value : " + mqttModbusDTO.getValue();
+        SendDoorayRequest sendDoorayRequest = new SendDoorayRequest("이상치 알림", message);
+
+        clientAdaptor.sendPostRequest(url, sendDoorayRequest);
     }
 }
