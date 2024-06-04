@@ -59,6 +59,7 @@ public class RuleConfig {
     private static final String ZERO_TYPE = "temperature";
     private static final String LOGGING_OUTLIER_STATUE = "empty outlier!";
     private static final String LOGGING_OUTLIER_TRACE = "in outlierCheck place {} | type {} | description {} | value {} | phase {}";
+    private static final String LOGGING_INFLUX_INSERT = "insert points {}";
 
     private final OutlierService outlierService;
     private final MappingTableService mappingTableService;
@@ -181,6 +182,7 @@ public class RuleConfig {
         synchronized (points) {
             if (blockingQueue.isEmpty() && (!points.isEmpty())) {
                 writeApiBlocking.writePoints(bucket, influxDBProperties.getOrg(), points);
+                log.info(LOGGING_INFLUX_INSERT, points.size());
                 points.clear();
             }
         }
