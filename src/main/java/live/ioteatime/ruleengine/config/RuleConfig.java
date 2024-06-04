@@ -50,6 +50,9 @@ public class RuleConfig {
     @Value("${outlier.phase}")
     private String outlierPhase;
 
+    @Value("${dooray.endpoint}")
+    private String doorayEndpoint;
+
     private static final String LOGGING_LIGHT_OFF = "light control off";
     private static final String LOGGING_LIGHT_ON = "light control on";
     private static final String LOGGING_OUTLIER = "outlier! place : {}, type {} ,description : {}, value : {} , phase {}";
@@ -149,6 +152,7 @@ public class RuleConfig {
                         , topicDto.getPhase());
 
                 webClientService.lightControl(Outlier.LIGHT.getLowercase(), sensorFlag);
+                webClientService.sendDooray(doorayEndpoint, topicDto, mqttModbusDTO);
                 webClientService.sendOutlierToApi(apiEndpoint, topicDto, mqttModbusDTO);
                 webClientService.sendOutlierToFront(frontEndpoint, topicDto, mqttModbusDTO, Outlier.LIGHT.getLowercase());
 

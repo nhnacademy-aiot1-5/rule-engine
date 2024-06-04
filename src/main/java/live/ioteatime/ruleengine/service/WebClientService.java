@@ -28,4 +28,12 @@ public interface WebClientService {
      * @param flag light state , on or off
      */
     void lightControl(String sensorName, String flag);
+
+    /**
+     * 이상치 감지시 두레이를 발송하는 엔드포인트로 값 전송하는 메서드
+     * @param endPoint control 서비스
+     * @param topicDto 토픽
+     * @param mqttModbusDTO 값
+     */
+    void sendDooray(String endPoint,TopicDto topicDto, MqttModbusDTO mqttModbusDTO);
 }
