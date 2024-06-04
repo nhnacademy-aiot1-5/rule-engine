@@ -181,6 +181,7 @@ public class RuleConfig {
         synchronized (points) {
             if (blockingQueue.isEmpty() && (!points.isEmpty())) {
                 writeApiBlocking.writePoints(bucket, influxDBProperties.getOrg(), points);
+                log.info("insert points {}", points.size());
                 points.clear();
             }
         }
