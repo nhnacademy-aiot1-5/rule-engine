@@ -50,8 +50,6 @@ public class RuleConfig {
     @Value("${dooray.endpoint}")
     private String doorayEndpoint;
 
-    private static final String LOGGING_LIGHT_OFF = "light control off";
-    private static final String LOGGING_LIGHT_ON = "light control on";
     private static final String LOGGING_OUTLIER = "outlier! place : {}, type {} ,description : {}, value : {} , phase {}";
     private static final String ZERO_TYPE = "temperature";
     private static final String LOGGING_OUTLIER_STATUE = "empty outlier!";
@@ -67,22 +65,14 @@ public class RuleConfig {
     }
 
     @Bean
-    public Rule acRule() {
+    public Rule validTopic() {
         return ((mqttModbusDTO, ruleChain) -> {
-            if (mqttModbusDTO.getId().contains(sensorOccupancy)) {
-                if (mqttModbusDTO.getValue() == 0) {
-                    webClientService.lightControl(Outlier.AC.getLowercase(), "off");
-                    loggingLightState(LOGGING_LIGHT_OFF);
-                    return;
-                }
-                if (mqttModbusDTO.getValue() == 1) {
-                    webClientService.lightControl(Outlier.AC.getLowercase(), "on");
-                    loggingLightState(LOGGING_LIGHT_ON);
-                    return;
-                }
-                return;
+            try {
+                splitTopic(mqttModbusDTO);
+                ruleChain.doProcess(mqttModbusDTO);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                log.error("{} is not valid! {}", mqttModbusDTO.getId(), e.getMessage());
             }
-            ruleChain.doProcess(mqttModbusDTO);
         });
     }
 
@@ -199,22 +189,13 @@ public class RuleConfig {
         }
     }
 
-    private @NotNull TopicDto splitTopic(MqttModbusDTO mqttModbusDTO) {
-        try {
-            String[] tags = mqttModbusDTO.getId().split("/");
-            String place = tags[6];
-            String type = tags[12];
-            String phase = tags[14];
-            String description = tags[16];
+    private @NotNull TopicDto splitTopic(MqttModbusDTO mqttModbusDTO) throws ArrayIndexOutOfBoundsException {
+        String[] tags = mqttModbusDTO.getId().split("/");
+        String place = tags[6];
+        String type = tags[12];
+        String phase = tags[14];
+        String description = tags[16];
 
-            return new TopicDto(place, type, phase, description);
-        }catch (Exception e) {
-            log.error("not valid {}",mqttModbusDTO.getId());
-            throw new ArrayIndexOutOfBoundsException(e.getMessage());
-        }
-    }
-
-    private static void loggingLightState(String message) {
-        log.info(message);
+        return new TopicDto(place, type, phase, description);
     }
 }
