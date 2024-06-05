@@ -86,6 +86,7 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
         } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
         } catch (Exception e) {
+            log.warn(e.getMessage(), e);
             //ignore
         }
     }
