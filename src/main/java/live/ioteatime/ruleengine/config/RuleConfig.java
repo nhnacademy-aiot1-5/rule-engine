@@ -38,9 +38,6 @@ public class RuleConfig {
     @Value("${sensor.flag}")
     private String sensorFlag;
 
-    @Value("${sensor.occupancy}")
-    private String sensorOccupancy;
-
     @Value("${outlier.type}")
     private String outlierType;
 
