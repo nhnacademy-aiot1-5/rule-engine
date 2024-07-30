@@ -158,7 +158,9 @@ public class RuleConfig {
     private void insertData(MqttModbusDTO mqttModbusDTO, RuleChain ruleChain, boolean isMqtt) {
         Point point = buildPoint(mqttModbusDTO, isMqtt);
 
-        points.add(point);
+        synchronized (points) {
+            points.add(point);
+        }
 
         ruleChain.doProcess(mqttModbusDTO);
     }

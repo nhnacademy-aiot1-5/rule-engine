@@ -35,7 +35,6 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
     private final BlockingQueue<MqttModbusDTO> blockingQueue;
     private final RuleChain ruleChain;
     private boolean paused = false;
-    private final Object pauseLock = new Object(); // 별도의 모니터 객체
 
     /**
      * 핸들러를 생성합니다.
@@ -60,15 +59,17 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
         preProcess();
 
         while (!Thread.currentThread().isInterrupted()) {
-            synchronized (pauseLock) {
-                while (paused) {
-                    try {
-                        pauseLock.wait();
-                        log.debug(LOGGING_PAUSE_THREAD, thread.getName());
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    }
+            while (paused) {
+                try {
+                    wait();
+                    log.debug(LOGGING_PAUSE_THREAD, thread.getName());
+                } catch (InterruptedException e) {
+                    log.error(LOGGING_INTERRUPT_THREAD, thread.getName(), e);
                 }
+            }
+            if (Thread.State.WAITING.equals(thread.getState())) {
+                notifyAll();
+                log.debug(LOGGING_RESTARTING_THREAD, thread.getName());
             }
             process();
         }
@@ -87,7 +88,6 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
-            //ignore
         }
     }
 
@@ -109,18 +109,12 @@ public class MqttDataHandlerImpl implements MqttDataHandler {
 
     @Override
     public void pause() {
-        synchronized (pauseLock) {
-            paused = true;
-        }
+        paused = true;
     }
 
     @Override
     public void reStart() {
-        synchronized (pauseLock) {
-            pauseLock.notifyAll();
-            paused = false;
-            log.debug(LOGGING_RESTARTING_THREAD, thread.getName());
-        }
+        paused = false;
     }
 
     @Override
