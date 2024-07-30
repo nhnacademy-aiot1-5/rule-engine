@@ -1,14 +1,15 @@
 package live.ioteatime.ruleengine.handler.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
 import live.ioteatime.ruleengine.handler.MqttDataHandler;
 import live.ioteatime.ruleengine.handler.MqttDataHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 @Component
 @Slf4j
@@ -24,7 +25,7 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
     private final Integer totalThread;
 
     public MqttDataHandlerContextImpl(ObjectFactory<MqttDataHandler> factory,
-        @Value("${datahandler.thread.total}") Integer totalThread) {
+                                      @Value("${datahandler.thread.total}") Integer totalThread) {
         handlers = new ArrayList<>();
         this.factory = factory;
         this.totalThread = totalThread;
@@ -40,7 +41,7 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
 
     private void createHandlers() {
         IntStream.range(0, totalThread)
-                 .forEach(i -> handlers.add(factory.getObject()));
+                .forEach(i -> handlers.add(factory.getObject()));
         log.info(LOGGING_CREATE_HANDLER, handlers.size());
     }
 
@@ -48,8 +49,7 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
     public void pauseAll() {
         boolean isWait = false;
 
-        handlers.forEach(MqttDataHandler::pause);
-
+        handlers.get(0).pause();
         while (!isWait) {
             isWait = handlers.stream().allMatch(MqttDataHandler::isWait);
         }
@@ -59,7 +59,7 @@ public class MqttDataHandlerContextImpl implements MqttDataHandlerContext {
 
     @Override
     public void restartAll() {
-        handlers.forEach(MqttDataHandler::reStart);
+        handlers.get(0).reStart();
         log.info(LOGGING_RESTART_HANDLER, handlers.size());
     }
 }
