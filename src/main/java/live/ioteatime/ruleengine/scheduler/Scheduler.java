@@ -51,9 +51,9 @@ public class Scheduler {
      */
     @Scheduled(fixedRate = 3000)
     public void bulkInsert() {
-        if (!points.isEmpty()) {
-            if ((preSize == points.size()) || points.size() == 1000) {
-                synchronized (points) {
+        synchronized (points) {
+            if (!points.isEmpty()) {
+                if ((preSize == points.size()) || points.size() >= 1000) {
                     writeApiBlocking.writePoints(influxDBProperties.getBucket(), influxDBProperties.getOrg(), points);
                     log.info(LOGGING_INFLUX_INSERT, points.size());
                     points.clear();
@@ -78,9 +78,13 @@ public class Scheduler {
 
         mqttDataHandlerContext.pauseAll();
         if (cronFlag) {
-            String key = outlierRedisKey;
-            List<OutlierDto> outlier = outlierService.getOutlier(key);
-            outlierService.matchTime(outlier, localDateTimeDto);
+            try {
+                String key = outlierRedisKey;
+                List<OutlierDto> outlier = outlierService.getOutlier(key);
+                outlierService.matchTime(outlier, localDateTimeDto);
+            } catch (Exception e) {
+                log.error("redis error : {}", e.getMessage());
+            }
         }
         mqttDataHandlerContext.restartAll();
     }

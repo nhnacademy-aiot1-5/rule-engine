@@ -1,0 +1,46 @@
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyyMMdd HH:mm:ss.SSS} [%thread] %-5level [%logger{0}:%line] - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name = "outlier" class = "ch.qos.logback.core.FileAppender">
+        <file>logs/outlier.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name = "mapping" class = "ch.qos.logback.core.FileAppender">
+        <file>logs/mapping-table.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name = "all" class = "ch.qos.logback.core.FileAppender">
+        <file>logs/all.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="live.ioteatime.ruleengine.config.RuleConfig" level = "DEBUG" additivity = "false">
+        <appender-ref ref="outlier" />
+    </logger>
+    <logger name="live.ioteatime.ruleengine.service.impl.OutlierServiceImpl" level = "DEBUG" additivity = "false">
+        <appender-ref ref="outlier" />
+    </logger>
+    <logger name="live.ioteatime.ruleengine.service.impl.MappingTableServiceImpl" level = "INFO" additivity = "false">
+        <appender-ref ref="mapping" />
+    </logger>
+    <logger name="live.ioteatime.ruleengine" level = "INFO" additivity = "false">
+        <appender-ref ref="all" />
+    </logger>
+
+    <root level = "INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>
