@@ -37,8 +37,8 @@ class MqttModbusDTOHandlerContextTest {
 
         mqttDataHandlerContext.pauseAll();
 
-        verify(handler, times(total)).pause();
-        verify(handler, times(total)).isWait();
+        verify(handler).pause();
+        verify(handler,times(total)).isWait();
     }
 
     @Test
@@ -49,6 +49,6 @@ class MqttModbusDTOHandlerContextTest {
 
         mqttDataHandlerContext.restartAll();
 
-        verify(handler, times(total)).reStart();
+        verify(handler).reStart();
     }
 }
