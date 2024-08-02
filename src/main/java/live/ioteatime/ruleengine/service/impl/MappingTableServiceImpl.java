@@ -6,6 +6,7 @@ import live.ioteatime.ruleengine.repository.MappingTableRepository;
 import live.ioteatime.ruleengine.service.MappingTableService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -19,12 +20,17 @@ public class MappingTableServiceImpl implements MappingTableService {
 
     private static final String LOGGING_GET_MAPPING = "getMappingTable {}";
 
+    @Value("${mapping.flag}")
+    private boolean mappingFlag;
+
     private final ChannelsRepository channelsRepository;
     private final MappingTableRepository mappingTableRepository;
 
     @PostConstruct
     private void initQuery() {
-        this.getMappingTable();
+        if (mappingFlag) {
+            this.getMappingTable();
+        }
     }
 
     @Override
